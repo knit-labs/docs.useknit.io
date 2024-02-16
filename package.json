@@ -1,7 +1,7 @@
 {
-  "name": "nextra-docs-template",
+  "name": "Knit Docs",
   "version": "0.0.1",
-  "description": "Nextra docs template",
+  "description": "Knit Docs",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
