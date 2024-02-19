@@ -1,0 +1,7 @@
+{
+    "create-a-wallet": "Create a Wallet",
+    "get-all-wallets": "Get All Wallet",
+    "get-single-wallet": "Get Single Wallet",
+    "get-single-wallet-transactions": "Get Single Wallet Transactions",
+    "delete-single-wallet": "Delete Single Wallet"
+}
