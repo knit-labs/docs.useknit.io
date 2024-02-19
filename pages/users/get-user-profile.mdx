@@ -1,0 +1,49 @@
+<h3 style={{ display: "flex", alignItems: "center" }}>
+  # Get User Profile
+ <span
+    style={{
+      display: "block",
+      backgroundColor: "#007bff",
+      color: "#fff",
+      marginLeft: "12px",
+      padding: "2px 6px",
+      borderRadius: "4px",
+      marginTop: "14px",
+    }}
+  >
+    GET
+  </span>
+</h3>
+
+```js copy
+{{baseUrl}}/api/user
+```
+
+## Headers
+| X-API-KEY | Accept|
+|----------|----------|
+| apiKey | application/json | 
+
+
+
+## Sample Request
+```js copy filename="Sample Request"
+curl --location -g '{{baseUrl}}/api/user' \
+--header 'X-API-KEY: {{apiKey}}' \
+--header 'Accept: application/json'
+```
+
+## Sample Response
+```json copy filename="Sample Response"
+{
+    "id": "a2667393-2c6c-43c9-a288-6rt5467567",
+    "name": "User",
+    "email": "user@gmail.com",
+    "email_verified_at": null,
+    "webhookUrl": "https://webhook.site/34b47e",
+    "createAt": "2024-02-17T16:25:47.000000Z",
+    "updateAt": "2024-02-17T18:02:06.000000Z"
+}
+```
+
+

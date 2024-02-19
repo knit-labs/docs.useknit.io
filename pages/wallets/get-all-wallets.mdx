@@ -1,0 +1,51 @@
+<h3 style={{ display: "flex", alignItems: "center" }}>
+  # Get All Wallets
+ <span
+    style={{
+      display: "block",
+      backgroundColor: "#007bff",
+      color: "#fff",
+      marginLeft: "12px",
+      padding: "2px 6px",
+      borderRadius: "4px",
+      marginTop: "14px",
+    }}
+  >
+    GET
+  </span>
+</h3>
+
+```js copy
+{{baseUrl}}/api/wallets
+```
+
+## Headers
+| X-API-KEY | Accept|
+|----------|----------|
+| apiKey | application/json | 
+
+
+## Sample Request
+```js copy filename="Sample Request"
+curl --location -g '{{baseUrl}}/api/wallets' \
+--header 'X-API-KEY: {{apiKey}}' \
+--header 'Accept: application/json'
+```
+
+## Sample Response
+```json copy filename="Sample Response"
+[
+    {
+        "id": "134a9423-0524-4dfc-85b0-057567",
+        "userId": "a2667393-2c6c-43c9-5676-ty657",
+        "network": "ETHEREUM_MAINNET",
+        "networkId": "ETHEREUM_MAINNET",
+        "address": "0x7294f90403c2ec2ae1b0d56546xdf5675676765",
+        "isActive": true,
+        "createAt": "2024-02-17T18:01:13.000000Z",
+        "updateAt": "2024-02-17T18:01:13.000000Z"
+    }
+]
+```
+
+

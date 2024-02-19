@@ -1,0 +1,41 @@
+<h3 style={{ display: "flex", alignItems: "center" }}>
+  # Get Single Wallet Transactions
+ <span
+    style={{
+      display: "block",
+      backgroundColor: "#007bff",
+      color: "#fff",
+      marginLeft: "12px",
+      padding: "2px 6px",
+      borderRadius: "4px",
+      marginTop: "14px",
+    }}
+  >
+    GET
+  </span>
+</h3>
+
+```js copy
+{{baseUrl}}/api/wallets/:id/transactions
+```
+
+## Headers
+| X-API-KEY | Accept|
+|----------|----------|
+| apiKey | application/json | 
+
+## Path Variables
+| id| 
+|----------|
+| 134a9423-0524-4dfc-85b0-06513841d7a2 | 
+
+## Sample Request
+```js copy filename="Sample Request"
+curl --location -g '{{baseUrl}}/api/wallets/134a9423-0524-4dfc-85b0-06513841d7a2/transactions' \
+--header 'X-API-KEY: {{apiKey}}' \
+--header 'Accept: application/json'
+```
+
+
+
+

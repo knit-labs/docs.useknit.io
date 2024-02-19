@@ -1,7 +1,7 @@
 {
   "index": "Introduction",
-  "another": "Another Page",
-  "advanced": "Advanced (A Folder)",
+  "wallets": "Wallets", 
+  "users": "Users",
   "about": {
     "title": "About",
     "type": "page"

@@ -1,0 +1,40 @@
+<h3 style={{ display: "flex", alignItems: "center" }}>
+  # Delete Single Wallet
+ <span
+    style={{
+      display: "block",
+      backgroundColor: "#007bff",
+      color: "#fff",
+      marginLeft: "12px",
+      padding: "2px 6px",
+      borderRadius: "4px",
+      marginTop: "14px",
+    }}
+  >
+    DELETE
+  </span>
+</h3>
+
+```js copy
+{{baseUrl}}/api/wallets/:id
+```
+
+## Headers
+| X-API-KEY | Accept|
+|----------|----------|
+| apiKey | application/json | 
+
+## Path Variables
+| id| 
+|----------|
+| bf81f144-efca-422a-aed7-bf7bf52da26b | 
+
+## Sample Request
+```js copy filename="Sample Request"
+curl --location -g --request DELETE '{{baseUrl}}/api/wallets/bf81f144-efca-422a-aed7-bf7bf52da26b' \
+--header 'X-API-KEY: {{apiKey}}' \
+--header 'Accept: application/json'
+```
+
+
+
