@@ -1,5 +1,6 @@
 {
   "index": "Introduction",
   "wallets": "Wallets", 
-  "users": "Users"
+  "user": "User",
+  "collections": "Collections"
 }
