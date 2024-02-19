@@ -1,6 +1,6 @@
 {
   "name": "Knit Docs",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Knit Docs",
   "scripts": {
     "dev": "next dev",
