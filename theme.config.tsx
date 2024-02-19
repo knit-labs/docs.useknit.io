@@ -10,12 +10,10 @@ const config: DocsThemeConfig = {
       <span className="text-gray-600 font-normal hidden md:inline"></span>
     </React.Fragment>
   ),
-  project: {
-    link: "https://github.com/gbxnga/docs.useknit.io",
-  },
-  chat: {
-    link: "https://discord.com",
-  },
+  // project: {
+  //   link: "https://github.com/gbxnga/docs.useknit.io",
+  // },
+
   docsRepositoryBase: "https://github.com/gbxnga/docs.useknit.io",
   footer: {
     text: "Knit",
