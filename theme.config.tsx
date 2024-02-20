@@ -1,8 +1,8 @@
 import React from "react";
 import { DocsThemeConfig } from "nextra-theme-docs";
-
 import { useRouter } from "next/router";
 import { useConfig } from "nextra-theme-docs";
+import Footer from "./components/Footer/Footer";
 
 export default {
   head: () => {
@@ -39,16 +39,20 @@ export default {
 
   docsRepositoryBase: "https://github.com/gbxnga/docs.useknit.io",
   footer: {
-    text: "Knit",
+    text: (
+      <div style={{ width: "100%" }}>
+        <Footer />
+      </div>
+    ),
   },
   useNextSeoProps() {
-    const { asPath } = useRouter()
-    if (asPath !== '/') {
+    const { asPath } = useRouter();
+    if (asPath !== "/") {
       return {
-        titleTemplate: '%s – KNIT'
-      }
+        titleTemplate: "%s – KNIT",
+      };
     }
-  }
+  },
 };
 
 // export default config;
