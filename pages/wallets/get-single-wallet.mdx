@@ -6,10 +6,26 @@ Knit API is designed to facilitate the interaction with cryptocurrency wallets, 
 
 #### Get Single Wallet
 
-##### Endpoint
+<div style={{ display: "flex", alignItems: "center" }}>
+  ##### Endpoint
+  <span
+    style={{
+      display: "block",
+      backgroundColor: "#ebfbfa",
+      color: "#194d53",
+      marginLeft: "-17px",
+      padding: "0px 6px",
+      fontSize: ".8rem",
+      borderRadius: "5px",
+      marginTop: "30px",
+    }}
+  >
+    GET
+  </span>
+</div>
 
 ```js copy
-GET \{\{baseUrl\}\}/api/wallets/:id
+ {{baseUrl}}/api/wallets/:id
 ```
 
 Access detailed information for a specific wallet by specifying its unique identifier. This endpoint is crucial for applications needing to display or manipulate the data of a particular wallet, including transaction history, balance checks, and asset management.

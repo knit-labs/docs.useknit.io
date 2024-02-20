@@ -6,10 +6,26 @@ Knit API allows users to create digital currency wallets, supporting a variety o
 
 #### Create a Wallet
 
-##### Endpoint
+<div style={{ display: "flex", alignItems: "center" }}>
+  ##### Endpoint
+  <span
+    style={{
+      display: "block",
+      backgroundColor: "#fff9eb",
+      color: "#d0a626",
+      marginLeft: "-17px",
+      padding: "0px 6px",
+      fontSize: ".8rem",
+      borderRadius: "5px",
+      marginTop: "30px",
+    }}
+  >
+    POST
+  </span>
+</div>
 
 ```js copy
-POST {{baseUrl}}/api/wallets
+{{baseUrl}}/api/wallets
 ```
 
 This endpoint creates a new wallet for a specified blockchain network. It supports multiple networks, allowing for flexibility in managing different cryptocurrencies.
