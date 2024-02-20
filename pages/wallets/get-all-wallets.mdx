@@ -1,39 +1,37 @@
-<h3 style={{ display: "flex", alignItems: "center" }}>
-  # Get All Wallets
- <span
-    style={{
-      display: "block",
-      backgroundColor: "#007bff",
-      color: "#fff",
-      marginLeft: "12px",
-      padding: "2px 6px",
-      borderRadius: "4px",
-      marginTop: "14px",
-    }}
-  >
-    GET
-  </span>
-</h3>
+### Wallets API Documentation
 
-```js copy
-{{baseUrl}}/api/wallets
-```
+#### Overview
 
-## Headers
-| X-API-KEY | Accept|
-|----------|----------|
-| apiKey | application/json | 
+The Wallets API provides a straightforward way for applications to interact with users' digital currency wallets. This section of the API focuses on retrieving a comprehensive list of all wallets associated with a user, making it easier to manage and access various cryptocurrency assets.
 
+#### Get All Wallets
 
-## Sample Request
-```js copy filename="Sample Request"
+##### Endpoint
+
+GET \{\{baseUrl\}\}/api/wallets
+
+This endpoint fetches a list of all wallets created by the user, across all supported blockchain networks. It's an essential tool for applications that need to display or manage users' cryptocurrency portfolios.
+
+##### Headers
+
+- X-API-KEY: Your unique API key for authentication.
+- Accept: Set to application/json to ensure the response is in JSON format.
+
+##### Sample Request
+
+To retrieve all wallets, use the following curl command:
+
+```sh
 curl --location -g '{{baseUrl}}/api/wallets' \
 --header 'X-API-KEY: {{apiKey}}' \
 --header 'Accept: application/json'
 ```
 
-## Sample Response
-```json copy filename="Sample Response"
+##### Sample Response
+
+The response includes an array of wallet objects. Each object contains detailed information about the wallet, including its ID, associated user ID, network, address, and activation status:
+
+```json
 [
     {
         "id": "134a9423-0524-4dfc-85b0-057567",
@@ -43,9 +41,13 @@ curl --location -g '{{baseUrl}}/api/wallets' \
         "address": "0x7294f90403c2ec2ae1b0d56546xdf5675676765",
         "isActive": true,
         "createAt": "2024-02-17T18:01:13.000000Z",
-        "updateAt": "2024-02-17T18:01:13.000000Z"
-    }
-]
+        "updateAt": "2024-02-17T18:01:13.000000Z
+"CreateAt": "2024-02-17T18:01:13.000000Z"
+}
 ```
 
+#### Description
 
+The "Get All Wallets" API endpoint is a critical component for applications requiring a holistic view of a user's digital currency portfolio. By calling this endpoint, developers can retrieve a list of all wallets a user has created, enabling comprehensive management and oversight of various cryptocurrency assets. This functionality is crucial for applications that provide financial insights, asset management, or transactional capabilities across multiple blockchain networks.
+
+The returned data includes essential wallet details such as the unique identifier, user association, network specifics, and the wallet's current status, ensuring applications have the necessary information to support user interactions effectively. Utilizing this API, developers can enhance their applications' user experience by providing detailed and up-to-date information on their cryptocurrency holdings.

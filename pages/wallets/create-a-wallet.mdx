@@ -1,54 +1,55 @@
-<h3 style={{ display: "flex", alignItems: "center" }}>
-  # Create A Wallet
- <span
-    style={{
-      display: "block",
-      backgroundColor: "#007bff",
-      color: "#fff",
-      marginLeft: "12px",
-      padding: "2px 6px",
-      borderRadius: "4px",
-      marginTop: "14px",
-    }}
-  >
-    POST
-  </span>
-</h3>
+### Wallets API Documentation
 
-```js copy
-{{baseUrl}}/api/wallets
-```
+#### Overview
 
-## Possible Network Values
+The Wallets API allows users to create digital currency wallets, supporting a variety of blockchain networks. This powerful feature enables seamless integration of cryptocurrency functionalities into your application, ensuring users can safely manage their digital assets.
 
-<br />
-<mark style={{background: "#f0f0f0"}}>BITCOIN_MAINNET</mark> <mark style={{background: "#f0f0f0"}}>ETHEREUM_MAINNET</mark> 
+#### Create a Wallet
 
-## Headers
-| X-API-KEY | Accept|
-|----------|----------|
-| apiKey | application/json | 
+##### Endpoint
 
-### Body
+POST \{\{baseUrl\}\}/api/wallets
 
-```json copy filename="json"
+This endpoint creates a new wallet for a specified blockchain network. It supports multiple networks, allowing for flexibility in managing different cryptocurrencies.
+
+##### Supported Networks
+
+- BITCOIN_MAINNET: For operations on the Bitcoin main network.
+- ETHEREUM_MAINNET: For activities on the Ethereum main network.
+
+##### Headers
+
+- X-API-KEY: Your API key for authentication.
+- Accept: Set to application/json to receive responses in JSON format.
+
+##### Request Body
+
+The request body must be in JSON format specifying the network for which the wallet is being created:
+
+```json
 {
     "network": "ETHEREUM_MAINNET"
 }
 ```
 
-## Sample Request
-```js copy filename="Sample Request"
+##### Sample Request
+
+Here's a curl example to create a wallet on the Ethereum main network:
+
+```sh
 curl --location -g '{{baseUrl}}/api/wallets' \
 --header 'X-API-KEY: {{apiKey}}' \
 --header 'Accept: application/json' \
---data '{
+--data-raw '{
     "network": "ETHEREUM_MAINNET"
 }'
 ```
 
-## Sample Response
-```json copy filename="Sample Response"
+##### Sample Response
+
+A successful request returns the newly created wallet's details, including its unique ID, network information, and addresses:
+
+```json
 {
     "userId": "a2667393-2c6c-43c9-a288-665576",
     "network": "ETHEREUM_MAINNET",
@@ -60,4 +61,6 @@ curl --location -g '{{baseUrl}}/api/wallets' \
 }
 ```
 
+#### Description
 
+This API is designed for developers looking to integrate wallet functionalities into their applications or services. It provides an easy-to-use interface for creating wallets on various blockchain networks, thus facilitating the secure management of digital assets. By leveraging this API, developers can offer their users a robust tool for cryptocurrency transactions and asset management.
