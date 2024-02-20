@@ -1,14 +1,16 @@
-### Wallets API Documentation
+### Knit API Documentation
 
 #### Overview
 
-The Wallets API provides a straightforward way for applications to interact with users' digital currency wallets. This section of the API focuses on retrieving a comprehensive list of all wallets associated with a user, making it easier to manage and access various cryptocurrency assets.
+Knit API provides a straightforward way for applications to interact with users' digital currency wallets. This section of the API focuses on retrieving a comprehensive list of all wallets associated with a user, making it easier to manage and access various cryptocurrency assets.
 
 #### Get All Wallets
 
 ##### Endpoint
 
+```js copy
 GET \{\{baseUrl\}\}/api/wallets
+```
 
 This endpoint fetches a list of all wallets created by the user, across all supported blockchain networks. It's an essential tool for applications that need to display or manage users' cryptocurrency portfolios.
 
@@ -41,9 +43,10 @@ The response includes an array of wallet objects. Each object contains detailed 
         "address": "0x7294f90403c2ec2ae1b0d56546xdf5675676765",
         "isActive": true,
         "createAt": "2024-02-17T18:01:13.000000Z",
-        "updateAt": "2024-02-17T18:01:13.000000Z
-"CreateAt": "2024-02-17T18:01:13.000000Z"
-}
+        "updateAt": "2024-02-17T18:01:13.000000Z",
+        "CreateAt": "2024-02-17T18:01:13.000000Z"
+    }
+]
 ```
 
 #### Description
