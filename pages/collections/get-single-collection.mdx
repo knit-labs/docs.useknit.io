@@ -1,0 +1,68 @@
+<h3 style={{ display: "flex", alignItems: "center" }}>
+  # Get Single Collection
+ <span
+    style={{
+      display: "block",
+      backgroundColor: "#007bff",
+      color: "#fff",
+      marginLeft: "12px",
+      padding: "2px 6px",
+      borderRadius: "4px",
+      marginTop: "14px",
+    }}
+  >
+    GET
+  </span>
+</h3>
+
+```js copy
+{{baseUrl}}/api/collections/:id
+```
+
+## Headers
+| X-API-KEY | Accept|
+|----------|----------|
+| apiKey | application/json | 
+
+## Path Variables
+| id| 
+|----------|
+| 134a9423-0524-4dfc-85b0-06513841d7a2 | 
+
+
+## Sample Request
+```sh copy filename="Sample Request"
+curl --location -g '{{baseUrl}}/api/collections/90f8fb6c-ca98-46f3-a76f-c28b316b4b80' \
+--header 'X-API-KEY: {{apiKey}}' \
+--header 'Accept: application/json'
+```
+
+## Sample Response
+```json copy filename="Sample Response"
+[
+    {
+        "id": "7470f8a2-17e2-4b37-95c1-d345345435",
+        "userId": "a2667393-2c6c-43c9-a288-454354535435",
+        "network": "POLYGON_MAINNET",
+        "token": "USDT",
+        "address": "0x543ca331029406a4ad0tre5et554e447b28c6fc4",
+        "tokenAmount": "0.100000000000000000",
+        "tokenToUsd": null,
+        "fiatExchangeRateToUsd": null,
+        "fiatAmountInUsd": null,
+        "fiatAmount": null,
+        "fiatAmountCurrency": null,
+        "status": null,
+        "transactionHash": null,
+        "transactionBlockNumber": null,
+        "numberOfConfirmations": null,
+        "merchantRedirectUrl": "https://example.com",
+        "merchantCallbackUrl": "https://example.com",
+        "expiresAt": null,
+        "createdAt": "2024-02-20T20:18:17.000000Z",
+        "updatedAt": "2024-02-20T20:18:17.000000Z"
+    }
+]
+```
+
+
