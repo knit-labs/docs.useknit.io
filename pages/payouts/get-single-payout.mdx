@@ -1,9 +1,5 @@
 ### Knit API Documentation
 
-#### Overview
-
-Knit API is designed to facilitate the interaction with cryptocurrency wallets, providing a secure and efficient way to manage digital assets. This particular endpoint focuses on retrieving detailed information for a single wallet, making it invaluable for operations that require specific wallet data.
-
 #### Get Single Payout
 
 <div style={{ display: "flex", alignItems: "center" }}>
@@ -39,8 +35,6 @@ Knit API is designed to facilitate the interaction with cryptocurrency wallets, 
 
 ##### Sample Request
 
-Below is an example of how to retrieve a single wallet using curl:
-
 ```sh
 curl --location -g '{{baseUrl}}/api/payouts/b0056f97-bfba-499b-a490-990a058abd30' \
 --header 'X-API-KEY: {{apiKey}}' \
@@ -70,10 +64,3 @@ curl --location -g '{{baseUrl}}/api/payouts/b0056f97-bfba-499b-a490-990a058abd30
     "message": "Payout fetched successfully"
 }
 ```
-
-
-#### Description
-
-The "Get Single Wallet" endpoint is a targeted API call that allows for the retrieval of comprehensive details regarding a specific wallet. This capability is essential for applications requiring precise information to facilitate user interactions, such as transferring assets, querying transaction histories, or simply displaying wallet details within a user interface.
-
-By leveraging this API, developers can ensure their applications are equipped to handle user requests accurately and efficiently, thereby enhancing the overall user experience. This endpoint underscores the flexibility and power of the Wallets API in supporting a wide range of cryptocurrency management functionalities.
