@@ -1,0 +1,99 @@
+### Knit API Documentation
+
+#### Overview
+
+Knit API allows users to create digital currency wallets, supporting a variety of blockchain networks. This powerful feature enables seamless integration of cryptocurrency functionalities into your application, ensuring users can safely manage their digital assets.
+
+#### Create a single Payout 
+
+<div style={{ display: "flex", alignItems: "center" }}>
+  ##### Endpoint
+  <span
+    style={{
+      display: "block",
+      backgroundColor: "#fff9eb",
+      color: "#d0a626",
+      marginLeft: "-17px",
+      padding: "0px 6px",
+      fontSize: ".8rem",
+      borderRadius: "5px",
+      marginTop: "30px",
+    }}
+  >
+    POST
+  </span>
+</div>
+
+```js copy
+{{baseUrl}}/api/payouts
+```
+
+This endpoint creates a new wallet for a specified blockchain network. It supports multiple networks, allowing for flexibility in managing different cryptocurrencies.
+
+##### Supported Networks
+
+- BITCOIN_MAINNET: For operations on the Bitcoin main network.
+- ETHEREUM_MAINNET: For activities on the Ethereum main network.
+- POLYGON_MAINNET: For activities on the Polygon main network 
+- TRON_MAINNET: For activities on the Tron main network 
+    
+##### Headers
+
+- X-API-KEY: Your API key for authentication.
+- Accept: Set to application/json to receive responses in JSON format.
+
+##### Request Body
+
+The request body must be in JSON format specifying the network for which the wallet is being created:
+
+```json
+{
+    "network": "MATIC_MAINNET",
+    "token": "USDT",
+    "amount": 0.02,
+    "toAddress": "0x56adfcc254ab3b8142a275c1837bcffaff5aa38b"
+}
+```
+
+##### Sample Request
+
+Here's a curl example to create a wallet on the Ethereum main network:
+
+```sh copy
+curl --location -g '{{baseUrl}}/api/payouts' \
+--header 'X-API-KEY: {{apiKey}}' \
+--header 'Accept: application/json' \
+--data '{
+    "network": "MATIC_MAINNET",
+    "token": "USDT",
+    "amount": 0.02,
+    "toAddress": "0x56adfcc254ab3b8142a275c1837bcffaff5aa38b"
+}'
+```
+
+##### Sample Response
+
+A successful request returns the newly created wallet's details, including its unique ID, network information, and addresses:
+
+```json
+{
+    "success": true,
+    "status": 201,
+    "data": {
+        "amount": 0.02,
+        "token": "USDT",
+        "toAddress": "0x56adfcc254ab3b8142a275c18t56465656xx",
+        "network": "MATIC_MAINNET",
+        "userId": "a2667393-2c6c-43c9-a288-6167e5jk8908",
+        "payoutWalletId": "c7ddb254-5da1-4136-b19e-733a00a31c70",
+        "id": "b0056f97-bfba-499b-a490-990a058abd30",
+        "updatedAt": "2024-02-22T14:16:53.000000Z",
+        "createdAt": "2024-02-22T14:16:53.000000Z"
+    },
+    "message": "Payout created successfully"
+}
+```
+
+#### Description
+
+This API is designed for developers looking to integrate wallet functionalities into their applications or services. It provides an easy-to-use interface for creating wallets on various blockchain networks, thus facilitating the secure management of digital assets. By leveraging this API, developers can offer their users a robust tool for cryptocurrency transactions and asset management.
