@@ -1,0 +1,43 @@
+### Knit API Documentation
+
+#### Delete Payout 
+
+<div style={{ display: "flex", alignItems: "center" }}>
+  ##### Endpoint
+  <span
+    style={{
+      display: "block",
+      backgroundColor: "#f9f5f6",
+      color: "#fc697a",
+      marginLeft: "-17px",
+      padding: "0px 6px",
+      fontSize: ".8rem",
+      borderRadius: "5px",
+      marginTop: "30px",
+    }}
+  >
+    GET
+  </span>
+</div>
+
+```js copy
+ {{baseUrl}}/api/payouts/:id
+```
+
+##### Headers
+
+- X-API-KEY: Your API key, which authorizes the request.
+- Accept: Set to application/json to receive the response in JSON format.
+
+##### Path Variables
+
+- id: The unique identifier of the wallet you wish to retrieve information for. This should be replaced with the actual wallet ID in your request.
+
+##### Sample Request
+
+
+```sh copy 
+curl --location -g --request DELETE '{{baseUrl}}/api/payouts/bf81f144-efca-422a-aed7-bf7bf52da26b' \
+--header 'X-API-KEY: {{apiKey}}' \
+--header 'Accept: application/json'
+```
