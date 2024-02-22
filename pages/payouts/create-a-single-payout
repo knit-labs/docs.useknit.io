@@ -28,8 +28,6 @@ Knit API allows users to create digital currency wallets, supporting a variety o
 {{baseUrl}}/api/payouts
 ```
 
-This endpoint creates a new wallet for a specified blockchain network. It supports multiple networks, allowing for flexibility in managing different cryptocurrencies.
-
 ##### Supported Networks
 
 - BITCOIN_MAINNET: For operations on the Bitcoin main network.
@@ -44,8 +42,6 @@ This endpoint creates a new wallet for a specified blockchain network. It suppor
 
 ##### Request Body
 
-The request body must be in JSON format specifying the network for which the wallet is being created:
-
 ```json
 {
     "network": "MATIC_MAINNET",
@@ -56,8 +52,6 @@ The request body must be in JSON format specifying the network for which the wal
 ```
 
 ##### Sample Request
-
-Here's a curl example to create a wallet on the Ethereum main network:
 
 ```sh copy
 curl --location -g '{{baseUrl}}/api/payouts' \
@@ -72,8 +66,6 @@ curl --location -g '{{baseUrl}}/api/payouts' \
 ```
 
 ##### Sample Response
-
-A successful request returns the newly created wallet's details, including its unique ID, network information, and addresses:
 
 ```json
 {
