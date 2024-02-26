@@ -1,35 +1,40 @@
-<h3 style={{ display: "flex", alignItems: "center" }}>
-  # Create A Collection
- <span
+### Knit API Documentation
+
+#### Create A Collection
+
+<div style={{ display: "flex", alignItems: "center" }}>
+  ##### Endpoint
+  <span
     style={{
       display: "block",
-      backgroundColor: "#007bff",
-      color: "#fff",
-      marginLeft: "12px",
-      padding: "2px 6px",
-      borderRadius: "4px",
-      marginTop: "14px",
+      backgroundColor: "#fff9eb",
+      color: "#d0a626",
+      marginLeft: "-17px",
+      padding: "0px 6px",
+      fontSize: ".8rem",
+      borderRadius: "5px",
+      marginTop: "30px",
     }}
   >
     POST
   </span>
-</h3>
+</div>
 
 ```js copy
 {{baseUrl}}/api/collections
 ```
 
-## Possible Network Values
+##### Supported Networks
 
-<br />
-<mark style={{background: "#f0f0f0"}}>BITCOIN_MAINNET</mark> <mark style={{background: "#f0f0f0"}}>ETHEREUM_MAINNET</mark> <mark style={{background: "#f0f0f0"}}>POLYGON_MAINNET</mark>  <mark style={{background: "#f0f0f0"}}>TRON_MAINNET</mark> 
+- BITCOIN_MAINNET: For operations on the Bitcoin main network.
+- ETHEREUM_MAINNET: For activities on the Ethereum main network.
+    
+##### Headers
 
-## Headers
-| X-API-KEY | Accept|
-|----------|----------|
-| apiKey | application/json | 
+- X-API-KEY: Your API key for authentication.
+- Accept: Set to application/json to receive responses in JSON format.
 
-### Body
+##### Request Body
 
 ```json copy filename="json"
 {
@@ -41,8 +46,9 @@
 }
 ```
 
-## Sample Request
-```js copy filename="Sample Request"
+##### Sample Request
+
+```sh copy filename="Sample Request"
 curl --location -g '{{baseUrl}}/api/collections' \
 --header 'X-API-KEY: {{apiKey}}' \
 --header 'Accept: application/json' \
@@ -55,7 +61,8 @@ curl --location -g '{{baseUrl}}/api/collections' \
 }'
 ```
 
-## Sample Response
+##### Sample Response
+
 ```json copy filename="Sample Response"
 {
     "token": "USDT",
@@ -70,5 +77,4 @@ curl --location -g '{{baseUrl}}/api/collections' \
     "createdAt": "2024-02-19T20:06:33.000000Z"
 }
 ```
-
 
