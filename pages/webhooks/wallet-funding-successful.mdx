@@ -1,0 +1,37 @@
+### Knit API Documentation
+
+#### Wallet Funding Successful
+
+##### Sample Response
+
+```json copy filename="Sample Response"
+{
+  "body": {
+    "eventType": "WALLET_FUNDING_SUCCESSFUL",
+    "wallet": {
+      "id": "3db04cff-3ea7-4387-891f-c1657a02a272",
+      "userId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
+      "network": "TRON_MAINNET",
+      "networkId": "MATIC_MAINNET",
+      "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+      "isActive": true,
+      "createdAt": "2024-02-22T17:12:50.000000Z",
+      "updatedAt": "2024-02-22T17:12:50.000000Z"
+    },
+    "transaction": {
+      "id": "b147db2c-4861-4fa5-9dff-086d6e06d116",
+      "walletId": "3db04cff-3ea7-4387-891f-c1657a02a272",
+      "network": "MATIC_MAINNET",
+      "token": "USDT",
+      "fromAddress": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+      "toAddress": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+      "value": "250.00000000",
+      "numberOfConfirmations": 1,
+      "status": "SUCCESSFUL",
+      "transactionHash": "6c3db59292c98c2a2c14f820",
+      "createdAt": "2024-02-23T16:44:49.000000Z",
+      "updatedAt": "2024-02-23T16:44:49.000000Z"
+    }
+  }
+}
+```

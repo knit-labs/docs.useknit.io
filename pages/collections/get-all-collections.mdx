@@ -41,30 +41,35 @@ curl --location -g '{{baseUrl}}/api/collections' \
 ##### Sample Response
 
 ```json copy filename="Sample Response"
-[
-    {
-        "id": "7470f8a2-17e2-4b37-95c1-d345345435",
-        "userId": "a2667393-2c6c-43c9-a288-454354535435",
-        "network": "POLYGON_MAINNET",
-        "token": "USDT",
-        "address": "0x543ca331029406a4ad0tre5et554e447b28c6fc4",
-        "tokenAmount": "0.100000000000000000",
-        "tokenToUsd": null,
-        "fiatExchangeRateToUsd": null,
-        "fiatAmountInUsd": null,
-        "fiatAmount": null,
-        "fiatAmountCurrency": null,
-        "status": null,
-        "transactionHash": null,
-        "transactionBlockNumber": null,
-        "numberOfConfirmations": null,
-        "merchantRedirectUrl": "https://example.com",
-        "merchantCallbackUrl": "https://example.com",
-        "expiresAt": null,
-        "createdAt": "2024-02-20T20:18:17.000000Z",
-        "updatedAt": "2024-02-20T20:18:17.000000Z"
-    }
-]
+{
+    "success": true,
+    "status": 200,
+    "message": "Collections fetched successfully",
+    "data": [
+        {
+            "id": "6148d258-ba65-4240-b283-d7c1abc7363d",
+            "userId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
+            "network": "MATIC_MAINNET",
+            "token": "USDT",
+            "address": "0xdb664b89191eb50e0b45d7516c1adc2fcc327746",
+            "tokenAmount": "25.000000000000000000",
+            "tokenToUsd": null,
+            "fiatExchangeRateToUsd": null,
+            "fiatAmountInUsd": null,
+            "fiatAmount": null,
+            "fiatAmountCurrency": null,
+            "status": "PENDING",
+            "transactionHash": null,
+            "transactionBlockNumber": null,
+            "numberOfConfirmations": null,
+            "merchantRedirectUrl": "https://example.com",
+            "merchantCallbackUrl": "https://example.com",
+            "expiresAt": "2024-02-26T14:24:15.000000Z",
+            "createdAt": "2024-02-26T13:54:15.000000Z",
+            "updatedAt": "2024-02-26T13:54:15.000000Z"
+        },
+    ]
+}
 ```
 
 

@@ -65,16 +65,23 @@ curl --location -g '{{baseUrl}}/api/collections' \
 
 ```json copy filename="Sample Response"
 {
-    "token": "USDT",
-    "tokenAmount": 0.1,
-    "network": "POLYGON_MAINNET",
-    "merchantRedirectUrl": "https://example.com",
-    "merchantCallbackUrl": "https://example.com",
-    "userId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
-    "address": "0x26e56203bc64ac699b17619b915e12f672b25314",
-    "id": "137d853e-781e-413d-9901-34f0e0a84408",
-    "updatedAt": "2024-02-19T20:06:33.000000Z",
-    "createdAt": "2024-02-19T20:06:33.000000Z"
+    "success": true,
+    "status": 201,
+    "data": {
+        "token": "USDT",
+        "tokenAmount": 25,
+        "network": "MATIC_MAINNET",
+        "merchantRedirectUrl": "https://example.com",
+        "merchantCallbackUrl": "https://example.com",
+        "userId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
+        "address": "0xdb664b89191eb50e0b45d7516c1adc2fcc327746",
+        "status": "PENDING",
+        "expiresAt": "2024-02-26T14:24:15.000000Z",
+        "id": "6148d258-ba65-4240-b283-d7c1abc7363d",
+        "updatedAt": "2024-02-26T13:54:15.000000Z",
+        "createdAt": "2024-02-26T13:54:15.000000Z"
+    },
+    "message": "Collection created successfully"
 }
 ```
 

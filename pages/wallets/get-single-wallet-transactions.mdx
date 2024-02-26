@@ -41,3 +41,28 @@ curl --location -g '{{baseUrl}}/api/wallets/134a9423-0524-4dfc-85b0-06513841d7a2
 --header 'Accept: application/json'
 ```
 
+##### Sample Response
+
+```json copy filename="Sample Request"
+{
+  "success": true,
+  "message": "Wallet Transactions fetched successfully",
+  "status": 200,
+  "data": [
+    {
+      "id": "75229581-5709-4b0a-886d-12ea1328e6a7",
+      "walletId": "3cb5ace1-5a1a-4ad0-b748-d1a8a6edf97f",
+      "network": "MATIC_MAINNET",
+      "token": "USDT",
+      "fromAddress": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+      "toAddress": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+      "value": "1.00000000",
+      "numberOfConfirmations": 1,
+      "status": "SUCCESSFUL",
+      "transactionHash": "0xa8ba7949431a95f71430ae6ce30aa5c2e488e6206996",
+      "createdAt": "2024-02-23T18:20:40.000000Z",
+      "updatedAt": "2024-02-23T18:20:40.000000Z"
+    }
+  ]
+}
+```

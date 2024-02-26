@@ -54,7 +54,7 @@ The request body must be in JSON format specifying the network for which the wal
 
 Here's a curl example to create a wallet on the Ethereum main network:
 
-```sh
+```sh copy
 curl --location -g '{{baseUrl}}/api/wallets' \
 --header 'X-API-KEY: {{apiKey}}' \
 --header 'Accept: application/json' \
@@ -67,15 +67,20 @@ curl --location -g '{{baseUrl}}/api/wallets' \
 
 A successful request returns the newly created wallet's details, including its unique ID, network information, and addresses:
 
-```json
+```json copy filename="Sample Response"
 {
-    "userId": "a2667393-2c6c-43c9-a288-665576",
-    "network": "ETHEREUM_MAINNET",
-    "networkId": "ETHEREUM_MAINNET",
-    "address": "0x7294f90403c2ec2ae1676280097fe3be96676",
-    "id": "134a9423-0524-4dfc-85b0-0667676",
-    "updateAt": "2024-02-17T18:01:13.000000Z",
-    "createAt": "2024-02-17T18:01:13.000000Z"
+    "success": true,
+    "message": "Wallet created successfully",
+    "status": 201,
+    "data": {
+        "userId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
+        "network": "ETHEREUM_MAINNET",
+        "networkId": "ETHEREUM_MAINNET",
+        "address": "0x1adb0a39bde00fa0957e519584cb5c51fefcb37f",
+        "id": "d95143d2-c076-49da-b121-b3beed054bf3",
+        "updatedAt": "2024-02-26T13:59:19.000000Z",
+        "createdAt": "2024-02-26T13:59:19.000000Z"
+    }
 }
 ```
 

@@ -3,5 +3,6 @@
   "wallets": "Wallets", 
   "user": "User",
   "collections": "Collections",
-  "payouts": "Payouts"
+  "payouts": "Payouts",
+  "webhooks": "Webhooks"
 }
