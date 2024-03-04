@@ -1,0 +1,86 @@
+### Knit API Documentation
+
+#### Get Supported Networks
+
+<div style={{ display: "flex", alignItems: "center" }}>
+  ##### Endpoint
+  <span
+    style={{
+      display: "block",
+      backgroundColor: "#ebfbfa",
+      color: "#194d53",
+      marginLeft: "-17px",
+      padding: "0px 6px",
+      fontSize: ".8rem",
+      borderRadius: "5px",
+      marginTop: "30px",
+    }}
+  >
+    GET
+  </span>
+</div>
+
+```js copy
+{{baseUrl}}/api/networks
+```
+
+##### Headers
+
+- X-API-KEY: Your API key, which authorizes the request.
+- Accept: Set to application/json to receive the response in JSON format.
+
+##### Sample Request
+
+```js copy filename="Sample Request"
+curl --location -g '{{baseUrl}}/api/networks' \
+--header 'X-API-KEY: {{apiKey}}' \
+--header 'Accept: application/json'
+```
+
+##### Sample Response
+
+```json copy filename="Sample Response"
+{
+  "success": true,
+  "message": "Networks fetched successfully",
+  "status": 200,
+  "data": [
+    {
+      "id": 1,
+      "name": "Ethereum Mainnet",
+      "identifier": "ETHEREUM_MAINNET",
+      "tokens": [
+        {
+          "id": 1,
+          "name": "USDT",
+          "symbol": "USDT",
+          "address": "0x1234567890"
+        },
+        { "id": 2, "name": "USDC", "symbol": "USDC", "address": "0x0987654321" }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Polygon Mainnet",
+      "identifier": "MATIC_MAINNET",
+      "tokens": [
+        {
+          "id": 1,
+          "name": "USDT",
+          "symbol": "USDT",
+          "address": "0x1234567890"
+        },
+        { "id": 2, "name": "USDC", "symbol": "USDC", "address": "0x0987654321" }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Tron Mainnet",
+      "identifier": "TRON_MAINNET",
+      "tokens": [
+        { "id": 1, "name": "USDT", "symbol": "USDT", "address": "0x1234567890" }
+      ]
+    }
+  ]
+}
+```

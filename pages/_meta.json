@@ -4,5 +4,6 @@
   "user": "User",
   "collections": "Collections",
   "payouts": "Payouts",
-  "webhooks": "Webhooks"
+  "webhooks": "Webhooks",
+  "networks": "Networks"
 }
