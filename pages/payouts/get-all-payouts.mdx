@@ -1,6 +1,6 @@
 ### Knit API Documentation
 
-#### Get All Payouts 
+#### Get All Payouts
 
 <div style={{ display: "flex", alignItems: "center" }}>
   ##### Endpoint
@@ -41,24 +41,25 @@ curl --location -g '{{baseUrl}}/api/payouts' \
 
 ```json copy filename="Sample Response"
 {
-    "success": true,
-    "status": 200,
-    "data": [
-        {
-            "id": "b0056f97-bfba-499b-a490-990a058abd30",
-            "userId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
-            "payoutWalletId": "c7ddb254-5da1-4136-b19e-733a00a31c70",
-            "network": "MATIC_MAINNET",
-            "token": "USDT",
-            "amount": "0.020000000000000000",
-            "toAddress": "0x56adfcc254ab3b8142a275c1837bcffaff5aa38b",
-            "transactionHash": null,
-            "status": "PENDING",
-            "info": null,
-            "createdAt": "2024-02-22T14:16:53.000000Z",
-            "updatedAt": "2024-02-22T14:16:53.000000Z"
-        }
-    ],
-    "message": "Payouts fetched successfully"
+  "success": true,
+  "message": "Payouts fetched successfully",
+  "status": 200,
+  "data": [
+    {
+      "id": "8e5697e3-8265-455b-984a-0eb40e10b0f9",
+      "userId": "8286065b-577e-11ef-9218-96f5ee698dcd",
+      "payoutWalletId": "5c7bb5bd-acb5-453a-9eb9-11380a329d79",
+      "network": "MATIC_MAINNET",
+      "token": "USDT",
+      "amount": "0.020000000000000000",
+      "toAddress": "0x56adfcc254ab3b8142a275c1837bcffaff5aa38b",
+      "transactionHash": null,
+      "status": "PROCESSING",
+      "info": null,
+      "payoutExternalRef": "6603f31f-4ebf-461b-89c5-75a13d41b7a9",
+      "createdAt": "2024-08-27T13:44:20.000000Z",
+      "updatedAt": "2024-08-27T13:44:21.000000Z"
+    }
+  ]
 }
 ```

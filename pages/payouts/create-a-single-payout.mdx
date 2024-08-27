@@ -1,6 +1,6 @@
 ### Knit API Documentation
 
-#### Create a single Payout 
+#### Create a single Payout
 
 <div style={{ display: "flex", alignItems: "center" }}>
   ##### Endpoint
@@ -28,9 +28,9 @@
 
 - BITCOIN_MAINNET: For operations on the Bitcoin main network.
 - ETHEREUM_MAINNET: For activities on the Ethereum main network.
-- POLYGON_MAINNET: For activities on the Polygon main network 
-- TRON_MAINNET: For activities on the Tron main network 
-    
+- MATIC_MAINNET: For activities on the Polygon main network
+- TRON_MAINNET: For activities on the Tron main network
+
 ##### Headers
 
 - X-API-KEY: Your API key for authentication.
@@ -40,10 +40,10 @@
 
 ```json
 {
-    "network": "MATIC_MAINNET",
-    "token": "USDT",
-    "amount": 0.02,
-    "toAddress": "0x56adfcc254ab3b8142a275c1837bcffaff5aa38b"
+  "network": "MATIC_MAINNET",
+  "token": "USDT",
+  "amount": 0.02,
+  "toAddress": "0x56adfcc254ab3b8142a275c1837bcffaff5aa38b"
 }
 ```
 
@@ -65,19 +65,19 @@ curl --location -g '{{baseUrl}}/api/payouts' \
 
 ```json copy filename="Sample Response"
 {
-    "success": true,
-    "status": 201,
-    "data": {
-        "amount": 0.02,
-        "token": "USDT",
-        "toAddress": "0x56adfcc254ab3b8142a275c18t56465656xx",
-        "network": "MATIC_MAINNET",
-        "userId": "a2667393-2c6c-43c9-a288-6167e5jk8908",
-        "payoutWalletId": "c7ddb254-5da1-4136-b19e-733a00a31c70",
-        "id": "b0056f97-bfba-499b-a490-990a058abd30",
-        "updatedAt": "2024-02-22T14:16:53.000000Z",
-        "createdAt": "2024-02-22T14:16:53.000000Z"
-    },
-    "message": "Payout created successfully"
+  "success": true,
+  "message": "Payout created successfully",
+  "status": 201,
+  "data": {
+    "amount": 0.02,
+    "token": "USDT",
+    "toAddress": "0x56adfcc254ab3b8142a275c1837bcffaff5aa38b",
+    "network": "MATIC_MAINNET",
+    "userId": "8286065b-577e-11ef-9218-96f5ee698dcd",
+    "payoutWalletId": "5c7bb5bd-acb5-453a-9eb9-11380a329d79",
+    "id": "8e5697e3-8265-455b-984a-0eb40e10b0f9",
+    "updatedAt": "2024-08-27T13:44:20.000000Z",
+    "createdAt": "2024-08-27T13:44:20.000000Z"
+  }
 }
 ```

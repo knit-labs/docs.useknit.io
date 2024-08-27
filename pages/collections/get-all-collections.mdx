@@ -1,4 +1,3 @@
-
 ### Knit API Documentation
 
 #### Get All Collections
@@ -42,34 +41,37 @@ curl --location -g '{{baseUrl}}/api/collections' \
 
 ```json copy filename="Sample Response"
 {
-    "success": true,
-    "status": 200,
-    "message": "Collections fetched successfully",
-    "data": [
-        {
-            "id": "6148d258-ba65-4240-b283-d7c1abc7363d",
-            "userId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
-            "network": "MATIC_MAINNET",
-            "token": "USDT",
-            "address": "0xdb664b89191eb50e0b45d7516c1adc2fcc327746",
-            "tokenAmount": "25.000000000000000000",
-            "tokenToUsd": null,
-            "fiatExchangeRateToUsd": null,
-            "fiatAmountInUsd": null,
-            "fiatAmount": null,
-            "fiatAmountCurrency": null,
-            "status": "PENDING",
-            "transactionHash": null,
-            "transactionBlockNumber": null,
-            "numberOfConfirmations": null,
-            "merchantRedirectUrl": "https://example.com",
-            "merchantCallbackUrl": "https://example.com",
-            "expiresAt": "2024-02-26T14:24:15.000000Z",
-            "createdAt": "2024-02-26T13:54:15.000000Z",
-            "updatedAt": "2024-02-26T13:54:15.000000Z"
-        },
-    ]
+  "success": true,
+  "message": "Collections fetched successfully",
+  "status": 200,
+  "data": [
+    {
+      "id": "9cddd3ad-c2a8-463c-a703-158b900beea8",
+      "network": "MATIC_MAINNET",
+      "token": "USDT",
+      "address": "0x3761f3504104f4faa8959963a5d8dce89989d45b",
+      "tokenAmount": "2500.000000000000000000",
+      "tokenToUsd": "1.00000000",
+      "tokenAmountRequested": "2500.000000000000000000",
+      "tokenAmountReceived": null,
+      "feeInUsd": "0.00000000",
+      "feeByToken": "0.000000000000000000",
+      "fiatExchangeRateToUsd": null,
+      "fiatAmountInUsd": null,
+      "fiatAmount": null,
+      "fiatAmountCurrency": null,
+      "status": "PENDING",
+      "transactionHash": null,
+      "transactionBlockNumber": null,
+      "numberOfConfirmations": null,
+      "confirmationThreshold": 10,
+      "merchantRedirectUrl": null,
+      "merchantCallbackUrl": "https://example.com",
+      "paymentLinkUrl": "https://checkout-dev.collection.useknit.io/9cddd3ad-c2a8-463c-a703-158b900beea8",
+      "expiresAt": "2024-08-27T14:02:10.000000Z",
+      "createdAt": "2024-08-27T13:32:10.000000Z",
+      "updatedAt": "2024-08-27T13:32:10.000000Z"
+    }
+  ]
 }
 ```
-
-
