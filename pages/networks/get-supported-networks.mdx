@@ -41,46 +41,91 @@ curl --location -g '{{baseUrl}}/api/networks' \
 
 ```json copy filename="Sample Response"
 {
-  "success": true,
-  "message": "Networks fetched successfully",
-  "status": 200,
-  "data": [
-    {
-      "id": 1,
-      "name": "Ethereum Mainnet",
-      "identifier": "ETHEREUM_MAINNET",
-      "tokens": [
+    "success": true,
+    "message": "Networks fetched successfully",
+    "status": 200,
+    "data": [
         {
-          "id": 1,
-          "name": "USDT",
-          "symbol": "USDT",
-          "address": "0x1234567890"
+            "id": 0,
+            "name": "Binance Smart Chain",
+            "identifier": "BSC_MAINNET",
+            "logo": "https://demo.useknit.io/coins/bsc.svg",
+            "tokens": [
+                {
+                    "id": 1,
+                    "name": "USDT",
+                    "symbol": "USDT",
+                    "logo": "https://demo.useknit.io/coins/usdt.svg",
+                    "address": "0x1234567890"
+                },
+                {
+                    "id": 2,
+                    "name": "USDC",
+                    "symbol": "USDC",
+                    "logo": "https://demo.useknit.io/coins/usdc.svg",
+                    "address": "0x0987654321"
+                }
+            ]
         },
-        { "id": 2, "name": "USDC", "symbol": "USDC", "address": "0x0987654321" }
-      ]
-    },
-    {
-      "id": 2,
-      "name": "Polygon Mainnet",
-      "identifier": "MATIC_MAINNET",
-      "tokens": [
         {
-          "id": 1,
-          "name": "USDT",
-          "symbol": "USDT",
-          "address": "0x1234567890"
+            "id": 1,
+            "name": "Ethereum Mainnet",
+            "identifier": "ETHEREUM_MAINNET",
+            "logo": "https://demo.useknit.io/coins/ethereum.svg",
+            "tokens": [
+                {
+                    "id": 1,
+                    "name": "USDT",
+                    "symbol": "USDT",
+                    "logo": "https://demo.useknit.io/coins/usdt.svg",
+                    "address": "0x1234567890"
+                },
+                {
+                    "id": 2,
+                    "name": "USDC",
+                    "symbol": "USDC",
+                    "logo": "https://demo.useknit.io/coins/usdc.svg",
+                    "address": "0x0987654321"
+                }
+            ]
         },
-        { "id": 2, "name": "USDC", "symbol": "USDC", "address": "0x0987654321" }
-      ]
-    },
-    {
-      "id": 3,
-      "name": "Tron Mainnet",
-      "identifier": "TRON_MAINNET",
-      "tokens": [
-        { "id": 1, "name": "USDT", "symbol": "USDT", "address": "0x1234567890" }
-      ]
-    }
-  ]
+        {
+            "id": 2,
+            "name": "Polygon Mainnet",
+            "identifier": "MATIC_MAINNET",
+            "logo": "https://demo.useknit.io/coins/polygon.svg",
+            "tokens": [
+                {
+                    "id": 1,
+                    "name": "USDT",
+                    "symbol": "USDT",
+                    "logo": "https://demo.useknit.io/coins/usdt.svg",
+                    "address": "0x1234567890"
+                },
+                {
+                    "id": 2,
+                    "name": "USDC",
+                    "symbol": "USDC",
+                    "logo": "https://demo.useknit.io/coins/usdc.svg",
+                    "address": "0x0987654321"
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "name": "Tron Mainnet",
+            "identifier": "TRON_MAINNET",
+            "logo": "https://demo.useknit.io/coins/tron.svg",
+            "tokens": [
+                {
+                    "id": 1,
+                    "name": "USDT",
+                    "symbol": "USDT",
+                    "logo": "https://demo.useknit.io/coins/usdt.svg",
+                    "address": "0x1234567890"
+                }
+            ]
+        }
+    ]
 }
 ```
