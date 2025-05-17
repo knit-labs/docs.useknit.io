@@ -33,21 +33,21 @@ export default function Footer() {
     }
   };
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await fetch("/api/send-email/");
-        const result = await response.json();
-        // setData(result);
-      } catch (error) {
-        console.error("Error fetching API:", error);
-      } finally {
-        // setLoading(false);
-      }
-    }
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     try {
+  //       const response = await fetch("/api/send-email/");
+  //       const result = await response.json();
+  //       // setData(result);
+  //     } catch (error) {
+  //       console.error("Error fetching API:", error);
+  //     } finally {
+  //       // setLoading(false);
+  //     }
+  //   }
 
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
 
   return (
     <>
