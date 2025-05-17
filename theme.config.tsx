@@ -39,11 +39,7 @@ export default {
 
   docsRepositoryBase: "https://github.com/gbxnga/docs.useknit.io",
   footer: {
-    text: (
-      <div style={{ width: "100%" }}>
-        <Footer />
-      </div>
-    ),
+    component: Footer,
   },
   useNextSeoProps() {
     const { asPath } = useRouter();

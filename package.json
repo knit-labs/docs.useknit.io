@@ -18,12 +18,16 @@
   },
   "homepage": "https://github.com/gbxnga/docs.useknit.io#readme",
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
+    "@material-tailwind/react": "^2.1.10",
+    "@sendgrid/mail": "^8.1.5",
     "axios": "^1.7.4",
     "next": "^13.0.6",
     "nextra": "latest",
     "nextra-theme-docs": "latest",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-spinners": "^0.17.0",
     "react-syntax-highlighter": "^15.5.0",
     "sass": "^1.71.0"
   },
