@@ -2,7 +2,9 @@ import React from "react";
 import { DocsThemeConfig } from "nextra-theme-docs";
 import { useRouter } from "next/router";
 import { useConfig } from "nextra-theme-docs";
-import Footer from "./components/Footer/Footer";
+import Footer from "./components/Footer";
+// import "./styles/globals.css";
+
 
 export default {
   head: () => {
@@ -36,6 +38,7 @@ export default {
       <span className="text-gray-600 font-normal hidden md:inline"></span>
     </React.Fragment>
   ),
+  // css: ["styles/globals.css"], // ← relative to project root
 
   docsRepositoryBase: "https://github.com/gbxnga/docs.useknit.io",
   footer: {

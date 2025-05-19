@@ -1,11 +1,11 @@
 "use client";
-import { useState , useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import axios from "axios";
 import { HashLoader } from "react-spinners";
 import { Dialog } from "@material-tailwind/react";
-import Success from "../success";
+import Success from "./success";
 
 export default function Footer() {
   const [isLoading, setIsLoading] = useState(false);
