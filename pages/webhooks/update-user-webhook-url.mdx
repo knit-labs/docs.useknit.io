@@ -21,7 +21,7 @@
 </div>
 
 ```js copy
-{{baseUrl}}/api/user
+{{baseUrl}}/api/v1/user
 ```
 
 ##### Headers
@@ -33,14 +33,14 @@
 
 ```json copy filename="json"
 {
-    "webhookUrl": "https://webhook.site/34b47e03-38ac-4040-a6fc-3dcb44a922e9"
+  "webhookUrl": "https://webhook.site/34b47e03-38ac-4040-a6fc-3dcb44a922e9"
 }
 ```
 
 ##### Sample Request
 
 ```js copy filename="Sample Request"
-curl --location -g --request PUT '{{baseUrl}}/api/user' \
+curl --location -g --request PUT '{{baseUrl}}/api/v1/user' \
 --header 'X-API-KEY: {{apiKey}}' \
 --header 'Accept: application/json' \
 --data '{

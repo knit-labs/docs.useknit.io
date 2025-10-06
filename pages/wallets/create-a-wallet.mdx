@@ -1,4 +1,3 @@
-
 ### Knit API Documentation
 
 #### Overview
@@ -26,7 +25,7 @@ Knit API allows users to create digital currency wallets, supporting a variety o
 </div>
 
 ```js copy
-{{baseUrl}}/api/wallets
+{{baseUrl}}/api/v1/wallets
 ```
 
 This endpoint creates a new wallet for a specified blockchain network. It supports multiple networks, allowing for flexibility in managing different cryptocurrencies.
@@ -35,8 +34,8 @@ This endpoint creates a new wallet for a specified blockchain network. It suppor
 
 - BITCOIN_MAINNET: For operations on the Bitcoin main network.
 - ETHEREUM_MAINNET: For activities on the Ethereum main network.
-- MATIC_MAINNET: For activities on the Polygon main network 
-- TRON_MAINNET: For activities on the Tron main network 
+- MATIC_MAINNET: For activities on the Polygon main network
+- TRON_MAINNET: For activities on the Tron main network
 
 ##### Headers
 
@@ -49,7 +48,7 @@ The request body must be in JSON format specifying the network for which the wal
 
 ```json
 {
-    "network": "ETHEREUM_MAINNET"
+  "network": "ETHEREUM_MAINNET"
 }
 ```
 
@@ -58,7 +57,7 @@ The request body must be in JSON format specifying the network for which the wal
 Here's a curl example to create a wallet on the Ethereum main network:
 
 ```sh copy
-curl --location -g '{{baseUrl}}/api/wallets' \
+curl --location -g '{{baseUrl}}/api/v1/wallets' \
 --header 'X-API-KEY: {{apiKey}}' \
 --header 'Accept: application/json' \
 --data-raw '{
@@ -72,18 +71,18 @@ A successful request returns the newly created wallet's details, including its u
 
 ```json copy filename="Sample Response"
 {
-    "success": true,
-    "message": "Wallet created successfully",
-    "status": 201,
-    "data": {
-        "userId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
-        "network": "ETHEREUM_MAINNET",
-        "networkId": "ETHEREUM_MAINNET",
-        "address": "0x1adb0a39bde00fa0957e519584cb5c51fefcb37f",
-        "id": "d95143d2-c076-49da-b121-b3beed054bf3",
-        "updatedAt": "2024-02-26T13:59:19.000000Z",
-        "createdAt": "2024-02-26T13:59:19.000000Z"
-    }
+  "success": true,
+  "message": "Wallet created successfully",
+  "status": 201,
+  "data": {
+    "userId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
+    "network": "ETHEREUM_MAINNET",
+    "networkId": "ETHEREUM_MAINNET",
+    "address": "0x1adb0a39bde00fa0957e519584cb5c51fefcb37f",
+    "id": "d95143d2-c076-49da-b121-b3beed054bf3",
+    "updatedAt": "2024-02-26T13:59:19.000000Z",
+    "createdAt": "2024-02-26T13:59:19.000000Z"
+  }
 }
 ```
 

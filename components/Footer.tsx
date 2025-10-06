@@ -20,7 +20,7 @@ export default function Footer() {
     event.preventDefault();
     setIsLoading(true);
     try {
-      await axios.post("/api/send-email/", {
+      await axios.post("/api/v1/send-email/", {
         subject: "From website: Subscription",
         from: email,
         text: `Subscription. Email: ${email}`,
@@ -53,7 +53,10 @@ export default function Footer() {
                 >
                   Documentation
                 </Link>
-                <Link className="block font-medium text-sm hover:text-gray-900 dark:hover:text-white transition-colors" href="">
+                <Link
+                  className="block font-medium text-sm hover:text-gray-900 dark:hover:text-white transition-colors"
+                  href=""
+                >
                   Status
                 </Link>
               </div>
@@ -64,7 +67,10 @@ export default function Footer() {
                 Socials
               </h3>
               <div className="space-y-3 text-gray-600 dark:text-gray-400">
-                <Link className="block font-medium text-sm hover:text-gray-900 dark:hover:text-white transition-colors" href="">
+                <Link
+                  className="block font-medium text-sm hover:text-gray-900 dark:hover:text-white transition-colors"
+                  href=""
+                >
                   Twitter
                 </Link>
                 <Link
@@ -82,7 +88,10 @@ export default function Footer() {
                 Legal
               </h3>
               <div className="space-y-3 text-gray-600 dark:text-gray-400">
-                <Link className="block font-medium text-sm hover:text-gray-900 dark:hover:text-white transition-colors" href="">
+                <Link
+                  className="block font-medium text-sm hover:text-gray-900 dark:hover:text-white transition-colors"
+                  href=""
+                >
                   Legal Notice
                 </Link>
                 <Link
@@ -107,7 +116,9 @@ export default function Footer() {
               <div className="space-y-3 text-gray-600 dark:text-gray-400">
                 <p className="block font-medium text-sm">business@useknit.io</p>
                 <p className="block font-medium text-sm">
-                  <span className="">Knit Business Financial Services Ltd.</span>
+                  <span className="">
+                    Knit Business Financial Services Ltd.
+                  </span>
                   <br />
                   3080 Yonge St <br />
                   Toronto ON, M4N 3N1, Canada
@@ -139,7 +150,9 @@ export default function Footer() {
                   className="px-4 py-3 placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-900 dark:text-white w-full md:w-80 rounded-lg outline-none border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors"
                 />
                 {status && (
-                  <p className="text-xs text-red-600 dark:text-red-400 font-medium mt-1">{status}</p>
+                  <p className="text-xs text-red-600 dark:text-red-400 font-medium mt-1">
+                    {status}
+                  </p>
                 )}
               </div>
 
@@ -166,7 +179,7 @@ export default function Footer() {
           <div className="mt-6 flex flex-col md:flex-row justify-center md:justify-between items-center gap-4">
             <div className="h-8 w-16 relative">
               <Image
-                src={theme === 'dark' ? "/knit-white.svg" : "/knit.svg"}
+                src={theme === "dark" ? "/knit-white.svg" : "/knit.svg"}
                 alt="Knit logo"
                 fill
                 className="object-contain"
@@ -181,7 +194,7 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      
+
       <div>
         <Dialog
           open={success}

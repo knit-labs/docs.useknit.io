@@ -21,7 +21,7 @@
 </div>
 
 ```js copy
-{{baseUrl}}/api/user
+{{baseUrl}}/api/v1/user
 ```
 
 ##### Headers
@@ -32,7 +32,7 @@
 ##### Sample Request
 
 ```js copy filename="Sample Request"
-curl --location -g '{{baseUrl}}/api/user' \
+curl --location -g '{{baseUrl}}/api/v1/user' \
 --header 'X-API-KEY: {{apiKey}}' \
 --header 'Accept: application/json'
 ```
@@ -41,20 +41,17 @@ curl --location -g '{{baseUrl}}/api/user' \
 
 ```json copy filename="Sample Response"
 {
-    "success": true,
-    "message": "User details fetched successfully",
-    "status": 200,
-    "data": {
-        "id": "a2667393-2c6c-43c9-a288-6167e2b2b591",
-        "name": "Firstname Lastname",
-        "email": "user@gmail.com",
-        "email_verified_at": null,
-        "webhookUrl": "https://webhook.site/id",
-        "createdAt": "2024-02-17T16:25:47.000000Z",
-        "updatedAt": "2024-02-17T18:02:06.000000Z"
-    }
+  "success": true,
+  "message": "User details fetched successfully",
+  "status": 200,
+  "data": {
+    "id": "a2667393-2c6c-43c9-a288-6167e2b2b591",
+    "name": "Firstname Lastname",
+    "email": "user@gmail.com",
+    "email_verified_at": null,
+    "webhookUrl": "https://webhook.site/id",
+    "createdAt": "2024-02-17T16:25:47.000000Z",
+    "updatedAt": "2024-02-17T18:02:06.000000Z"
+  }
 }
 ```
-
-
-

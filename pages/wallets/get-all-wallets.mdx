@@ -25,7 +25,7 @@ Knit API provides a straightforward way for applications to interact with users'
 </div>
 
 ```js copy
-{{baseUrl}}/api/wallets
+{{baseUrl}}/api/v1/wallets
 ```
 
 This endpoint fetches a list of all wallets created by the user, across all supported blockchain networks. It's an essential tool for applications that need to display or manage users' cryptocurrency portfolios.
@@ -40,7 +40,7 @@ This endpoint fetches a list of all wallets created by the user, across all supp
 To retrieve all wallets, use the following curl command:
 
 ```sh copy
-curl --location -g '{{baseUrl}}/api/wallets' \
+curl --location -g '{{baseUrl}}/api/v1/wallets' \
 --header 'X-API-KEY: {{apiKey}}' \
 --header 'Accept: application/json'
 ```
@@ -51,21 +51,21 @@ The response includes an array of wallet objects. Each object contains detailed 
 
 ```json copy filename="Sample Response"
 {
-    "success": true,
-    "message": "Wallets fetched successfully",
-    "status": 200,
-    "data": [
-        {
-            "id": "d95143d2-c076-49da-b121-b3beed054bf3",
-            "userId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
-            "network": "ETHEREUM_MAINNET",
-            "networkId": "ETHEREUM_MAINNET",
-            "address": "0x1adb0a39bde00fa0957e519584cb5c51fefcb37f",
-            "isActive": true,
-            "createdAt": "2024-02-26T13:59:19.000000Z",
-            "updatedAt": "2024-02-26T13:59:19.000000Z"
-        }
-    ]
+  "success": true,
+  "message": "Wallets fetched successfully",
+  "status": 200,
+  "data": [
+    {
+      "id": "d95143d2-c076-49da-b121-b3beed054bf3",
+      "userId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
+      "network": "ETHEREUM_MAINNET",
+      "networkId": "ETHEREUM_MAINNET",
+      "address": "0x1adb0a39bde00fa0957e519584cb5c51fefcb37f",
+      "isActive": true,
+      "createdAt": "2024-02-26T13:59:19.000000Z",
+      "updatedAt": "2024-02-26T13:59:19.000000Z"
+    }
+  ]
 }
 ```
 

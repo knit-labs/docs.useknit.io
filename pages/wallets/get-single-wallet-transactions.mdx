@@ -21,7 +21,7 @@
 </div>
 
 ```js copy
-{{baseUrl}}/api/wallets/:id/transactions
+{{baseUrl}}/api/v1/wallets/:id/transactions
 ```
 
 ##### Headers
@@ -36,7 +36,7 @@
 ##### Sample Request
 
 ```sh copy filename="Sample Request"
-curl --location -g '{{baseUrl}}/api/wallets/134a9423-0524-4dfc-85b0-06513841d7a2/transactions' \
+curl --location -g '{{baseUrl}}/api/v1/wallets/134a9423-0524-4dfc-85b0-06513841d7a2/transactions' \
 --header 'X-API-KEY: {{apiKey}}' \
 --header 'Accept: application/json'
 ```
