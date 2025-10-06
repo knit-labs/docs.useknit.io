@@ -25,7 +25,7 @@ Knit API is designed to facilitate the interaction with cryptocurrency wallets, 
 </div>
 
 ```js copy
- {{baseUrl}}/api/wallets/:id
+ {{baseUrl}}/api/v1/wallets/:id
 ```
 
 Access detailed information for a specific wallet by specifying its unique identifier. This endpoint is crucial for applications needing to display or manipulate the data of a particular wallet, including transaction history, balance checks, and asset management.
@@ -44,7 +44,7 @@ Access detailed information for a specific wallet by specifying its unique ident
 Below is an example of how to retrieve a single wallet using curl:
 
 ```sh copy
-curl --location -g '{{baseUrl}}/api/wallets/bf81f144-efca-422a-aed7-bf7bf52da26b' \
+curl --location -g '{{baseUrl}}/api/v1/wallets/bf81f144-efca-422a-aed7-bf7bf52da26b' \
 --header 'X-API-KEY: {{apiKey}}' \
 --header 'Accept: application/json'
 ```
@@ -55,22 +55,21 @@ The response provides a JSON object containing detailed information about the wa
 
 ```json copy filename="Sample Response"
 {
-    "success": true,
-    "message": "Wallet fetched successfully",
-    "status": 200,
-    "data": {
-        "id": "d95143d2-c076-49da-b121-b3beed054bf3",
-        "userId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
-        "network": "ETHEREUM_MAINNET",
-        "networkId": "ETHEREUM_MAINNET",
-        "address": "0x1adb0a39bde00fa0957e519584cb5c51fefcb37f",
-        "isActive": true,
-        "createdAt": "2024-02-26T13:59:19.000000Z",
-        "updatedAt": "2024-02-26T13:59:19.000000Z"
-    }
+  "success": true,
+  "message": "Wallet fetched successfully",
+  "status": 200,
+  "data": {
+    "id": "d95143d2-c076-49da-b121-b3beed054bf3",
+    "userId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
+    "network": "ETHEREUM_MAINNET",
+    "networkId": "ETHEREUM_MAINNET",
+    "address": "0x1adb0a39bde00fa0957e519584cb5c51fefcb37f",
+    "isActive": true,
+    "createdAt": "2024-02-26T13:59:19.000000Z",
+    "updatedAt": "2024-02-26T13:59:19.000000Z"
+  }
 }
 ```
-
 
 #### Description
 

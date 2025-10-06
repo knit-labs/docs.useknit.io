@@ -21,16 +21,16 @@
 </div>
 
 ```js copy
-{{baseUrl}}/api/collections
+{{baseUrl}}/api/v1/collections
 ```
 
 ##### Supported Networks
 
 - BITCOIN_MAINNET: For operations on the Bitcoin main network.
 - ETHEREUM_MAINNET: For activities on the Ethereum main network.
-- MATIC_MAINNET: For activities on the Polygon main network 
-- TRON_MAINNET: For activities on the Tron main network 
-    
+- MATIC_MAINNET: For activities on the Polygon main network
+- TRON_MAINNET: For activities on the Tron main network
+
 ##### Headers
 
 - X-API-KEY: Your API key for authentication.
@@ -40,19 +40,19 @@
 
 ```json copy filename="json"
 {
-    "network": "MATIC_MAINNET",
-    "token": "USDT",
-    "tokenAmount": 2500,
-    "confirmationThreshold": 10,
-    "merchantRedirectUrl": "https://example.com/test",
-    "merchantCallbackUrl": "https://webhook.site/34b47e03-38ac-4040-a6fc-3dcb44a922e9"
+  "network": "MATIC_MAINNET",
+  "token": "USDT",
+  "tokenAmount": 2500,
+  "confirmationThreshold": 10,
+  "merchantRedirectUrl": "https://example.com/test",
+  "merchantCallbackUrl": "https://webhook.site/34b47e03-38ac-4040-a6fc-3dcb44a922e9"
 }
 ```
 
 ##### Sample Request
 
 ```sh copy filename="Sample Request"
-curl --location -g '{{baseUrl}}/api/collections' \
+curl --location -g '{{baseUrl}}/api/v1/collections' \
 --header 'X-API-KEY: {{apiKey}}' \
 --header 'Accept: application/json' \
 --data '{
@@ -68,27 +68,26 @@ curl --location -g '{{baseUrl}}/api/collections' \
 
 ```json copy filename="Sample Response"
 {
-    "success": true,
-    "message": "Collection created successfully",
-    "status": 201,
-    "data": {
-        "network": "MATIC_MAINNET",
-        "token": "USDT",
-        "address": "0x3761f3504104f4faa8959963a5d8dce89989d45b",
-        "status": "PENDING",
-        "tokenToUsd": 1,
-        "feeInUsd": 0,
-        "feeByToken": 0,
-        "expiresAt": "2024-08-27T14:02:10.000000Z",
-        "tokenAmountRequested": 2500,
-        "tokenAmount": 2500,
-        "confirmationThreshold": 10,
-        "merchantCallbackUrl": "https://example.com",
-        "id": "9cddd3ad-c2a8-463c-a703-158b900beea8",
-        "updatedAt": "2024-08-27T13:32:10.000000Z",
-        "createdAt": "2024-08-27T13:32:10.000000Z",
-        "paymentLinkUrl": "https://checkout-dev.collection.useknit.io/9cddd3ad-c2a8-463c-a703-158b900beea8"
-    }
+  "success": true,
+  "message": "Collection created successfully",
+  "status": 201,
+  "data": {
+    "network": "MATIC_MAINNET",
+    "token": "USDT",
+    "address": "0x3761f3504104f4faa8959963a5d8dce89989d45b",
+    "status": "PENDING",
+    "tokenToUsd": 1,
+    "feeInUsd": 0,
+    "feeByToken": 0,
+    "expiresAt": "2024-08-27T14:02:10.000000Z",
+    "tokenAmountRequested": 2500,
+    "tokenAmount": 2500,
+    "confirmationThreshold": 10,
+    "merchantCallbackUrl": "https://example.com",
+    "id": "9cddd3ad-c2a8-463c-a703-158b900beea8",
+    "updatedAt": "2024-08-27T13:32:10.000000Z",
+    "createdAt": "2024-08-27T13:32:10.000000Z",
+    "paymentLinkUrl": "https://checkout-dev.collection.useknit.io/9cddd3ad-c2a8-463c-a703-158b900beea8"
+  }
 }
 ```
-

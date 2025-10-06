@@ -21,7 +21,7 @@
 </div>
 
 ```js copy
-{{baseUrl}}/api/wallets/:id
+{{baseUrl}}/api/v1/wallets/:id
 ```
 
 ##### Headers
@@ -35,9 +35,8 @@
 
 ##### Sample Request
 
-
 ```sh copy filename="Sample Request"
-curl --location -g --request DELETE '{{baseUrl}}/api/wallets/bf81f144-efca-422a-aed7-bf7bf52da26b' \
+curl --location -g --request DELETE '{{baseUrl}}/api/v1/wallets/bf81f144-efca-422a-aed7-bf7bf52da26b' \
 --header 'X-API-KEY: {{apiKey}}' \
 --header 'Accept: application/json'
 ```

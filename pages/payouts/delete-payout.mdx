@@ -1,6 +1,6 @@
 ### Knit API Documentation
 
-#### Delete Payout 
+#### Delete Payout
 
 <div style={{ display: "flex", alignItems: "center" }}>
   ##### Endpoint
@@ -21,7 +21,7 @@
 </div>
 
 ```js copy
- {{baseUrl}}/api/payouts/:id
+ {{baseUrl}}/api/v1/payouts/:id
 ```
 
 ##### Headers
@@ -35,9 +35,8 @@
 
 ##### Sample Request
 
-
-```sh copy 
-curl --location -g --request DELETE '{{baseUrl}}/api/payouts/bf81f144-efca-422a-aed7-bf7bf52da26b' \
+```sh copy
+curl --location -g --request DELETE '{{baseUrl}}/api/v1/payouts/bf81f144-efca-422a-aed7-bf7bf52da26b' \
 --header 'X-API-KEY: {{apiKey}}' \
 --header 'Accept: application/json'
 ```

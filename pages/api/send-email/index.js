@@ -1,15 +1,17 @@
-// pages/api/send-mail/index.js
+// pages/api/v1/send-mail/index.js
 import sgMail from "@sendgrid/mail";
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 export default async function handler(req, res) {
   // Check the HTTP method
-  if (req.method === 'GET') {
-    return res.status(405).json({ message: "This endpoint only supports POST requests" });
+  if (req.method === "GET") {
+    return res
+      .status(405)
+      .json({ message: "This endpoint only supports POST requests" });
   }
 
-  if (req.method === 'POST') {
+  if (req.method === "POST") {
     try {
       const { from, subject, text, html } = req.body;
       const recipients = ["business@useknit.io", "info@useknit.io"];
