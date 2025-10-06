@@ -19,7 +19,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "pages/api/v1/send-email/index.js"
+    "pages/api/send-email/index.js"
   ],
   "exclude": ["node_modules"]
 }

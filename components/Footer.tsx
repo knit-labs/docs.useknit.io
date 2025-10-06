@@ -20,7 +20,7 @@ export default function Footer() {
     event.preventDefault();
     setIsLoading(true);
     try {
-      await axios.post("/api/v1/send-email/", {
+      await axios.post("/api/send-email/", {
         subject: "From website: Subscription",
         from: email,
         text: `Subscription. Email: ${email}`,
