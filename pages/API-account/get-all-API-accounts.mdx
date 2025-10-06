@@ -1,0 +1,59 @@
+### Knit API Documentation
+
+#### Get All API Accounts
+
+<div style={{ display: "flex", alignItems: "center" }}>
+  ##### Endpoint
+  <span
+    style={{
+      display: "block",
+      backgroundColor: "#ebfbfa",
+      color: "#194d53",
+      marginLeft: "-17px",
+      padding: "0px 6px",
+      fontSize: ".8rem",
+      borderRadius: "5px",
+      marginTop: "30px",
+    }}
+  >
+    GET
+  </span>
+</div>
+
+```js copy
+{{baseUrl}}/api/v1/business-api-services-wallets
+```
+
+##### Headers
+
+- X-API-KEY: Your unique API key for authentication.
+- Accept: Set to application/json to ensure the response is in JSON format.
+
+##### Sample Request
+
+```sh copy
+curl --location -g '{{baseUrl}}/api/v1/business-api-services-wallets' \
+--header 'X-API-KEY: {{apiKey}}' \
+--header 'Accept: application/json'
+```
+
+##### Sample Response
+
+```json copy filename="Sample Response"
+{
+  "success": true,
+  "status": 200,
+  "data": [
+    {
+      "id": "c7ddb254-5da1-4136-b19e-733a00a31c70",
+      "userId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
+      "amount": "99.897000000000000000",
+      "token": "USDT",
+      "status": "ACTIVE",
+      "createdAt": "2024-02-22T14:16:23.000000Z",
+      "updatedAt": "2024-02-22T14:43:21.000000Z"
+    }
+  ],
+  "message": "Payout wallets fetched successfully"
+}
+```
