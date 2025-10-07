@@ -1,8 +1,9 @@
 {
   "index": "Introduction",
-  "wallets": "Wallets", 
+  "wallets": "Wallets",
   "user": "User",
   "collections": "Collections",
+  "API-account": "API Account",
   "payouts": "Payouts",
   "webhooks": "Webhooks",
   "networks": "Networks"
