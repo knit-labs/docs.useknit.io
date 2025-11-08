@@ -1,0 +1,88 @@
+### Platform Architecture & Money Movement
+
+Knit combines a traditional business wallet with a dedicated API account so you
+can collect, store, and disburse crypto without exposing your main treasury.
+This page explains the moving parts so you can reason about balances,
+authentication, and webhook side-effects before touching any endpoint.
+
+#### Wallet Layers
+
+| Layer | Backing Model | Purpose |
+| ----- | ------------- | ------- |
+| Business Wallet | `Wallet` | Custody account for deposits arriving from on-chain or the dashboard UI. Fees, KYB, and manual withdrawals are governed here. |
+| API Account | `BusinessApiServicesWallet` | A per-token balance that funds API services (collections credit into it, payouts debit from it). Transfer value from the business wallet before issuing payouts. |
+| API Services | `Collections`, `ApiWallet`, `Payout`, `WalletTransaction`, `ApiAccountTransaction` | Feature-specific records that describe collection requests, reusable wallets, payout jobs, and ledger movements within the API account. |
+
+Because API services do not have their own spendable balances, every call that
+credits or debits value ultimately updates `BusinessApiServicesWallet`.
+
+#### Money-Movement Flows
+
+The `useknit-api` application models the following flows (see
+`docs/funds-flow.md` in the main repo for diagrams):
+
+1. **External Deposit → Business Wallet:** triggered by KnitCore webhooks, writes
+   to `transactions` with `trx_category = WALLET_DEPOSIT`.
+2. **Business Wallet Withdrawal:** dashboard-driven outflows to exchanges or cold
+   storage.
+3. **Business Wallet → API Account:** fund the API account before using payouts
+   or when reserving balance for programmatic activity.
+4. **API Account → Business Wallet:** return unused API funds to the main wallet.
+5. **Collections → API Account:** single-use addresses credit value into the API
+   account once confirmed on-chain.
+6. **API Wallets → API Account:** reusable merchant/customer wallets also credit
+   the API account after `WalletTransaction` entries settle.
+7. **Payouts → External Recipient:** debits API account balance, posts the
+   payout to KnitCore, and emits webhook notifications.
+8. **Subscriptions:** (if enabled) try to charge the Business Wallet first and
+   then fall back to the API account.
+
+When you read `balance_before`/`balance_after` pairs in API responses, they are
+coming from the API account ledger (`api_account_transactions`).
+
+#### Authentication Path
+
+Every `/api/v1/**` route uses the `dual_auth` middleware:
+
+1. Inspect the `Authorization` header for a JWT bearer token issued by Passport.
+2. If absent, fall back to the `X-API-KEY` header.
+3. Resolve the underlying business, verify IP whitelist membership, and attach
+   the business to `Request->user` so downstream controllers can access `$request->user`.
+4. When a bearer token is used, `OAuthScopeService` enforces resource-specific
+   scopes (for example `payouts:write` for `POST /api/v1/payouts`).
+
+This means example payloads in the docs can be mixed-and-matched (API key today,
+OAuth tomorrow) without changing the rest of your integration.
+
+#### Webhooks & Observability
+
+- **Webhook queue:** `WebhookService` stores payloads, signs them with your
+  business secret, and retries failed deliveries for up to 12 hours with a
+  3-attempt limit.
+- **Event coverage:** Collections emit CREATED/SUCCESSFUL/FAILED events;
+  payouts emit SUCCESSFUL once KnitCore marks them complete. Each payload is
+  automatically camelCased before delivery.
+- **ApiServiceLogs:** the `api_logger` middleware measures latency per request,
+  increments total calls, and records success/error rates. You can consume the
+  aggregated metrics via the dashboard API endpoints under `api-glance`.
+
+#### Error & Response Envelope
+
+All controllers return the shared `ApiResponse` format:
+
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "message": "...",
+  "data": {},
+  "pagination": { /* optional */ }
+}
+```
+
+Errors reuse the same structure with `success: false` and a descriptive
+`message`. Validation errors include an `errors` object when thrown from a
+`BaseRequest`.
+
+Keep this context in mind as you explore the per-endpoint documentation in the
+sidebar.

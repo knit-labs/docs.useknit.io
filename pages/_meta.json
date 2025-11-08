@@ -1,5 +1,7 @@
 {
   "index": "Introduction",
+  "architecture": "Architecture",
+  "authentication": "Authentication",
   "wallets": "Wallets",
   "user": "User",
   "collections": "Collections",

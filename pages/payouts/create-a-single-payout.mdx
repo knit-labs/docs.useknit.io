@@ -33,8 +33,34 @@
 
 ##### Headers
 
-- X-API-KEY: Your API key for authentication.
-- Accept: Set to application/json to receive responses in JSON format.
+- Provide either `X-API-KEY: {{apiKey}}` or `Authorization: Bearer <token>`.
+- Accept: `application/json`
+
+##### Prerequisites
+
+1. **API Account funded:** `POST /api/v1/business-api-services-wallets` creates
+   the wallet, but you still need to move funds from the business wallet into
+   it (see the dashboard transfer action). If the selected token balance is
+   lower than the `amount`, the API responds with `400 Insufficient balance`.
+2. **IP Whitelist:** both API keys and OAuth clients inherit the business
+   whitelist. Requests from non-approved IPs are rejected before they reach the
+   controller.
+3. **Valid crypto address:** Knit validates `toAddress` per network using the
+   `ValidCryptoAddressRule`. Invalid checksums or formats produce a `422`
+   validation error.
+
+##### Validation & Defaults
+
+| Field | Notes |
+| ----- | ----- |
+| `network` | Must be one of `MATIC_MAINNET`, `TRON_MAINNET`, `BSC_MAINNET`, `SOL_MAINNET`. |
+| `token` | Currently `USDT` or `USDC`. |
+| `amount` | Minimum `0.01`. Use token decimals (not fiat). |
+| `toAddress` | Checked against the per-chain format; invalid values block the request. |
+| `merchantReference` | Optional but recommended for idempotency. If supplied it must be unique in `api_payouts`. |
+
+When the request passes validation the service persists the payout as `PENDING`,
+kicks off KnitCore settlement, and stores the caller’s IP address for auditing.
 
 ##### Request Body
 
@@ -80,4 +106,16 @@ curl --location -g '{{baseUrl}}/api/v1/payouts' \
     "createdAt": "2024-08-27T13:44:20.000000Z"
   }
 }
+
+##### Status Lifecycle & Webhooks
+
+- `PENDING` → initial state after creation.
+- `COMPLETED` → KnitCore confirms on-chain success; triggers a
+  `PAYOUT_SUCCESSFUL` webhook (see the Webhooks section for payload format) and
+  the listener skips delivery if the payout isn’t completed.
+- `FAILED` → KnitCore or blockchain errors; check dashboard logs and retry with
+  a new payout ID (the service does not auto-retry failed payouts).
+
+Webhook payloads are camelCased and signed with your business webhook secret via
+`X-Signature`. Use that signature plus your stored secret to verify integrity.
 ```

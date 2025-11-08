@@ -33,8 +33,30 @@
 
 ##### Headers
 
-- X-API-KEY: Your API key for authentication.
+- X-API-KEY: Your server-side API key **or** `Authorization: Bearer <token>` if
+  you are using OAuth 2.0 client credentials. See
+  [Authentication](/authentication) for details.
 - Accept: Set to application/json to receive responses in JSON format.
+
+##### Prerequisites & Behavior
+
+- Each collection is a **single-use** address that expires 30 minutes after
+  creation. After expiry you must create a new collection.
+- Knit automatically creates/looks up the KnitCore user for your business, so
+  the only required fields are the ones in the body above.
+- `merchantCallbackUrl` is stored as metadata and echoed back via webhook events
+  so you can reconcile requests on your side.
+
+##### Event Timeline
+
+1. `CollectionCreatedEvent` fires immediately; you can observe it on the
+   dashboard.
+2. When KnitCore detects on-chain funds, `CollectionSuccessfulEvent` credits the
+   API account via `ApiAccountTransaction`.
+3. If confirmation thresholds are not met or the transfer fails, a
+   `collectionFailed` webhook is emitted (see the Webhooks section).
+
+Every webhook payload is camelCased and signed with your business secret key.
 
 ##### Request Body
 

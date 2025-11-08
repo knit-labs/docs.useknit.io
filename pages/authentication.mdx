@@ -1,0 +1,77 @@
+### Authentication & Request Conventions
+
+Knit’s public API is served from `https://api.useknit.io` and versioned under
+`/api/v1`. All examples in this documentation use the placeholder
+`{{baseUrl}}`—replace it with the base URL that matches your environment
+(production or sandbox) before calling an endpoint.
+
+#### Request & Response Shape
+
+- **Request casing:** send payload keys in camelCase. Every request class inside
+  `useknit-api` extends `BaseRequest`, which automatically maps camelCase inputs
+  to Laravel’s internal snake_case fields.
+- **Response casing:** the `TransformResponseToCamelCase` middleware rewrites all
+  JSON responses to camelCase, so you never have to convert the keys coming back
+  from the API.
+- **Content-Type:** all endpoints accept and return JSON.
+
+#### Dual Authentication
+
+All `/api/v1/**` routes are protected by the `dual_auth` middleware. Provide one
+of the following credential types with every request:
+
+| Method | Required Header(s) | When to Use |
+| ------ | ------------------ | ----------- |
+| API Key | `X-API-KEY: <server key>` | Legacy keys that you manage in the Business → Developer → API Keys section of the dashboard. |
+| OAuth 2.0 Client Credentials | `Authorization: Bearer <access token>` | Recommended for new integrations. Create OAuth clients in Business → Developer → OAuth Clients and request scoped access tokens. |
+
+> You may send both headers during migrations—the middleware will prioritise the
+> bearer token and fall back to `X-API-KEY` if it is absent.
+
+#### Getting an OAuth Access Token
+
+1. Create or rotate a client by calling `POST /business/developer/oauth-clients`
+   inside the dashboard (or via the private admin API).
+2. Request a bearer token via Passport’s client credentials grant:
+
+```bash
+curl --location '{{baseUrl}}/oauth/token' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "grant_type": "client_credentials",
+    "client_id": "<client-id>",
+    "client_secret": "<plain-secret>",
+    "scope": "collections:write payouts:write wallets:read"
+  }'
+```
+
+The response contains `access_token`, `expires_in`, and `token_type` (`Bearer`).
+Supply that token in the `Authorization` header for subsequent API calls.
+
+##### Scopes
+
+Scopes follow the `resource:action` pattern:
+
+- `collections:read`, `collections:write`
+- `payouts:read`, `payouts:write`
+- `wallets:read`, `wallets:write`
+- `payout-wallets:read`, `payout-wallets:write`
+- `*` for full access (use sparingly)
+
+Write scopes implicitly grant read access (e.g. `payouts:write` can also perform
+`GET /api/v1/payouts`). If a request reaches an endpoint without the required
+scope, the middleware returns `401 Insufficient permissions`.
+
+#### IP Whitelisting
+
+Both API keys and OAuth clients inherit the business-level IP whitelist. The
+middleware extracts the caller’s IP (respecting `X-Forwarded-For`) and compares
+it to the list configured in the dashboard. Requests from non-whitelisted IPs
+are rejected with `401 IP address not whitelisted`. Add your outbound IP(s)
+before hitting production.
+
+#### Rate Limiting
+
+Use the provided API keys or OAuth clients per application/service rather than
+sharing them between environments. Doing so ensures accurate usage metrics in
+`ApiServiceLogs` and simplifies throttling if a single integration misbehaves.

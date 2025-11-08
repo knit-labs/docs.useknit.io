@@ -1,26 +1,50 @@
-### General Introduction to Knit API Documentation
+### Knit API Overview
 
-Welcome to Knit API Documentation, your comprehensive guide to integrating cryptocurrency wallet functionalities into your application. This API is designed to streamline the management, transfer, and tracking of digital assets across multiple blockchain networks, providing developers with the tools needed to create a seamless and secure cryptocurrency experience for their users.
+Knit provides a unified API for managing on-chain treasury tooling—collecting
+payments, provisioning reusable wallets, distributing payouts, and keeping web2
+systems in sync through reliable webhooks. Every endpoint lives under
+`{{baseUrl}}/api/v1` and is guarded by the same dual-authentication middleware,
+so you can start with legacy API keys and migrate to OAuth 2.0 client
+credentials when you are ready.
 
-#### Key Features
+#### Platform Pillars
 
-- *Wallet Management:* Create, retrieve, and manage wallets for a wide range of cryptocurrencies, enabling users to securely store, send, and receive digital assets.
-- *Multi-Network Support:* Support for major blockchain networks such as Bitcoin Mainnet, Tron Mainnet and Ethereum Mainnet, allowing for versatile cryptocurrency operations.
-- *Digital Asset Payment Collection:* Facilitate the collection of payments in various cryptocurrencies, simplifying the process of integrating digital asset transactions into your service offerings.
-- *Secure Authentication:* Robust security measures, including API key authentication, to ensure that wallet operations remain secure and protected against unauthorized access.
+- **Collections:** one-time deposit addresses for invoice-like flows. Each
+  request creates a single-use address and forwards status events via webhooks.
+- **API Wallets:** reusable, labelled wallets (per chain) for recurring deposits
+  or customer-specific ledgers. Wallet transactions are queryable with filters
+  for status, token, range, and pagination.
+- **Business API Services Wallet (API Account):** holds funds that power payout
+  requests. Transfer crypto from the core business wallet into this account
+  before initiating disbursements.
+- **Payouts:** programmatic, on-chain withdrawals. Knit validates balances,
+  enforces IP whitelists, and pushes final statuses via `PAYOUT_SUCCESSFUL`
+  events.
+- **Webhooks & Dashboards:** every critical state change is persisted and can be
+  replayed; business stakeholders can also review activity via dashboard APIs.
 
-#### Who Should Use This API?
+#### Quick Start
 
-This API is tailored for developers and businesses looking to incorporate cryptocurrency functionalities into their platforms or applications. Whether you're building a financial app, a marketplace that accepts cryptocurrency payments, or a service that requires the management of digital assets, our API provides the essential building blocks to meet your needs.
+1. **Create or onboard a business** in the Knit dashboard.
+2. **Configure authentication** — generate an API key or create an OAuth client
+   (see the [Authentication](/authentication) page).
+3. **Whitelist outgoing IPs** so the `dual_auth` middleware accepts your
+   requests.
+4. **Set the webhook URL + secret** under Business → Developer → Webhooks to
+   receive collection/payout events.
+5. **Call the service endpoints** documented in the navigation (Collections,
+   Wallets, Payouts, Webhooks, Networks, etc.).
 
-#### Getting Started
+#### Request/Response Conventions
 
-To get started, you'll need an API key which can be obtained through our developer portal. This key will enable you to authenticate your requests and access the API's features. We recommend familiarizing yourself with the various endpoints documented here, including wallet creation, retrieval, and digital asset payment collection.
+- JSON only. Send camelCase keys; the API converts them to snake_case
+  internally.
+- Responses are automatically camelCased by middleware, and the shared response
+  envelope includes `success`, `statusCode`, `message`, `data`, and optional
+  pagination metadata.
+- Where relevant we show both `X-API-KEY` and `Authorization: Bearer` header
+  options so you can choose the auth strategy that fits your rollout plan.
 
-#### Support and Community
-
-We're committed to your success in using our API. For assistance, questions, or feedback, please visit our support center or join our developer community forum. There, you can find answers, share insights, and connect with other developers integrating with our API.
-
-#### Conclusion
-
-Knit API is your gateway to integrating sophisticated cryptocurrency functionalities into your applications. With our detailed documentation and supportive community, you're well-equipped to harness the power of digital assets, enhancing your service offerings and
+Need more detail on a particular workflow? Jump straight into the section that
+matches your use case or reach out via the support channel linked from the
+dashboard.

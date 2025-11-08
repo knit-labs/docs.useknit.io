@@ -26,7 +26,8 @@
 
 ##### Headers
 
-- X-API-KEY: Your API key, which authorizes the request.
+- X-API-KEY: Your API key **or** use `Authorization: Bearer <token>` with an
+  OAuth access token.
 - Accept: Set to application/json to receive the response in JSON format.
 
 ##### Sample Request
@@ -47,82 +48,142 @@ curl --location -g '{{baseUrl}}/api/v1/networks' \
   "data": [
     {
       "id": 0,
-      "name": "Binance Smart Chain",
+      "name": "BSC (BEP 20)",
       "identifier": "BSC_MAINNET",
       "logo": "https://demo.useknit.io/coins/bsc.svg",
+      "collectionStatus": "ACTIVE",
+      "payoutStatus": "ACTIVE",
       "tokens": [
         {
           "id": 1,
           "name": "USDT",
           "symbol": "USDT",
           "logo": "https://demo.useknit.io/coins/usdt.svg",
-          "address": "0x1234567890"
+          "address": "0x1234567890",
+          "collectionStatus": "ACTIVE",
+          "payoutStatus": "ACTIVE"
         },
         {
           "id": 2,
           "name": "USDC",
           "symbol": "USDC",
           "logo": "https://demo.useknit.io/coins/usdc.svg",
-          "address": "0x0987654321"
+          "address": "0x0987654321",
+          "collectionStatus": "ACTIVE",
+          "payoutStatus": "ACTIVE"
         }
       ]
     },
     {
       "id": 1,
-      "name": "Ethereum Mainnet",
+      "name": "Ethereum (ERC 20)",
       "identifier": "ETHEREUM_MAINNET",
       "logo": "https://demo.useknit.io/coins/ethereum.svg",
+      "collectionStatus": "ACTIVE",
+      "payoutStatus": "INACTIVE",
       "tokens": [
         {
           "id": 1,
           "name": "USDT",
           "symbol": "USDT",
           "logo": "https://demo.useknit.io/coins/usdt.svg",
-          "address": "0x1234567890"
-        },
-        {
-          "id": 2,
-          "name": "USDC",
-          "symbol": "USDC",
-          "logo": "https://demo.useknit.io/coins/usdc.svg",
-          "address": "0x0987654321"
+          "address": "0x1234567890",
+          "collectionStatus": "ACTIVE",
+          "payoutStatus": "INACTIVE"
         }
       ]
     },
     {
       "id": 2,
-      "name": "Polygon Mainnet",
+      "name": "Polygon",
       "identifier": "MATIC_MAINNET",
       "logo": "https://demo.useknit.io/coins/polygon.svg",
+      "collectionStatus": "ACTIVE",
+      "payoutStatus": "ACTIVE",
       "tokens": [
         {
           "id": 1,
           "name": "USDT",
           "symbol": "USDT",
           "logo": "https://demo.useknit.io/coins/usdt.svg",
-          "address": "0x1234567890"
+          "address": "0x1234567890",
+          "collectionStatus": "ACTIVE",
+          "payoutStatus": "ACTIVE"
         },
         {
           "id": 2,
           "name": "USDC",
           "symbol": "USDC",
           "logo": "https://demo.useknit.io/coins/usdc.svg",
-          "address": "0x0987654321"
+          "address": "0x0987654321",
+          "collectionStatus": "ACTIVE",
+          "payoutStatus": "ACTIVE"
         }
       ]
     },
     {
       "id": 3,
-      "name": "Tron Mainnet",
+      "name": "Tron (TRC 20)",
       "identifier": "TRON_MAINNET",
       "logo": "https://demo.useknit.io/coins/tron.svg",
+      "collectionStatus": "ACTIVE",
+      "payoutStatus": "ACTIVE",
       "tokens": [
         {
           "id": 1,
           "name": "USDT",
           "symbol": "USDT",
           "logo": "https://demo.useknit.io/coins/usdt.svg",
-          "address": "0x1234567890"
+          "address": "0x1234567890",
+          "collectionStatus": "ACTIVE",
+          "payoutStatus": "ACTIVE"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Solana",
+      "identifier": "SOL_MAINNET",
+      "logo": "https://demo.useknit.io/coins/solana.svg",
+      "collectionStatus": "ACTIVE",
+      "payoutStatus": "ACTIVE",
+      "tokens": [
+        {
+          "id": 1,
+          "name": "USDT",
+          "symbol": "USDT",
+          "logo": "https://demo.useknit.io/coins/usdt.svg",
+          "address": "0x1234567890",
+          "collectionStatus": "ACTIVE",
+          "payoutStatus": "INACTIVE"
+        },
+        {
+          "id": 2,
+          "name": "USDC",
+          "symbol": "USDC",
+          "logo": "https://demo.useknit.io/coins/usdc.svg",
+          "address": "0x0987654321",
+          "collectionStatus": "ACTIVE",
+          "payoutStatus": "ACTIVE"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Base Network",
+      "identifier": "BASE_MAINNET",
+      "logo": "https://images.mirror-media.xyz/publication-images/cgqxxPdUFBDjgKna_dDir.png?height=400&width=400",
+      "collectionStatus": "ACTIVE",
+      "payoutStatus": "INACTIVE",
+      "tokens": [
+        {
+          "id": 2,
+          "name": "USDC",
+          "symbol": "USDC",
+          "logo": "https://demo.useknit.io/coins/usdc.svg",
+          "address": "0x0987654321",
+          "collectionStatus": "ACTIVE",
+          "payoutStatus": "INACTIVE"
         }
       ]
     }

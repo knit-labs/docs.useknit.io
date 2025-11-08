@@ -26,8 +26,27 @@
 
 ##### Headers
 
-- X-API-KEY: Your API key for authentication.
-- Accept: Set to application/json to receive responses in JSON format.
+- Use either `X-API-KEY: {{apiKey}}` **or** `Authorization: Bearer <token>`
+  depending on your auth strategy.
+- Accept: `application/json`
+
+##### Prerequisites
+
+- Your business must be KYB-approved and have access to the Developer → API
+  section inside the Knit dashboard.
+- An API account is created **per token** (e.g. one for USDT, another for
+  USDC). Duplicate creations return `409 Payout wallet already exists`.
+- Fund the business wallet first; transferring from business wallet → API
+  account is how you load balance for payouts.
+
+##### Behavior Notes
+
+- Newly created accounts start at `amount = 0` and will only change when
+  collections/wallets credit funds or payouts debit funds.
+- The controller automatically binds the account to the authenticated business,
+  so the `token` field is the only required input.
+- API accounts correspond to the `BusinessApiServicesWallet` model in the core
+  repo; each payout references one via `business_api_services_wallet_id`.
 
 ##### Request Body
 

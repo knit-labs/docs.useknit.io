@@ -1,23 +1,42 @@
-# Nextra Docs Template 
+# Knit API Documentation
 
-This is a template for creating documentation with [Nextra](https://nextra.site).
+This repository powers [docs.useknit.io](https://docs.useknit.io), the public
+documentation for the Knit API platform. It is a Nextra-based (Next.js) site
+that explains how to integrate with our Collections, API Wallets, Payouts,
+Business API Services Wallet, and webhook infrastructure.
 
-[**Live Demo →**](https://nextra-docs-template.vercel.app)
+## Prerequisites
 
-[![](.github/screenshot.png)](https://nextra-docs-template.vercel.app)
-
-## Quick Start
-
-Click the button to clone this repository and deploy it on Vercel:
-
-[![](https://vercel.com/button)](https://vercel.com/new/clone?s=https%3A%2F%2Fgithub.com%2Fshuding%2Fnextra-docs-template&showOptionalTeamCreation=false)
+- Node.js 18+
+- `pnpm` (preferred) or `npm`
 
 ## Local Development
 
-First, run `pnpm i` to install the dependencies.
+```bash
+pnpm install
+pnpm dev
+```
 
-Then, run `pnpm dev` to start the development server and visit localhost:3000.
+The docs site will be available at `http://localhost:3000`. Content lives under
+`/pages`; any `.mdx` file automatically becomes a route.
+
+## Linting & Builds
+
+- `pnpm build` — runs the Next.js production build
+- `pnpm start` — serves the already-built site
+
+## Conventions
+
+- Keep prose in Markdown/MDX and component overrides in `components/`
+- Navigation is driven by the `_meta.json` files inside each directory
+- Reuse shared callouts/components so that request/response examples stay
+  consistent with the API implementation in `useknit-api`
+
+## Deployment
+
+Deploys are handled by Vercel. Pushes to the default branch trigger an automatic
+build. Preview deployments are available for pull requests.
 
 ## License
 
-This project is licensed under the MIT License.
+MIT
