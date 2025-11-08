@@ -61,15 +61,13 @@ Every `/api/v1/**` route expects **OAuth 2.0 client-credential tokens**. Provide
 
 #### Webhooks & Observability
 
-- **Webhook queue:** `WebhookService` stores payloads, signs them with your
-  business secret, and retries failed deliveries for up to 12 hours with a
-  3-attempt limit.
-- **Event coverage:** Collections emit CREATED/SUCCESSFUL/FAILED events;
-  payouts emit SUCCESSFUL once they are fully settled on-chain. Each payload is
-  automatically camelCased before delivery.
-- **ApiServiceLogs:** the `api_logger` middleware measures latency per request,
-  increments total calls, and records success/error rates. You can consume the
-  aggregated metrics via the dashboard API endpoints under `api-glance`.
+- **Webhook delivery:** Knit signs every webhook with your business secret and
+  retries failed deliveries for up to 12 hours (three attempts). Keep your
+  endpoint idempotent so duplicate deliveries are safe.
+- **Event coverage:** Collections emit CREATED/SUCCESSFUL/FAILED events; payouts
+  emit SUCCESSFUL once they are fully settled on-chain.
+- **Usage metrics:** You can monitor request counts, success/error rates, and
+  latency via the Analytics section of the dashboard (`API Glance`).
 
 #### Error & Response Envelope
 
