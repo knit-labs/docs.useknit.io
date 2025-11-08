@@ -16,29 +16,31 @@ authentication, and webhook side-effects before touching any endpoint.
 Because API services do not have their own spendable balances, every call that
 credits or debits value ultimately updates `BusinessApiServicesWallet`.
 
-#### Money-Movement Flows
+#### Money-Movement Flows (What Merchants Should Know)
 
-The `useknit-api` application models the following flows (see
-`docs/funds-flow.md` in the main repo for diagrams):
+All activity you trigger through the API ultimately affects the **API Account**
+balance. Keep these scenarios in mind when planning your integration:
 
-1. **External Deposit → Business Wallet:** triggered by KnitCore webhooks, writes
-   to `transactions` with `trx_category = WALLET_DEPOSIT`.
-2. **Business Wallet Withdrawal:** dashboard-driven outflows to exchanges or cold
-   storage.
-3. **Business Wallet → API Account:** fund the API account before using payouts
-   or when reserving balance for programmatic activity.
-4. **API Account → Business Wallet:** return unused API funds to the main wallet.
-5. **Collections → API Account:** single-use addresses credit value into the API
-   account once confirmed on-chain.
-6. **API Wallets → API Account:** reusable merchant/customer wallets also credit
-   the API account after `WalletTransaction` entries settle.
-7. **Payouts → External Recipient:** debits API account balance, posts the
-   payout to KnitCore, and emits webhook notifications.
-8. **Subscriptions:** (if enabled) try to charge the Business Wallet first and
-   then fall back to the API account.
+1. **Fund the API Account from the dashboard.** Move USDT/USDC from the business
+   wallet into the API account before creating payouts. This is a manual step so
+   you stay in control of how much balance programmatic flows can touch.
+2. **Collections credit the API Account.** Every one-time collection address you
+   create funnels the confirmed proceeds into the API account automatically—no
+   extra transfer needed.
+3. **API Wallet deposits also credit the API Account.** Reusable wallets (for
+   customer balances or recurring payments) record each deposit and then top up
+   the API account so the funds are ready for payouts or internal transfers.
+4. **Payouts debit the API Account.** When you call `POST /api/v1/payouts`, Knit
+   verifies that the API account for the specified token has enough balance,
+   locks it, and then submits the transfer. Successful completions trigger the
+   `PAYOUT_SUCCESSFUL` webhook.
+5. **Return unused balance when you’re done.** If you want to move funds back to
+   the main business wallet, use the dashboard action to transfer from API
+   account → business wallet.
 
-When you read `balance_before`/`balance_after` pairs in API responses, they are
-coming from the API account ledger (`api_account_transactions`).
+Whenever you see `balanceBefore` / `balanceAfter` in API responses, those values
+represent the API account ledger. Monitoring that balance is the best way to
+determine how much runway you have left for programmatic payouts.
 
 #### Authentication Path
 
