@@ -44,17 +44,20 @@ determine how much runway you have left for programmatic payouts.
 
 #### Authentication Path
 
-Every `/api/v1/**` route uses the `dual_auth` middleware:
+Every `/api/v1/**` route expects **OAuth 2.0 client-credential tokens**. Provide
+`Authorization: Bearer <access-token>` and the platform will:
 
-1. Inspect the `Authorization` header for a JWT bearer token issued by Passport.
-2. If absent, fall back to the `X-API-KEY` header.
-3. Resolve the underlying business, verify IP whitelist membership, and attach
-   the business to `Request->user` so downstream controllers can access `$request->user`.
-4. When a bearer token is used, `OAuthScopeService` enforces resource-specific
-   scopes (for example `payouts:write` for `POST /api/v1/payouts`).
+1. Validate the token signature/expiry using Passport and extract the OAuth
+   client plus its scopes.
+2. Resolve the associated business, enforce the business-level IP whitelist, and
+   expose that business to controllers via `$request->user`.
+3. Check the route’s required scope via `OAuthScopeService` (for example
+   `payouts:write` for `POST /api/v1/payouts`). Requests without the correct
+   scope are rejected with “Insufficient permissions”.
 
-This means example payloads in the docs can be mixed-and-matched (API key today,
-OAuth tomorrow) without changing the rest of your integration.
+> The `X-API-KEY` header still works for **legacy** integrations, but we
+> recommend migrating to OAuth for scoped access control, richer audit logs, and
+> easier credential rotation.
 
 #### Webhooks & Observability
 
