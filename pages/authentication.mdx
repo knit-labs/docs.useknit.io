@@ -37,13 +37,13 @@ curl --location '{{baseUrl}}/oauth/token' \
   --data '{
     "grant_type": "client_credentials",
     "client_id": "<client-id>",
-    "client_secret": "<plain-secret>",
-    "scope": "collections:write payouts:write wallets:read"
+    "client_secret": "<plain-secret>"
   }'
 ```
 
-The response contains `access_token`, `expires_in`, and `token_type` (`Bearer`).
-Supply that token in the `Authorization` header for subsequent API calls.
+The response contains `token_type`, `expires_in` (default is 900 seconds), and
+`access_token`. Supply that token in the `Authorization` header for subsequent
+API calls.
 
 ##### Scopes
 
