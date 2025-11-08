@@ -28,8 +28,8 @@ credentials when you are ready.
 1. **Create or onboard a business** in the Knit dashboard.
 2. **Configure authentication** — generate an API key or create an OAuth client
    (see the [Authentication](/authentication) page).
-3. **Whitelist outgoing IPs** so the `dual_auth` middleware accepts your
-   requests.
+3. **Whitelist your server IPs** in the dashboard so authenticated requests are
+   allowed through to the API.
 4. **Set the webhook URL + secret** under Business → Developer → Webhooks to
    receive collection/payout events.
 5. **Call the service endpoints** documented in the navigation (Collections,
@@ -37,11 +37,11 @@ credentials when you are ready.
 
 #### Request/Response Conventions
 
-- JSON only. Send camelCase keys; the API converts them to snake_case
-  internally.
-- Responses are automatically camelCased by middleware, and the shared response
-  envelope includes `success`, `statusCode`, `message`, `data`, and optional
-  pagination metadata.
+- JSON only. The request/response examples in this documentation match exactly
+  what the API expects and returns.
+- Responses always include the shared envelope (`success`, `statusCode`,
+  `message`, `data`, and optional pagination metadata) so you can rely on a
+  consistent structure across endpoints.
 - Where relevant we show both `X-API-KEY` and `Authorization: Bearer` header
   options so you can choose the auth strategy that fits your rollout plan.
 

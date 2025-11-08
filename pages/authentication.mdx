@@ -1,19 +1,15 @@
 ### Authentication & Request Conventions
 
-Knit’s public API is served from `https://api.useknit.io` and versioned under
-`/api/v1`. All examples in this documentation use the placeholder
-`{{baseUrl}}`—replace it with the base URL that matches your environment
-(production or sandbox) before calling an endpoint.
+Knit’s public API is versioned under `/api/v1`. Use
+`https://api-prod.useknit.io` for production traffic and
+`https://api-dev.useknit.io` for pre-production testing. Throughout the docs we
+refer to these as `{{baseUrl}}`; substitute whichever environment you are
+targeting when making a request.
 
 #### Request & Response Shape
 
-- **Request casing:** send payload keys in camelCase. Every request class inside
-  `useknit-api` extends `BaseRequest`, which automatically maps camelCase inputs
-  to Laravel’s internal snake_case fields.
-- **Response casing:** the `TransformResponseToCamelCase` middleware rewrites all
-  JSON responses to camelCase, so you never have to convert the keys coming back
-  from the API.
-- **Content-Type:** all endpoints accept and return JSON.
+- **Content-Type:** all endpoints accept and return JSON. Example payloads in
+  this documentation mirror what the API expects.
 
 #### Authentication Options
 
@@ -25,12 +21,14 @@ All `/api/v1/**` routes accept the following credential types:
 | OAuth 2.0 Client Credentials | `Authorization: Bearer <access token>` | Recommended for new integrations. Create OAuth clients in Business → Developer → OAuth Clients and request scoped access tokens. |
 
 > You may send both headers during migrations—the platform prioritises the
-> bearer token and falls back to `X-API-KEY` if it is absent.
+> bearer token and falls back to `X-API-KEY` if it is absent—but note that API
+> keys are being deprecated, so plan to rely solely on OAuth going forward.
 
 #### Getting an OAuth Access Token
 
-1. Create or rotate a client by calling `POST /business/developer/oauth-clients`
-   inside the dashboard (or via the private admin API).
+1. In the Knit dashboard, navigate to **Business → Developer → OAuth Clients**
+   and create (or rotate) a client. Copy the client ID and plain secret. No API
+   call is required for this step.
 2. Request a bearer token via Passport’s client credentials grant:
 
 ```bash
