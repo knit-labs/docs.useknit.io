@@ -63,14 +63,13 @@ scope, the API returns `401 Insufficient permissions`.
 
 #### IP Whitelisting
 
-Both API keys and OAuth clients inherit the business-level IP whitelist. Knit
-extracts the caller’s IP (respecting `X-Forwarded-For`) and compares it to the
-list configured in the dashboard. Requests from non-whitelisted IPs are rejected
-with `401 IP address not whitelisted`. Add your outbound IP(s) before hitting
-production.
+Provide the outbound IP addresses of your servers in the dashboard and we’ll
+add them to your business whitelist. Any request coming from an IP that is not
+on that list is rejected with `401 IP address not whitelisted`, so be sure to
+register staging/production IPs before going live.
 
 #### Rate Limiting
 
 Use the provided API keys or OAuth clients per application/service rather than
-sharing them between environments. Doing so ensures accurate usage metrics in
-`ApiServiceLogs` and simplifies throttling if a single integration misbehaves.
+sharing them between environments. This keeps credentials easy to rotate and
+limits blast radius if one integration needs to be paused.
