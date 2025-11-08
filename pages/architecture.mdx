@@ -47,8 +47,8 @@ determine how much runway you have left for programmatic payouts.
 Every `/api/v1/**` route expects **OAuth 2.0 client-credential tokens**. Provide
 `Authorization: Bearer <access-token>` and the platform will:
 
-1. Validate the token signature/expiry using Passport and extract the OAuth
-   client plus its scopes.
+1. Validate the token signature/expiry and extract the OAuth client plus its
+   scopes.
 2. Resolve the business tied to that client, make sure the caller’s IP address
    is on the approved list, and continue the request on behalf of that business.
 3. Confirm the route’s required scope (for example `payouts:write` for

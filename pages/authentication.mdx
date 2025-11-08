@@ -29,7 +29,7 @@ All `/api/v1/**` routes accept the following credential types:
 1. In the Knit dashboard, navigate to **Business → Developer → OAuth Clients**
    and create (or rotate) a client. Copy the client ID and plain secret. No API
    call is required for this step.
-2. Request a bearer token via Passport’s client credentials grant:
+2. Request a bearer token via the OAuth 2.0 client credentials grant:
 
 ```bash
 curl --location '{{baseUrl}}/oauth/token' \
