@@ -15,18 +15,17 @@ Knit’s public API is served from `https://api.useknit.io` and versioned under
   from the API.
 - **Content-Type:** all endpoints accept and return JSON.
 
-#### Dual Authentication
+#### Authentication Options
 
-All `/api/v1/**` routes are protected by the `dual_auth` middleware. Provide one
-of the following credential types with every request:
+All `/api/v1/**` routes accept the following credential types:
 
 | Method | Required Header(s) | When to Use |
 | ------ | ------------------ | ----------- |
 | API Key | `X-API-KEY: <server key>` | Legacy keys that you manage in the Business → Developer → API Keys section of the dashboard. |
 | OAuth 2.0 Client Credentials | `Authorization: Bearer <access token>` | Recommended for new integrations. Create OAuth clients in Business → Developer → OAuth Clients and request scoped access tokens. |
 
-> You may send both headers during migrations—the middleware will prioritise the
-> bearer token and fall back to `X-API-KEY` if it is absent.
+> You may send both headers during migrations—the platform prioritises the
+> bearer token and falls back to `X-API-KEY` if it is absent.
 
 #### Getting an OAuth Access Token
 
@@ -60,15 +59,15 @@ Scopes follow the `resource:action` pattern:
 
 Write scopes implicitly grant read access (e.g. `payouts:write` can also perform
 `GET /api/v1/payouts`). If a request reaches an endpoint without the required
-scope, the middleware returns `401 Insufficient permissions`.
+scope, the API returns `401 Insufficient permissions`.
 
 #### IP Whitelisting
 
-Both API keys and OAuth clients inherit the business-level IP whitelist. The
-middleware extracts the caller’s IP (respecting `X-Forwarded-For`) and compares
-it to the list configured in the dashboard. Requests from non-whitelisted IPs
-are rejected with `401 IP address not whitelisted`. Add your outbound IP(s)
-before hitting production.
+Both API keys and OAuth clients inherit the business-level IP whitelist. Knit
+extracts the caller’s IP (respecting `X-Forwarded-For`) and compares it to the
+list configured in the dashboard. Requests from non-whitelisted IPs are rejected
+with `401 IP address not whitelisted`. Add your outbound IP(s) before hitting
+production.
 
 #### Rate Limiting
 
