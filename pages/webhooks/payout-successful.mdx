@@ -1,0 +1,57 @@
+### Payout Successful Webhook
+
+Knit sends this webhook whenever a payout you initiated reaches the `COMPLETED`
+state on-chain. Use it to reconcile your ledger, unlock downstream workflows, or
+notify your end customer.
+
+#### Event Type
+
+```
+PAYOUT_SUCCESSFUL
+```
+
+#### Delivery
+
+- **URL:** The webhook URL configured under Business → Developer → Webhooks.
+- **Method:** `POST`
+- **Headers:**
+  - `Content-Type: application/json`
+  - `X-Signature: <HMAC SHA-256>` (generated from the raw JSON body using your
+    business webhook secret)
+
+#### Sample Payload
+
+```json copy
+{
+  "eventType": "PAYOUT_SUCCESSFUL",
+  "payout": {
+    "id": "8e5697e3-8265-455b-984a-0eb40e10b0f9",
+    "businessId": "b7b93a40-4e18-4e97-9c5f-8a7a4fd0df92",
+    "token": "USDT",
+    "network": "MATIC_MAINNET",
+    "amount": "100.25",
+    "merchantReference": "INV-2045",
+    "toAddress": "0x56adfcc254ab3b8142a275c1837bcffaff5aa38b",
+    "transactionHash": "0xb0b1...f2",
+    "status": "COMPLETED",
+    "createdAt": "2024-10-02T11:21:33Z",
+    "updatedAt": "2024-10-02T11:32:01Z"
+  }
+}
+```
+
+All keys are camelCase to match the rest of the API surface.
+
+#### Handling Guidance
+
+1. **Verify authenticity.** Recreate the `X-Signature` using your webhook secret
+   and compare before processing.
+2. **Idempotency.** Make the handler idempotent; Knit retries failed deliveries
+   for up to 12 hours (max three attempts), so you may receive duplicates.
+3. **Reconcile balances.** Use the payload to mark the payout as complete in your
+   system and release any funds you were holding.
+4. **Fetch more details if needed.** Call `GET /api/v1/payouts/{id}` to retrieve
+   the latest record if you need additional metadata.
+
+If you are not receiving these notifications, double-check the webhook URL,
+secret, and IP restrictions in the dashboard.

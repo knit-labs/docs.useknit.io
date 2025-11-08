@@ -1,3 +1,8 @@
 {
-  "update-user-webhook-url": "Update User Webhook URL"
+  "collection-confirmed": "Collection Confirmed",
+  "collection-successful": "Collection Successful",
+  "collection-failed": "Collection Failed",
+  "wallet-funding-successful": "Wallet Funding Successful",
+  "payout-successful": "Payout Successful",
+  "update-user-webhook-url": "Update Webhook Settings"
 }
