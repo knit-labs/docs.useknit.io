@@ -14,7 +14,7 @@ authentication, and webhook side-effects before touching any endpoint.
 | API Services | The feature layer: collections (single-use addresses), API wallets (reusable addresses), payouts, and the transactions that record each movement. |
 
 Because API services do not have their own spendable balances, every call that
-credits or debits value ultimately updates `BusinessApiServicesWallet`.
+credits or debits value ultimately updates the API Account.
 
 #### Money-Movement Flows (What Merchants Should Know)
 
