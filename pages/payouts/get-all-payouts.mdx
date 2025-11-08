@@ -26,14 +26,15 @@
 
 ##### Headers
 
-- X-API-KEY: Your unique API key for authentication.
+- Authentication: `Authorization: Bearer <token>` (preferred) or the legacy
+  `X-API-KEY: {{apiKey}}`.
 - Accept: Set to application/json to ensure the response is in JSON format.
 
 ##### Sample Request
 
 ```sh copy
 curl --location -g '{{baseUrl}}/api/v1/payouts' \
---header 'X-API-KEY: {{apiKey}}' \
+--header 'Authorization: Bearer {{token}}' \
 --header 'Accept: application/json'
 ```
 

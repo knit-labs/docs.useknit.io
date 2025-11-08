@@ -26,7 +26,8 @@
 
 ##### Headers
 
-- X-API-KEY: Your API key, which authorizes the request.
+- Authentication: `Authorization: Bearer <token>` (preferred) or the legacy
+  `X-API-KEY: {{apiKey}}`.
 - Accept: Set to application/json to receive the response in JSON format.
 
 ##### Path Variables
@@ -37,6 +38,6 @@
 
 ```sh copy
 curl --location -g --request DELETE '{{baseUrl}}/api/v1/payouts/bf81f144-efca-422a-aed7-bf7bf52da26b' \
---header 'X-API-KEY: {{apiKey}}' \
+--header 'Authorization: Bearer {{token}}' \
 --header 'Accept: application/json'
 ```

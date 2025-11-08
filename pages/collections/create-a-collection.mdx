@@ -33,9 +33,8 @@
 
 ##### Headers
 
-- X-API-KEY: Your server-side API key **or** `Authorization: Bearer <token>` if
-  you are using OAuth 2.0 client credentials. See
-  [Authentication](/authentication) for details.
+- Authentication: `Authorization: Bearer <token>` (preferred) or the legacy
+  `X-API-KEY: {{apiKey}}`. See [Authentication](/authentication) for details.
 - Accept: Set to application/json to receive responses in JSON format.
 
 ##### Prerequisites & Behavior

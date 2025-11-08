@@ -32,8 +32,8 @@ This endpoint fetches a list of all wallets created by the user, across all supp
 
 ##### Headers
 
-- X-API-KEY: Your unique API key **or** use `Authorization: Bearer <token>` if
-  you are authenticating with OAuth.
+- Authentication: Send `Authorization: Bearer <token>` (recommended) or the
+  legacy `X-API-KEY: {{apiKey}}` header.
 - Accept: Set to application/json to ensure the response is in JSON format.
 
 ##### Sample Request
