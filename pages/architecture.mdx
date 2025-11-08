@@ -51,9 +51,9 @@ Every `/api/v1/**` route expects **OAuth 2.0 client-credential tokens**. Provide
    client plus its scopes.
 2. Resolve the business tied to that client, make sure the caller’s IP address
    is on the approved list, and continue the request on behalf of that business.
-3. Check the route’s required scope via `OAuthScopeService` (for example
-   `payouts:write` for `POST /api/v1/payouts`). Requests without the correct
-   scope are rejected with “Insufficient permissions”.
+3. Confirm the route’s required scope (for example `payouts:write` for
+   `POST /api/v1/payouts`). Requests without the correct scope are rejected with
+   “Insufficient permissions”.
 
 > The `X-API-KEY` header still works for **legacy** integrations, but we
 > recommend migrating to OAuth for scoped access control, richer audit logs, and
