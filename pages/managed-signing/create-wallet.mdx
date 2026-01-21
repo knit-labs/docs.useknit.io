@@ -1,0 +1,112 @@
+### Knit API Documentation
+
+#### Create Managed Signing Wallet
+
+<div style={{ display: "flex", alignItems: "center" }}>
+  ##### Endpoint
+  <span
+    style={{
+      display: "block",
+      backgroundColor: "#fff9eb",
+      color: "#d0a626",
+      marginLeft: "-17px",
+      padding: "0px 6px",
+      fontSize: ".8rem",
+      borderRadius: "5px",
+      marginTop: "30px",
+    }}
+  >
+    POST
+  </span>
+</div>
+
+```js copy
+{{baseUrl}}/api/v1/managed-signing/wallets
+```
+
+This endpoint creates a new managed signing wallet for a specified blockchain network type.
+
+##### Supported Networks
+
+- `ETH_MAINNET`
+- `ETHEREUM_MAINNET`
+- `MATIC_MAINNET`
+- `BSC_MAINNET`
+- `BASE_MAINNET`
+
+##### Headers
+
+- `X-API-KEY`: Your API key for authentication.
+- `Accept`: Set to `application/json` to receive responses in JSON format.
+- `Content-Type`: Set to `application/json`.
+
+##### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `type` | string | Yes | Wallet type (e.g., `EVM`) |
+| `networks` | array | Yes | Array of supported networks |
+| `merchantCallbackUrl` | string | No | URL for receiving callbacks |
+
+```json copy
+{
+  "type": "EVM",
+  "networks": ["ETHEREUM_MAINNET"],
+  "merchantCallbackUrl": "https://example.com/callback"
+}
+```
+
+##### Sample Request
+
+```sh copy
+curl --location -g '{{baseUrl}}/api/v1/managed-signing/wallets' \
+--header 'X-API-KEY: {{apiKey}}' \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
+--data '{
+    "type": "EVM",
+    "networks": ["ETHEREUM_MAINNET"],
+    "merchantCallbackUrl": "https://example.com/callback"
+}'
+```
+
+##### Sample Response
+
+```json copy filename="Sample Response"
+{
+  "statusCode": 201,
+  "message": "Wallet created",
+  "data": {
+    "id": "<local-wallet-id>",
+    "businessId": "<business-id>",
+    "type": "EVM",
+    "networks": ["ETH_MAINNET"],
+    "network": "ETH_MAINNET",
+    "address": "0x...",
+    "hdPath": "m/44'/60'/0'/0/0",
+    "keyId": "<key-id>",
+    "isActive": true,
+    "merchantCallbackUrl": "https://example.com/callback",
+    "createdAt": "2026-01-20T18:30:40.912Z",
+    "updatedAt": "2026-01-20T18:30:40.912Z"
+  },
+  "success": true
+}
+```
+
+##### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Local wallet ID (use this in subsequent requests) |
+| `businessId` | string | Your business ID |
+| `type` | string | Wallet type |
+| `networks` | array | Supported networks |
+| `network` | string | Primary network |
+| `address` | string | Wallet address |
+| `hdPath` | string | HD derivation path |
+| `keyId` | string | Key identifier |
+| `isActive` | boolean | Wallet active status |
+| `merchantCallbackUrl` | string | Callback URL |
+| `createdAt` | string | Creation timestamp |
+| `updatedAt` | string | Last update timestamp |

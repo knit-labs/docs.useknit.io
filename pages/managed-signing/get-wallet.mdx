@@ -1,0 +1,87 @@
+### Knit API Documentation
+
+#### Get Managed Signing Wallet
+
+<div style={{ display: "flex", alignItems: "center" }}>
+  ##### Endpoint
+  <span
+    style={{
+      display: "block",
+      backgroundColor: "#ebfbfa",
+      color: "#194d53",
+      marginLeft: "-17px",
+      padding: "0px 6px",
+      fontSize: ".8rem",
+      borderRadius: "5px",
+      marginTop: "30px",
+    }}
+  >
+    GET
+  </span>
+</div>
+
+```js copy
+{{baseUrl}}/api/v1/managed-signing/wallets/{walletId}
+```
+
+This endpoint retrieves a specific managed signing wallet by its local ID.
+
+##### Headers
+
+- `X-API-KEY`: Your API key for authentication.
+- `Accept`: Set to `application/json` to receive responses in JSON format.
+
+##### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `walletId` | string | Yes | The local wallet ID returned by create/list endpoints |
+
+##### Sample Request
+
+```sh copy
+curl --location -g '{{baseUrl}}/api/v1/managed-signing/wallets/<local-wallet-id>' \
+--header 'X-API-KEY: {{apiKey}}' \
+--header 'Accept: application/json'
+```
+
+##### Sample Response
+
+```json copy filename="Sample Response"
+{
+  "statusCode": 200,
+  "message": "Wallet retrieved",
+  "data": {
+    "id": "<local-wallet-id>",
+    "businessId": "<business-id>",
+    "type": "EVM",
+    "networks": ["ETH_MAINNET"],
+    "network": "ETH_MAINNET",
+    "address": "0x...",
+    "hdPath": "m/44'/60'/0'/0/0",
+    "keyId": "<key-id>",
+    "isActive": true,
+    "merchantCallbackUrl": "https://example.com/callback",
+    "createdAt": "2026-01-20T18:30:40.912Z",
+    "updatedAt": "2026-01-20T18:30:40.912Z"
+  },
+  "success": true
+}
+```
+
+##### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Local wallet ID |
+| `businessId` | string | Your business ID |
+| `type` | string | Wallet type |
+| `networks` | array | Supported networks |
+| `network` | string | Primary network |
+| `address` | string | Wallet address |
+| `hdPath` | string | HD derivation path |
+| `keyId` | string | Key identifier |
+| `isActive` | boolean | Wallet active status |
+| `merchantCallbackUrl` | string | Callback URL |
+| `createdAt` | string | Creation timestamp |
+| `updatedAt` | string | Last update timestamp |

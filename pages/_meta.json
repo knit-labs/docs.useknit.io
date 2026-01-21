@@ -3,6 +3,7 @@
   "architecture": "Architecture",
   "authentication": "Authentication",
   "wallets": "Wallets",
+  "managed-signing": "Managed Signing",
   "user": "User",
   "collections": "Collections",
   "API-account": "API Account",

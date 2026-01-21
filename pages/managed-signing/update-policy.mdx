@@ -1,0 +1,106 @@
+### Knit API Documentation
+
+#### Update Policy
+
+<div style={{ display: "flex", alignItems: "center" }}>
+  ##### Endpoint
+  <span
+    style={{
+      display: "block",
+      backgroundColor: "#f0e6ff",
+      color: "#6b21a8",
+      marginLeft: "-17px",
+      padding: "0px 6px",
+      fontSize: ".8rem",
+      borderRadius: "5px",
+      marginTop: "30px",
+    }}
+  >
+    PATCH
+  </span>
+</div>
+
+```js copy
+{{baseUrl}}/api/v1/managed-signing/policies/{policyId}
+```
+
+This endpoint updates an existing policy by its local ID.
+
+##### Headers
+
+- `X-API-KEY`: Your API key for authentication.
+- `Accept`: Set to `application/json` to receive responses in JSON format.
+- `Content-Type`: Set to `application/json`.
+
+##### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `policyId` | string | Yes | The local policy ID |
+
+##### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | No | Policy name |
+| `rules` | object | No | Policy rules configuration |
+| `rules.chains` | array | No | Allowed blockchain networks |
+| `rules.maxApprovalAmount` | string | No | Maximum approval amount |
+| `rules.denyUnlimitedApprovals` | boolean | No | Whether to deny unlimited approvals |
+
+```json copy
+{
+  "rules": {
+    "maxApprovalAmount": "2000000",
+    "denyUnlimitedApprovals": false
+  }
+}
+```
+
+##### Sample Request
+
+```sh copy
+curl --location -g --request PATCH '{{baseUrl}}/api/v1/managed-signing/policies/<local-policy-id>' \
+--header 'X-API-KEY: {{apiKey}}' \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
+--data '{
+    "rules": {
+        "maxApprovalAmount": "2000000",
+        "denyUnlimitedApprovals": false
+    }
+}'
+```
+
+##### Sample Response
+
+```json copy filename="Sample Response"
+{
+  "statusCode": 200,
+  "message": "Policy updated",
+  "data": {
+    "id": "<local-policy-id>",
+    "businessId": "<business-id>",
+    "name": "default",
+    "rules": {
+      "chains": ["ETHEREUM_MAINNET"],
+      "maxApprovalAmount": "2000000",
+      "denyUnlimitedApprovals": false
+    },
+    "createdAt": "2026-01-20T18:30:40.912Z",
+    "updatedAt": "2026-01-20T19:15:22.456Z"
+  },
+  "success": true
+}
+```
+
+##### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Local policy ID |
+| `businessId` | string | Your business ID |
+| `name` | string | Policy name |
+| `rules` | object | Policy rules configuration |
+| `createdAt` | string | Creation timestamp |
+| `updatedAt` | string | Last update timestamp |

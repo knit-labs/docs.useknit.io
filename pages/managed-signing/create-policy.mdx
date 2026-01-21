@@ -1,0 +1,104 @@
+### Knit API Documentation
+
+#### Create Policy
+
+<div style={{ display: "flex", alignItems: "center" }}>
+  ##### Endpoint
+  <span
+    style={{
+      display: "block",
+      backgroundColor: "#fff9eb",
+      color: "#d0a626",
+      marginLeft: "-17px",
+      padding: "0px 6px",
+      fontSize: ".8rem",
+      borderRadius: "5px",
+      marginTop: "30px",
+    }}
+  >
+    POST
+  </span>
+</div>
+
+```js copy
+{{baseUrl}}/api/v1/managed-signing/policies
+```
+
+This endpoint creates a new policy for managing signing request rules.
+
+##### Headers
+
+- `X-API-KEY`: Your API key for authentication.
+- `Accept`: Set to `application/json` to receive responses in JSON format.
+- `Content-Type`: Set to `application/json`.
+
+##### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Policy name |
+| `rules` | object | Yes | Policy rules configuration |
+| `rules.chains` | array | No | Allowed blockchain networks |
+| `rules.maxApprovalAmount` | string | No | Maximum approval amount |
+| `rules.denyUnlimitedApprovals` | boolean | No | Whether to deny unlimited approvals |
+
+```json copy
+{
+  "name": "default",
+  "rules": {
+    "chains": ["ETHEREUM_MAINNET"],
+    "maxApprovalAmount": "1000000",
+    "denyUnlimitedApprovals": true
+  }
+}
+```
+
+##### Sample Request
+
+```sh copy
+curl --location -g '{{baseUrl}}/api/v1/managed-signing/policies' \
+--header 'X-API-KEY: {{apiKey}}' \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
+--data '{
+    "name": "default",
+    "rules": {
+        "chains": ["ETHEREUM_MAINNET"],
+        "maxApprovalAmount": "1000000",
+        "denyUnlimitedApprovals": true
+    }
+}'
+```
+
+##### Sample Response
+
+```json copy filename="Sample Response"
+{
+  "statusCode": 201,
+  "message": "Policy created",
+  "data": {
+    "id": "<local-policy-id>",
+    "businessId": "<business-id>",
+    "name": "default",
+    "rules": {
+      "chains": ["ETHEREUM_MAINNET"],
+      "maxApprovalAmount": "1000000",
+      "denyUnlimitedApprovals": true
+    },
+    "createdAt": "2026-01-20T18:30:40.912Z",
+    "updatedAt": "2026-01-20T18:30:40.912Z"
+  },
+  "success": true
+}
+```
+
+##### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Local policy ID (use this in subsequent requests) |
+| `businessId` | string | Your business ID |
+| `name` | string | Policy name |
+| `rules` | object | Policy rules configuration |
+| `createdAt` | string | Creation timestamp |
+| `updatedAt` | string | Last update timestamp |

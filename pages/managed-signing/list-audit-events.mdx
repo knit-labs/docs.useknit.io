@@ -1,0 +1,107 @@
+### Knit API Documentation
+
+#### List Audit Events
+
+<div style={{ display: "flex", alignItems: "center" }}>
+  ##### Endpoint
+  <span
+    style={{
+      display: "block",
+      backgroundColor: "#ebfbfa",
+      color: "#194d53",
+      marginLeft: "-17px",
+      padding: "0px 6px",
+      fontSize: ".8rem",
+      borderRadius: "5px",
+      marginTop: "30px",
+    }}
+  >
+    GET
+  </span>
+</div>
+
+```js copy
+{{baseUrl}}/api/v1/managed-signing/audit
+```
+
+This endpoint retrieves audit events for signing requests. Audit events are fetched from Knit Core but mapped by local request ID.
+
+##### Headers
+
+- `X-API-KEY`: Your API key for authentication.
+- `Accept`: Set to `application/json` to receive responses in JSON format.
+
+##### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `requestId` | string | No | Filter by local request ID |
+
+##### Sample Request
+
+```sh copy
+curl --location -g '{{baseUrl}}/api/v1/managed-signing/audit?requestId=<local-request-id>' \
+--header 'X-API-KEY: {{apiKey}}' \
+--header 'Accept: application/json'
+```
+
+##### Sample Response
+
+```json copy filename="Sample Response"
+{
+  "statusCode": 200,
+  "message": "Audit events retrieved",
+  "data": [
+    {
+      "id": "<audit-event-id>",
+      "requestId": "<local-request-id>",
+      "action": "SIGNING_REQUEST_CREATED",
+      "actor": "api_key",
+      "timestamp": "2026-01-20T18:30:40.912Z",
+      "metadata": {
+        "walletId": "<local-wallet-id>",
+        "network": "MATIC_MAINNET",
+        "type": "evm_tx"
+      }
+    },
+    {
+      "id": "<audit-event-id>",
+      "requestId": "<local-request-id>",
+      "action": "SIGNING_REQUEST_APPROVED",
+      "actor": "api_key",
+      "timestamp": "2026-01-20T18:35:22.456Z",
+      "metadata": {
+        "walletId": "<local-wallet-id>",
+        "status": "SIGNED"
+      }
+    }
+  ],
+  "success": true
+}
+```
+
+##### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Audit event ID |
+| `requestId` | string | Local request ID |
+| `action` | string | Action performed |
+| `actor` | string | Who performed the action |
+| `timestamp` | string | When the action occurred |
+| `metadata` | object | Additional event metadata |
+
+##### Audit Actions
+
+| Action | Description |
+|--------|-------------|
+| `SIGNING_REQUEST_CREATED` | A signing request was created |
+| `SIGNING_REQUEST_APPROVED` | A signing request was approved |
+| `SIGNING_REQUEST_DENIED` | A signing request was denied by policy |
+| `SIGNING_REQUEST_FAILED` | A signing request failed |
+
+##### Notes
+
+- Audit events provide a complete history of actions taken on signing requests.
+- Use the `requestId` query parameter to filter events for a specific signing request.
+- All request IDs in audit events are local IDs, not Knit Core IDs.

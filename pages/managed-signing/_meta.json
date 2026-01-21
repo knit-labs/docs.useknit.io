@@ -1,0 +1,15 @@
+{
+  "index": "Overview",
+  "create-wallet": "Create Wallet",
+  "list-wallets": "List Wallets",
+  "get-wallet": "Get Wallet",
+  "create-policy": "Create Policy",
+  "update-policy": "Update Policy",
+  "list-policies": "List Policies",
+  "get-policy": "Get Policy",
+  "create-signing-request": "Create Signing Request",
+  "approve-signing-request": "Approve Signing Request",
+  "get-signing-request": "Get Signing Request",
+  "list-signing-requests": "List Signing Requests",
+  "list-audit-events": "List Audit Events"
+}

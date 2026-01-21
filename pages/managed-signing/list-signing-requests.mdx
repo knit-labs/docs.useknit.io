@@ -1,0 +1,101 @@
+### Knit API Documentation
+
+#### List Signing Requests
+
+<div style={{ display: "flex", alignItems: "center" }}>
+  ##### Endpoint
+  <span
+    style={{
+      display: "block",
+      backgroundColor: "#ebfbfa",
+      color: "#194d53",
+      marginLeft: "-17px",
+      padding: "0px 6px",
+      fontSize: ".8rem",
+      borderRadius: "5px",
+      marginTop: "30px",
+    }}
+  >
+    GET
+  </span>
+</div>
+
+```js copy
+{{baseUrl}}/api/v1/managed-signing/requests
+```
+
+This endpoint retrieves all signing requests for your business with optional filtering.
+
+##### Headers
+
+- `X-API-KEY`: Your API key for authentication.
+- `Accept`: Set to `application/json` to receive responses in JSON format.
+
+##### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `walletId` | string | No | Filter by local wallet ID |
+| `status` | string | No | Filter by status |
+
+##### Available Status Values
+
+- `AWAITING_APPROVAL`
+- `SIGNED`
+- `POLICY_DENIED`
+- `FAILED`
+
+##### Sample Request
+
+```sh copy
+curl --location -g '{{baseUrl}}/api/v1/managed-signing/requests?walletId=<local-wallet-id>&status=SIGNED' \
+--header 'X-API-KEY: {{apiKey}}' \
+--header 'Accept: application/json'
+```
+
+##### Sample Response
+
+```json copy filename="Sample Response"
+{
+  "statusCode": 200,
+  "message": "Signing requests retrieved",
+  "data": [
+    {
+      "id": "<local-request-id>",
+      "businessId": "<business-id>",
+      "walletId": "<local-wallet-id>",
+      "network": "MATIC_MAINNET",
+      "type": "evm_tx",
+      "kind": "erc20_approve",
+      "status": "SIGNED",
+      "payload": {
+        "token": "0xToken",
+        "spender": "0xSpender",
+        "amount": "10"
+      },
+      "signature": "0x...",
+      "broadcast": false,
+      "createdAt": "2026-01-20T18:30:40.912Z",
+      "updatedAt": "2026-01-20T18:35:22.456Z"
+    }
+  ],
+  "success": true
+}
+```
+
+##### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Local request ID |
+| `businessId` | string | Your business ID |
+| `walletId` | string | Local wallet ID |
+| `network` | string | Target network |
+| `type` | string | Request type |
+| `kind` | string | Transaction kind |
+| `status` | string | Request status |
+| `payload` | object | Request payload |
+| `signature` | string | Generated signature (if signed) |
+| `broadcast` | boolean | Broadcast flag |
+| `createdAt` | string | Creation timestamp |
+| `updatedAt` | string | Last update timestamp |
