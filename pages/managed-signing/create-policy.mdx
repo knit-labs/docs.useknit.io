@@ -38,9 +38,8 @@ This endpoint creates a new policy for managing signing request rules.
 |-------|------|----------|-------------|
 | `name` | string | Yes | Policy name |
 | `rules` | object | Yes | Policy rules configuration |
-| `rules.chains` | array | No | Allowed blockchain networks |
-| `rules.maxApprovalAmount` | string | No | Maximum approval amount |
-| `rules.denyUnlimitedApprovals` | boolean | No | Whether to deny unlimited approvals |
+
+##### Basic Example
 
 ```json copy
 {
@@ -52,6 +51,92 @@ This endpoint creates a new policy for managing signing request rules.
   }
 }
 ```
+
+##### Full Policy Rules Schema
+
+```json copy
+{
+  "name": "comprehensive-policy",
+  "rules": {
+    "chains": ["ETHEREUM_MAINNET", "MATIC_MAINNET"],
+    "tokens": ["0xAllowedToken1", "0xAllowedToken2"],
+    "spenders": ["0xAllowedSpender1"],
+    "maxApprovalAmount": "1000000000000000000",
+    "denyUnlimitedApprovals": true,
+    "requireApprovalAbove": "500000000000000000",
+    "rateLimits": {
+      "windowSec": 3600,
+      "maxCount": 10,
+      "maxValue": "5000000000000000000"
+    },
+    "allowRawTx": false,
+    "allowedContracts": ["0xContract1", "0xContract2"],
+    "typedData": {
+      "allow": true,
+      "allowedPrimaryTypes": ["Permit", "Order"],
+      "allowedDomains": [
+        {
+          "name": "Uniswap",
+          "chainId": 1,
+          "verifyingContract": "0xContractAddress"
+        }
+      ]
+    },
+    "message": {
+      "allow": true,
+      "maxBytes": 1024,
+      "allowedPrefixes": ["Sign this message"]
+    }
+  }
+}
+```
+
+##### Policy Rules Reference
+
+**Transaction Controls**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `chains` | string[] | Allowed blockchain networks |
+| `tokens` | string[] | Allowed token contract addresses for approvals |
+| `spenders` | string[] | Allowed spender addresses for approvals |
+| `allowedContracts` | string[] | Contracts allowed for raw transactions |
+| `allowRawTx` | boolean | Allow raw transaction signing |
+
+**Approval Limits**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `maxApprovalAmount` | string | Maximum approval amount (in wei) |
+| `denyUnlimitedApprovals` | boolean | Block unlimited (max uint256) approvals |
+| `requireApprovalAbove` | string | Require manual approval above this amount |
+
+**Rate Limiting**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `rateLimits.windowSec` | number | Time window for rate limiting (seconds) |
+| `rateLimits.maxCount` | number | Max requests allowed in time window |
+| `rateLimits.maxValue` | string | Max total value in time window (wei) |
+
+**EIP-712 Typed Data Controls**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `typedData.allow` | boolean | Allow EIP-712 signing |
+| `typedData.allowedPrimaryTypes` | string[] | Allowed EIP-712 primary types |
+| `typedData.allowedDomains` | object[] | Allowed EIP-712 domains |
+| `typedData.allowedDomains[].name` | string | Domain name |
+| `typedData.allowedDomains[].chainId` | number | Chain ID |
+| `typedData.allowedDomains[].verifyingContract` | string | Contract address |
+
+**EIP-191 Message Controls**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `message.allow` | boolean | Allow EIP-191 message signing |
+| `message.maxBytes` | number | Max message size in bytes |
+| `message.allowedPrefixes` | string[] | Required message prefixes |
 
 ##### Sample Request
 

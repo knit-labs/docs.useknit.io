@@ -24,7 +24,15 @@
 {{baseUrl}}/api/v1/managed-signing/requests
 ```
 
-This endpoint creates a new signing request. Supports EVM transactions and EIP-712 typed data signing.
+This endpoint creates a new signing request. Supports EVM transactions, EIP-712 typed data signing, and EIP-191 message signing.
+
+##### Signing Request Types
+
+| Type | Description |
+|------|-------------|
+| `evm_tx` | EVM transaction signing (e.g., ERC20 approvals, raw transactions) |
+| `eip712` | EIP-712 typed data signing (structured data with domain separator) |
+| `eip191` | EIP-191 message signing (personal sign messages) |
 
 ##### Supported Networks
 
@@ -45,7 +53,7 @@ This endpoint creates a new signing request. Supports EVM transactions and EIP-7
 |-------|------|----------|-------------|
 | `walletId` | string | Yes | Local wallet ID |
 | `network` | string | Yes | Target network |
-| `type` | string | Yes | Request type (`evm_tx` or `eip712`) |
+| `type` | string | Yes | Request type (`evm_tx`, `eip712`, or `eip191`) |
 | `kind` | string | Conditional | Transaction kind (required for `evm_tx`, e.g., `erc20_approve`) |
 | `payload` | object | Yes | Request payload |
 | `broadcast` | boolean | No | Whether to broadcast the transaction |
@@ -125,6 +133,32 @@ This endpoint creates a new signing request. Supports EVM transactions and EIP-7
 
 ---
 
+##### EIP-191 Message Signing
+
+```json copy
+{
+  "walletId": "<local-wallet-id>",
+  "network": "ETHEREUM_MAINNET",
+  "type": "eip191",
+  "payload": {
+    "message": "Sign this message to verify ownership"
+  }
+}
+```
+
+**Payload Fields for EIP-191**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `message` | string | The message to sign |
+
+EIP-191 is commonly used for:
+- Wallet ownership verification
+- Off-chain authentication
+- Simple message signing without structured data
+
+---
+
 ##### Sample Request (EVM TX)
 
 ```sh copy
@@ -186,6 +220,11 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/requests' \
 | `status` | string | Request status |
 | `payload` | object | Request payload |
 | `broadcast` | boolean | Broadcast flag |
+| `signature` | string | The cryptographic signature (when signed) |
+| `rawSignedTx` | string | Full signed transaction (if `broadcast: false`) |
+| `txHash` | string | Transaction hash (if `broadcast: true`) |
+| `decisionTrace` | object | Policy evaluation details |
+| `errorMessage` | string | Error details (if status is `FAILED` or `POLICY_DENIED`) |
 | `createdAt` | string | Creation timestamp |
 | `updatedAt` | string | Last update timestamp |
 
@@ -193,7 +232,7 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/requests' \
 
 | Status | Description |
 |--------|-------------|
-| `AWAITING_APPROVAL` | Request is pending approval |
-| `SIGNED` | Request has been signed |
-| `POLICY_DENIED` | Request was denied by policy |
-| `FAILED` | Request failed |
+| `AWAITING_APPROVAL` | Request is pending manual approval (exceeds policy threshold) |
+| `SIGNED` | Request was signed successfully |
+| `POLICY_DENIED` | Request was denied by policy rules |
+| `FAILED` | Request failed (see `errorMessage` for details) |
