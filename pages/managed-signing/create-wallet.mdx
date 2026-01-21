@@ -28,7 +28,6 @@ This endpoint creates a new managed signing wallet for a specified blockchain ne
 
 ##### Supported Networks
 
-- `ETH_MAINNET`
 - `ETHEREUM_MAINNET`
 - `MATIC_MAINNET`
 - `BSC_MAINNET`
@@ -80,8 +79,8 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/wallets' \
     "id": "<local-wallet-id>",
     "businessId": "<business-id>",
     "type": "EVM",
-    "networks": ["ETH_MAINNET"],
-    "network": "ETH_MAINNET",
+    "networks": ["ETHEREUM_MAINNET"],
+    "network": "ETHEREUM_MAINNET",
     "address": "0x...",
     "hdPath": "m/44'/60'/0'/0/0",
     "keyId": "<key-id>",
