@@ -1,0 +1,112 @@
+### Knit API Documentation
+
+#### CPN Onboarding Checklist
+
+This checklist maps Circle CPN V2 requirements to Knit's Managed Signing API.
+
+##### Overview
+
+| Step | Action | Endpoint | Frequency |
+|------|--------|----------|-----------|
+| 1 | Create Wallet | `POST /managed-signing/wallets` | Once |
+| 2 | Create Policy | `POST /managed-signing/policies` | Once |
+| 3 | Permit2 Approval | `POST /managed-signing/requests` | Once per token |
+| 4 | Per-Payment Signature | `POST /managed-signing/requests` | Per payment |
+
+---
+
+##### Step 1: Create a Managed Signing Wallet
+
+Create a wallet that will hold funds and sign CPN transactions.
+
+```json copy
+{
+  "type": "EVM",
+  "networks": ["MATIC_MAINNET"]
+}
+```
+
+See: [Create Wallet](/managed-signing/cpn/create-wallet)
+
+---
+
+##### Step 2: Create a CPN Policy
+
+Configure policy rules that allow CPN V2 signature flows.
+
+```json copy
+{
+  "name": "cpn-v2",
+  "rules": {
+    "chains": ["MATIC_MAINNET"],
+    "tokens": ["<USDC token address>"],
+    "spenders": ["<Permit2 contract address>"],
+    "typedData": { "allow": true },
+    "denyUnlimitedApprovals": false,
+    "allowRawTx": false
+  }
+}
+```
+
+See: [Create Policy](/managed-signing/cpn/create-policy)
+
+---
+
+##### Step 3: One-Time Permit2 Approval
+
+Approve the Permit2 contract to spend USDC on behalf of your wallet.
+
+```json copy
+{
+  "walletId": "<wallet-id>",
+  "network": "MATIC_MAINNET",
+  "type": "evm_tx",
+  "kind": "erc20_approve",
+  "payload": {
+    "token": "<USDC token address>",
+    "spender": "<Permit2 contract address>",
+    "amount": "<approval amount>"
+  },
+  "broadcast": true
+}
+```
+
+See: [Permit2 Approval](/managed-signing/cpn/permit2-approval)
+
+---
+
+##### Step 4: Per-Payment Signature
+
+For each payment, Circle provides `messageToBeSigned` (EIP-712 typed data). Sign it and return the signature.
+
+```json copy
+{
+  "walletId": "<wallet-id>",
+  "network": "MATIC_MAINNET",
+  "type": "eip712",
+  "payload": {
+    "typedData": { "...Circle's messageToBeSigned..." }
+  }
+}
+```
+
+See: [Per-Payment Signature](/managed-signing/cpn/per-payment-signature)
+
+---
+
+##### (Optional) Step 5: CPN V1 Raw Transaction
+
+Only needed for legacy CPN V1 integration.
+
+See: [CPN V1 Raw TX](/managed-signing/cpn/cpn-v1-raw-tx)
+
+---
+
+##### Key Addresses
+
+| Network | USDC Token | Permit2 Contract |
+|---------|------------|------------------|
+| Polygon (MATIC_MAINNET) | Contact Circle | Contact Circle |
+| Ethereum (ETHEREUM_MAINNET) | Contact Circle | Contact Circle |
+
+Contact Circle or refer to their documentation for the exact contract addresses for your integration.

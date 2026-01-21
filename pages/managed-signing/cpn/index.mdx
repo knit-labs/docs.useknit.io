@@ -1,0 +1,57 @@
+### Knit API Documentation
+
+#### Circle Payment Network (CPN) Integration
+
+This guide covers how to integrate Knit's Managed Signing API with Circle's Payment Network (CPN) for seamless payment processing.
+
+##### What is CPN?
+
+Circle Payment Network (CPN) is Circle's payment infrastructure that enables fast, low-cost USDC transfers. CPN V2 uses EIP-712 signatures (Permit2) for gasless payment authorization, while CPN V1 uses traditional on-chain transactions.
+
+##### Why Use Knit for CPN?
+
+- **Secure Key Management**: Your signing keys are securely managed by Knit
+- **Policy Controls**: Define granular rules for what can be signed
+- **Simplified Integration**: Single API for wallet creation, policy management, and signing
+- **Audit Trail**: Complete visibility into all signing operations
+
+##### CPN Versions
+
+| Version | Signing Method | Gas Required | Recommended |
+|---------|---------------|--------------|-------------|
+| CPN V2 | EIP-712 (Permit2) | No (gasless) | Yes |
+| CPN V1 | Raw Transaction | Yes | Legacy only |
+
+##### Integration Flow
+
+```
+1. Create Wallet     → POST /managed-signing/wallets
+2. Create Policy     → POST /managed-signing/policies
+3. Permit2 Approval  → POST /managed-signing/requests (one-time, on-chain)
+4. Per-Payment Sign  → POST /managed-signing/requests (per payment, off-chain)
+```
+
+##### Quick Links
+
+- [Onboarding Checklist](/managed-signing/cpn/onboarding-checklist) - Complete setup guide
+- [Create Wallet](/managed-signing/cpn/create-wallet) - Step 1: Create a CPN-enabled wallet
+- [Create Policy](/managed-signing/cpn/create-policy) - Step 2: Configure CPN policy rules
+- [Permit2 Approval](/managed-signing/cpn/permit2-approval) - Step 3: One-time on-chain approval
+- [Per-Payment Signature](/managed-signing/cpn/per-payment-signature) - Step 4: Sign each payment
+- [Troubleshooting](/managed-signing/cpn/troubleshooting) - Common issues and solutions
+
+##### Supported Networks
+
+CPN is typically used on:
+
+- `MATIC_MAINNET` (Polygon)
+- `ETHEREUM_MAINNET`
+
+##### Prerequisites
+
+Before integrating:
+
+1. Obtain your Knit API key
+2. Whitelist your IP addresses
+3. Get the USDC token address for your target network
+4. Get the Permit2 contract address for your target network

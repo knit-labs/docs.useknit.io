@@ -1,0 +1,10 @@
+{
+  "index": "Overview",
+  "onboarding-checklist": "Onboarding Checklist",
+  "create-wallet": "1. Create Wallet",
+  "create-policy": "2. Create Policy",
+  "permit2-approval": "3. Permit2 Approval",
+  "per-payment-signature": "4. Per-Payment Signature",
+  "cpn-v1-raw-tx": "5. CPN V1 (Optional)",
+  "troubleshooting": "Troubleshooting"
+}

@@ -1,0 +1,115 @@
+### Knit API Documentation
+
+#### Step 2: Create CPN Policy
+
+<div style={{ display: "flex", alignItems: "center" }}>
+  ##### Endpoint
+  <span
+    style={{
+      display: "block",
+      backgroundColor: "#fff9eb",
+      color: "#d0a626",
+      marginLeft: "-17px",
+      padding: "0px 6px",
+      fontSize: ".8rem",
+      borderRadius: "5px",
+      marginTop: "30px",
+    }}
+  >
+    POST
+  </span>
+</div>
+
+```js copy
+{{baseUrl}}/api/v1/managed-signing/policies
+```
+
+Create a policy that allows CPN V2 signature flows while restricting signing to only approved tokens and contracts.
+
+##### Headers
+
+- `X-API-KEY`: Your API key for authentication.
+- `Accept`: Set to `application/json` to receive responses in JSON format.
+- `Content-Type`: Set to `application/json`.
+
+##### Request Body
+
+```json copy
+{
+  "name": "cpn-v2",
+  "rules": {
+    "chains": ["MATIC_MAINNET"],
+    "tokens": ["<USDC token address>"],
+    "spenders": ["<Permit2 contract address>"],
+    "typedData": { "allow": true },
+    "denyUnlimitedApprovals": false,
+    "allowRawTx": false
+  }
+}
+```
+
+##### Policy Rules Explained
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `chains` | array | Allowed blockchain networks |
+| `tokens` | array | Token contract addresses that can be approved |
+| `spenders` | array | Contract addresses allowed as spenders (Permit2) |
+| `typedData.allow` | boolean | **Must be `true`** for CPN V2 EIP-712 signatures |
+| `denyUnlimitedApprovals` | boolean | Set to `false` to allow standard Permit2 approvals |
+| `allowRawTx` | boolean | Set to `false` unless you need CPN V1 |
+
+##### Security Recommendations
+
+- **Restrict `tokens`**: Only include USDC addresses you intend to use
+- **Restrict `spenders`**: Only include the official Permit2 contract address
+- **Keep `allowRawTx: false`**: Only enable for CPN V1 legacy support
+
+##### Sample Request
+
+```sh copy
+curl --location -g '{{baseUrl}}/api/v1/managed-signing/policies' \
+--header 'X-API-KEY: {{apiKey}}' \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
+--data '{
+    "name": "cpn-v2",
+    "rules": {
+        "chains": ["MATIC_MAINNET"],
+        "tokens": ["0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"],
+        "spenders": ["0x000000000022D473030F116dDEE9F6B43aC78BA3"],
+        "typedData": { "allow": true },
+        "denyUnlimitedApprovals": false,
+        "allowRawTx": false
+    }
+}'
+```
+
+##### Sample Response
+
+```json copy filename="Sample Response"
+{
+  "statusCode": 201,
+  "message": "Policy created",
+  "data": {
+    "id": "<local-policy-id>",
+    "businessId": "<business-id>",
+    "name": "cpn-v2",
+    "rules": {
+      "chains": ["MATIC_MAINNET"],
+      "tokens": ["0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"],
+      "spenders": ["0x000000000022D473030F116dDEE9F6B43aC78BA3"],
+      "typedData": { "allow": true },
+      "denyUnlimitedApprovals": false,
+      "allowRawTx": false
+    },
+    "createdAt": "2026-01-20T18:30:40.912Z",
+    "updatedAt": "2026-01-20T18:30:40.912Z"
+  },
+  "success": true
+}
+```
+
+##### Next Step
+
+Proceed to [Permit2 Approval](/managed-signing/cpn/permit2-approval) to set up the one-time on-chain approval.

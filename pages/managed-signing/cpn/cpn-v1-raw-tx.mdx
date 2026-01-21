@@ -1,0 +1,166 @@
+### Knit API Documentation
+
+#### CPN V1: Raw Transaction Signing (Optional)
+
+<div style={{ display: "flex", alignItems: "center" }}>
+  ##### Endpoint
+  <span
+    style={{
+      display: "block",
+      backgroundColor: "#fff9eb",
+      color: "#d0a626",
+      marginLeft: "-17px",
+      padding: "0px 6px",
+      fontSize: ".8rem",
+      borderRadius: "5px",
+      marginTop: "30px",
+    }}
+  >
+    POST
+  </span>
+</div>
+
+```js copy
+{{baseUrl}}/api/v1/managed-signing/requests
+```
+
+CPN V1 uses traditional on-chain transactions instead of EIP-712 signatures. **Only use this if you specifically need CPN V1 support.**
+
+##### When to Use CPN V1
+
+- Legacy integrations that don't support Permit2
+- Specific Circle requirements for your use case
+
+For new integrations, **CPN V2 is recommended** as it's gasless and more efficient.
+
+##### Prerequisites
+
+1. Update your policy to allow raw transactions:
+
+```json copy
+{
+  "name": "cpn-v1",
+  "rules": {
+    "chains": ["MATIC_MAINNET"],
+    "allowRawTx": true
+  }
+}
+```
+
+##### Headers
+
+- `X-API-KEY`: Your API key for authentication.
+- `Accept`: Set to `application/json` to receive responses in JSON format.
+- `Content-Type`: Set to `application/json`.
+
+##### Request Body
+
+```json copy
+{
+  "walletId": "<local-wallet-id>",
+  "network": "MATIC_MAINNET",
+  "type": "evm_tx",
+  "kind": "raw",
+  "payload": {
+    "tx": {
+      "to": "0x...",
+      "data": "0x...",
+      "value": "0x0",
+      "gas": "0x...",
+      "maxFeePerGas": "0x...",
+      "maxPriorityFeePerGas": "0x...",
+      "nonce": 123
+    }
+  },
+  "broadcast": false
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `walletId` | string | Your local wallet ID |
+| `network` | string | Target network |
+| `type` | string | Must be `evm_tx` |
+| `kind` | string | Must be `raw` for raw transaction signing |
+| `payload.tx` | object | Raw transaction object |
+| `broadcast` | boolean | Whether to broadcast (usually `false` for CPN V1) |
+
+##### Transaction Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `to` | string | Recipient contract address |
+| `data` | string | Encoded transaction data |
+| `value` | string | ETH value in hex (usually `0x0`) |
+| `gas` | string | Gas limit in hex |
+| `maxFeePerGas` | string | Max fee per gas in hex (EIP-1559) |
+| `maxPriorityFeePerGas` | string | Priority fee in hex (EIP-1559) |
+| `nonce` | number | Transaction nonce |
+
+##### Sample Request
+
+```sh copy
+curl --location -g '{{baseUrl}}/api/v1/managed-signing/requests' \
+--header 'X-API-KEY: {{apiKey}}' \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
+--data '{
+    "walletId": "<local-wallet-id>",
+    "network": "MATIC_MAINNET",
+    "type": "evm_tx",
+    "kind": "raw",
+    "payload": {
+        "tx": {
+            "to": "0x...",
+            "data": "0x...",
+            "value": "0x0",
+            "gas": "0x5208",
+            "maxFeePerGas": "0x59682f00",
+            "maxPriorityFeePerGas": "0x59682f00",
+            "nonce": 1
+        }
+    },
+    "broadcast": false
+}'
+```
+
+##### Sample Response
+
+```json copy filename="Sample Response"
+{
+  "statusCode": 201,
+  "message": "Signing request created",
+  "data": {
+    "id": "<local-request-id>",
+    "businessId": "<business-id>",
+    "walletId": "<local-wallet-id>",
+    "network": "MATIC_MAINNET",
+    "type": "evm_tx",
+    "kind": "raw",
+    "status": "SIGNED",
+    "payload": {
+      "tx": { "..." }
+    },
+    "signedTx": "0x...",
+    "broadcast": false,
+    "createdAt": "2026-01-20T18:30:40.912Z",
+    "updatedAt": "2026-01-20T18:30:40.912Z"
+  },
+  "success": true
+}
+```
+
+##### Important Notes
+
+- Raw transaction signing requires **all fields** to be provided (gas, fees, nonce)
+- If RPCs are configured, the service can auto-fill gas estimation
+- The `signedTx` in the response is the signed raw transaction to submit to Circle
+- CPN V1 transactions require gas fees paid by the wallet
+
+##### Security Considerations
+
+Enabling `allowRawTx: true` in your policy allows signing arbitrary transactions. Consider:
+
+- Only enable if you specifically need CPN V1
+- Restrict `chains` to only the networks you need
+- Monitor audit logs for unexpected raw transaction requests

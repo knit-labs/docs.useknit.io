@@ -1,0 +1,132 @@
+### Knit API Documentation
+
+#### Step 3: Permit2 Approval (One-Time)
+
+<div style={{ display: "flex", alignItems: "center" }}>
+  ##### Endpoint
+  <span
+    style={{
+      display: "block",
+      backgroundColor: "#fff9eb",
+      color: "#d0a626",
+      marginLeft: "-17px",
+      padding: "0px 6px",
+      fontSize: ".8rem",
+      borderRadius: "5px",
+      marginTop: "30px",
+    }}
+  >
+    POST
+  </span>
+</div>
+
+```js copy
+{{baseUrl}}/api/v1/managed-signing/requests
+```
+
+This is a **one-time on-chain transaction** that approves the Permit2 contract to spend USDC on behalf of your wallet. After this approval, all subsequent CPN V2 payments use gasless EIP-712 signatures.
+
+##### Prerequisites
+
+- Wallet must have MATIC (or native token) for gas fees
+- USDC token address for your network
+- Permit2 contract address for your network
+
+##### Headers
+
+- `X-API-KEY`: Your API key for authentication.
+- `Accept`: Set to `application/json` to receive responses in JSON format.
+- `Content-Type`: Set to `application/json`.
+
+##### Request Body
+
+```json copy
+{
+  "walletId": "<local-wallet-id>",
+  "network": "MATIC_MAINNET",
+  "type": "evm_tx",
+  "kind": "erc20_approve",
+  "payload": {
+    "token": "<USDC token address>",
+    "spender": "<Permit2 contract address>",
+    "amount": "<approval amount>"
+  },
+  "broadcast": true
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `walletId` | string | Your local wallet ID from Step 1 |
+| `network` | string | Target network (e.g., `MATIC_MAINNET`) |
+| `type` | string | Must be `evm_tx` for on-chain transaction |
+| `kind` | string | Must be `erc20_approve` |
+| `payload.token` | string | USDC contract address |
+| `payload.spender` | string | Permit2 contract address |
+| `payload.amount` | string | Approval amount (use max for unlimited) |
+| `broadcast` | boolean | Set to `true` to broadcast on-chain |
+
+##### Approval Amount
+
+- For unlimited approval: use a large number like `115792089237316195423570985008687907853269984665640564039457584007913129639935` (max uint256)
+- For limited approval: specify the exact amount in token units
+
+##### Sample Request
+
+```sh copy
+curl --location -g '{{baseUrl}}/api/v1/managed-signing/requests' \
+--header 'X-API-KEY: {{apiKey}}' \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
+--data '{
+    "walletId": "<local-wallet-id>",
+    "network": "MATIC_MAINNET",
+    "type": "evm_tx",
+    "kind": "erc20_approve",
+    "payload": {
+        "token": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+        "spender": "0x000000000022D473030F116dDEE9F6B43aC78BA3",
+        "amount": "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+    },
+    "broadcast": true
+}'
+```
+
+##### Sample Response
+
+```json copy filename="Sample Response"
+{
+  "statusCode": 201,
+  "message": "Signing request created",
+  "data": {
+    "id": "<local-request-id>",
+    "businessId": "<business-id>",
+    "walletId": "<local-wallet-id>",
+    "network": "MATIC_MAINNET",
+    "type": "evm_tx",
+    "kind": "erc20_approve",
+    "status": "SIGNED",
+    "payload": {
+      "token": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+      "spender": "0x000000000022D473030F116dDEE9F6B43aC78BA3",
+      "amount": "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+    },
+    "txHash": "0x...",
+    "broadcast": true,
+    "createdAt": "2026-01-20T18:30:40.912Z",
+    "updatedAt": "2026-01-20T18:30:40.912Z"
+  },
+  "success": true
+}
+```
+
+##### Important Notes
+
+- This transaction requires gas paid by the wallet
+- The service will auto-fill gas/fees/nonce if an RPC is configured for the network
+- If `broadcast` is `false`, you'll receive the signed transaction to broadcast yourself
+- This approval only needs to be done **once per token**
+
+##### Next Step
+
+Proceed to [Per-Payment Signature](/managed-signing/cpn/per-payment-signature) to sign individual payments.

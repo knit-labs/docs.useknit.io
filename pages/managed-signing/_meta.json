@@ -1,5 +1,6 @@
 {
   "index": "Overview",
+  "cpn": "Circle Payment Network (CPN)",
   "create-wallet": "Create Wallet",
   "list-wallets": "List Wallets",
   "get-wallet": "Get Wallet",

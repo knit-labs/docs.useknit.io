@@ -1,0 +1,97 @@
+### Knit API Documentation
+
+#### Step 1: Create CPN Wallet
+
+<div style={{ display: "flex", alignItems: "center" }}>
+  ##### Endpoint
+  <span
+    style={{
+      display: "block",
+      backgroundColor: "#fff9eb",
+      color: "#d0a626",
+      marginLeft: "-17px",
+      padding: "0px 6px",
+      fontSize: ".8rem",
+      borderRadius: "5px",
+      marginTop: "30px",
+    }}
+  >
+    POST
+  </span>
+</div>
+
+```js copy
+{{baseUrl}}/api/v1/managed-signing/wallets
+```
+
+Create a managed signing wallet for CPN integration. This wallet will hold your USDC and sign payment authorizations.
+
+##### Headers
+
+- `X-API-KEY`: Your API key for authentication.
+- `Accept`: Set to `application/json` to receive responses in JSON format.
+- `Content-Type`: Set to `application/json`.
+
+##### Request Body
+
+```json copy
+{
+  "type": "EVM",
+  "networks": ["MATIC_MAINNET"],
+  "merchantCallbackUrl": "https://your-domain.com/cpn-callback"
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `type` | string | Yes | Must be `EVM` for CPN |
+| `networks` | array | Yes | Include `MATIC_MAINNET` for Polygon CPN |
+| `merchantCallbackUrl` | string | No | URL for receiving signing callbacks |
+
+##### Sample Request
+
+```sh copy
+curl --location -g '{{baseUrl}}/api/v1/managed-signing/wallets' \
+--header 'X-API-KEY: {{apiKey}}' \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
+--data '{
+    "type": "EVM",
+    "networks": ["MATIC_MAINNET"],
+    "merchantCallbackUrl": "https://your-domain.com/cpn-callback"
+}'
+```
+
+##### Sample Response
+
+```json copy filename="Sample Response"
+{
+  "statusCode": 201,
+  "message": "Wallet created",
+  "data": {
+    "id": "<local-wallet-id>",
+    "businessId": "<business-id>",
+    "type": "EVM",
+    "networks": ["MATIC_MAINNET"],
+    "network": "MATIC_MAINNET",
+    "address": "0x...",
+    "hdPath": "m/44'/60'/0'/0/0",
+    "keyId": "<key-id>",
+    "isActive": true,
+    "merchantCallbackUrl": "https://your-domain.com/cpn-callback",
+    "createdAt": "2026-01-20T18:30:40.912Z",
+    "updatedAt": "2026-01-20T18:30:40.912Z"
+  },
+  "success": true
+}
+```
+
+##### Important
+
+- Save the `id` (local wallet ID) - you'll need it for all subsequent API calls
+- Save the `address` - this is your wallet's blockchain address for receiving USDC
+- Fund this wallet with MATIC for gas (needed for the one-time Permit2 approval)
+
+##### Next Step
+
+Proceed to [Create Policy](/managed-signing/cpn/create-policy) to configure CPN-specific signing rules.
