@@ -19,10 +19,19 @@ This checklist maps Circle CPN V2 requirements to Knit's Managed Signing API.
 
 Create a wallet that will hold funds and sign CPN transactions.
 
+**Production:**
 ```json copy
 {
   "type": "EVM",
   "networks": ["MATIC_MAINNET"]
+}
+```
+
+**Testing (Sandbox/Dev):**
+```json copy
+{
+  "type": "EVM",
+  "networks": ["MATIC_AMOY"]
 }
 ```
 
@@ -34,6 +43,7 @@ See: [Create Wallet](/managed-signing/cpn/create-wallet)
 
 Configure policy rules that allow CPN V2 signature flows.
 
+**Production:**
 ```json copy
 {
   "name": "cpn-v2",
@@ -41,6 +51,21 @@ Configure policy rules that allow CPN V2 signature flows.
     "chains": ["MATIC_MAINNET"],
     "tokens": ["<USDC token address>"],
     "spenders": ["<Permit2 contract address>"],
+    "typedData": { "allow": true },
+    "denyUnlimitedApprovals": false,
+    "allowRawTx": false
+  }
+}
+```
+
+**Testing (Sandbox/Dev):**
+```json copy
+{
+  "name": "cpn-v2-test",
+  "rules": {
+    "chains": ["MATIC_AMOY"],
+    "tokens": ["<USDC testnet token address>"],
+    "spenders": ["<Permit2 testnet contract address>"],
     "typedData": { "allow": true },
     "denyUnlimitedApprovals": false,
     "allowRawTx": false
@@ -71,6 +96,8 @@ Approve the Permit2 contract to spend USDC on behalf of your wallet.
 }
 ```
 
+**For testing, use `MATIC_AMOY` network with testnet token/contract addresses.**
+
 See: [Permit2 Approval](/managed-signing/cpn/permit2-approval)
 
 ---
@@ -90,6 +117,8 @@ For each payment, Circle provides `messageToBeSigned` (EIP-712 typed data). Sign
 }
 ```
 
+**For testing, use `MATIC_AMOY` network.**
+
 See: [Per-Payment Signature](/managed-signing/cpn/per-payment-signature)
 
 ---
@@ -104,9 +133,19 @@ See: [CPN V1 Raw TX](/managed-signing/cpn/cpn-v1-raw-tx)
 
 ##### Key Addresses
 
+**Production Networks**
+
 | Network | USDC Token | Permit2 Contract |
 |---------|------------|------------------|
 | Polygon (MATIC_MAINNET) | Contact Circle | Contact Circle |
 | Ethereum (ETHEREUM_MAINNET) | Contact Circle | Contact Circle |
 
+**Testnet Networks (Sandbox/Dev)**
+
+| Network | USDC Token | Permit2 Contract |
+|---------|------------|------------------|
+| Polygon Amoy (MATIC_AMOY) | Contact Circle | Contact Circle |
+
 Contact Circle or refer to their documentation for the exact contract addresses for your integration.
+
+**Note:** Most merchants test CPN integration using `MATIC_AMOY` testnet before moving to production.
