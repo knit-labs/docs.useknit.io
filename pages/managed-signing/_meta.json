@@ -4,6 +4,8 @@
   "create-wallet": "Create Wallet",
   "list-wallets": "List Wallets",
   "get-wallet": "Get Wallet",
+  "get-wallet-balance": "Get Wallet Balance",
+  "get-wallet-assets": "Get Wallet Assets",
   "create-policy": "Create Policy",
   "update-policy": "Update Policy",
   "list-policies": "List Policies",

@@ -1,0 +1,103 @@
+### Knit API Documentation
+
+#### Get Wallet Assets
+
+<div style={{ display: "flex", alignItems: "center" }}>
+  ##### Endpoint
+  <span
+    style={{
+      display: "block",
+      backgroundColor: "#ebfbfa",
+      color: "#194d53",
+      marginLeft: "-17px",
+      padding: "0px 6px",
+      fontSize: ".8rem",
+      borderRadius: "5px",
+      marginTop: "30px",
+    }}
+  >
+    GET
+  </span>
+</div>
+
+```js copy
+{{baseUrl}}/api/v1/managed-signing/wallets/{walletId}/assets
+```
+
+This endpoint fetches balances for all supported tokens across all networks the wallet is active on. This is a live query to the blockchain — no balance data is stored locally.
+
+##### Headers
+
+- `X-API-KEY`: Your API key for authentication.
+- `Accept`: Set to `application/json` to receive responses in JSON format.
+
+##### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `walletId` | string | Yes | The local wallet ID returned by create/list endpoints |
+
+##### Sample Request
+
+```sh copy
+curl --location -g '{{baseUrl}}/api/v1/managed-signing/wallets/<local-wallet-id>/assets' \
+--header 'X-API-KEY: {{apiKey}}' \
+--header 'Accept: application/json'
+```
+
+##### Sample Response
+
+```json copy filename="Sample Response"
+{
+  "statusCode": 200,
+  "message": "Managed signing wallet assets fetched",
+  "data": {
+    "walletId": "<wallet-id>",
+    "walletAddress": "0x...",
+    "walletType": "EVM",
+    "networks": [
+      {
+        "network": "ETH_MAINNET",
+        "tokens": [
+          {
+            "tokenAddress": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+            "tokenSymbol": "USDC",
+            "decimals": 6,
+            "balanceRaw": "1200000",
+            "balanceFormatted": "1.2"
+          }
+        ]
+      },
+      {
+        "network": "MATIC_MAINNET",
+        "tokens": [
+          {
+            "tokenAddress": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+            "tokenSymbol": "USDC",
+            "decimals": 6,
+            "balanceRaw": "3000000",
+            "balanceFormatted": "3.0"
+          }
+        ]
+      }
+    ]
+  },
+  "success": true
+}
+```
+
+##### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `walletId` | string | Wallet identifier |
+| `walletAddress` | string | On-chain wallet address |
+| `walletType` | string | Wallet type (e.g., `EVM`) |
+| `networks` | array | Array of network objects |
+| `networks[].network` | string | Network identifier |
+| `networks[].tokens` | array | Token balances on this network |
+| `networks[].tokens[].tokenAddress` | string | ERC20 token contract address |
+| `networks[].tokens[].tokenSymbol` | string | Token symbol |
+| `networks[].tokens[].decimals` | number | Token decimal places |
+| `networks[].tokens[].balanceRaw` | string | Raw balance in base units |
+| `networks[].tokens[].balanceFormatted` | string | Human-readable balance |

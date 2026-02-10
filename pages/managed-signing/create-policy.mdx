@@ -64,6 +64,7 @@ This endpoint creates a new policy for managing signing request rules.
     "maxApprovalAmount": "1000000000000000000",
     "denyUnlimitedApprovals": true,
     "requireApprovalAbove": "500000000000000000",
+    "maxTransferAmount": "1000000000000000000",
     "rateLimits": {
       "windowSec": 3600,
       "maxCount": 10,
@@ -98,17 +99,18 @@ This endpoint creates a new policy for managing signing request rules.
 | Field | Type | Description |
 |-------|------|-------------|
 | `chains` | string[] | Allowed blockchain networks |
-| `tokens` | string[] | Allowed token contract addresses for approvals |
+| `tokens` | string[] | Allowed token contract addresses (for approvals and transfers) |
 | `spenders` | string[] | Allowed spender addresses for approvals |
 | `allowedContracts` | string[] | Contracts allowed for raw transactions |
 | `allowRawTx` | boolean | Allow raw transaction signing |
 
-**Approval Limits**
+**Approval & Transfer Limits**
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `maxApprovalAmount` | string | Maximum approval amount (in wei) |
+| `maxApprovalAmount` | string | Maximum approval amount (in base units) |
 | `denyUnlimitedApprovals` | boolean | Block unlimited (max uint256) approvals |
+| `maxTransferAmount` | string | Maximum transfer amount per transaction (in base units) |
 | `requireApprovalAbove` | string | Require manual approval above this amount |
 
 **Rate Limiting**

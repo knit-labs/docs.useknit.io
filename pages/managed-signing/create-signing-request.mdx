@@ -30,7 +30,7 @@ This endpoint creates a new signing request. Supports EVM transactions, EIP-712 
 
 | Type | Description |
 |------|-------------|
-| `evm_tx` | EVM transaction signing (e.g., ERC20 approvals, raw transactions) |
+| `evm_tx` | EVM transaction signing (e.g., ERC20 approvals, ERC20 transfers, raw transactions) |
 | `eip712` | EIP-712 typed data signing (structured data with domain separator) |
 | `eip191` | EIP-191 message signing (personal sign messages) |
 
@@ -58,7 +58,7 @@ This endpoint creates a new signing request. Supports EVM transactions, EIP-712 
 | `walletId` | string | Yes | Local wallet ID |
 | `network` | string | Yes | Target network |
 | `type` | string | Yes | Request type (`evm_tx`, `eip712`, or `eip191`) |
-| `kind` | string | Conditional | Transaction kind (required for `evm_tx`, e.g., `erc20_approve`) |
+| `kind` | string | Conditional | Transaction kind (required for `evm_tx`: `erc20_approve`, `erc20_transfer`, or `raw`) |
 | `payload` | object | Yes | Request payload |
 | `broadcast` | boolean | No | Whether to broadcast the transaction |
 | `idempotencyKey` | string | No | Idempotency key for request deduplication |
@@ -90,6 +90,38 @@ This endpoint creates a new signing request. Supports EVM transactions, EIP-712 
 | `token` | string | Token contract address |
 | `spender` | string | Spender address |
 | `amount` | string | Approval amount |
+
+---
+
+##### EVM Transaction (ERC20 Transfer)
+
+```json copy
+{
+  "walletId": "<local-wallet-id>",
+  "network": "ETH_MAINNET",
+  "type": "evm_tx",
+  "kind": "erc20_transfer",
+  "broadcast": true,
+  "payload": {
+    "token": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "to": "0x1111111111111111111111111111111111111111",
+    "amount": "1000000"
+  }
+}
+```
+
+**Payload Fields for ERC20 Transfer**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `token` | string | ERC20 token contract address |
+| `to` | string | Recipient address |
+| `amount` | string | Transfer amount in base units (e.g., `1000000` for 1.0 USDC) |
+| `txOverrides` | object | (Optional) Gas overrides (e.g., `gasLimit`) |
+
+**Note:** The `broadcast` field is commonly set to `true` for transfers so the signed transaction is submitted on-chain. When `broadcast: true`, the response includes a `txHash`. When `broadcast: false`, the response includes `rawSignedTx` for manual submission.
+
+Transfer requests are subject to policy rules including `tokens`, `rateLimits`, `requireApprovalAbove`, and `maxTransferAmount`.
 
 ---
 

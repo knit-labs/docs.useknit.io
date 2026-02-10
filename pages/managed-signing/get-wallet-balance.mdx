@@ -1,0 +1,94 @@
+### Knit API Documentation
+
+#### Get Wallet Balance
+
+<div style={{ display: "flex", alignItems: "center" }}>
+  ##### Endpoint
+  <span
+    style={{
+      display: "block",
+      backgroundColor: "#ebfbfa",
+      color: "#194d53",
+      marginLeft: "-17px",
+      padding: "0px 6px",
+      fontSize: ".8rem",
+      borderRadius: "5px",
+      marginTop: "30px",
+    }}
+  >
+    GET
+  </span>
+</div>
+
+```js copy
+{{baseUrl}}/api/v1/managed-signing/wallets/{walletId}/balance
+```
+
+This endpoint fetches the balance of a single token for an EVM wallet. This is a live query to the blockchain — no balance data is stored locally.
+
+##### Headers
+
+- `X-API-KEY`: Your API key for authentication.
+- `Accept`: Set to `application/json` to receive responses in JSON format.
+
+##### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `walletId` | string | Yes | The local wallet ID returned by create/list endpoints |
+
+##### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `network` | string | Yes | Target network (e.g., `ETH_MAINNET`, `MATIC_MAINNET`) |
+| `contractAddress` | string | No | ERC20 token contract address |
+| `tokenSymbol` | string | No | Token symbol (e.g., `USDC`, `USDT`) |
+
+**Note:** If both `contractAddress` and `tokenSymbol` are provided, `contractAddress` takes precedence. If only `tokenSymbol` is provided, the token is resolved from the supported tokens for that network.
+
+##### Sample Request
+
+```sh copy
+curl --location -g '{{baseUrl}}/api/v1/managed-signing/wallets/<local-wallet-id>/balance?network=ETH_MAINNET&tokenSymbol=USDC' \
+--header 'X-API-KEY: {{apiKey}}' \
+--header 'Accept: application/json'
+```
+
+##### Sample Response
+
+```json copy filename="Sample Response"
+{
+  "statusCode": 200,
+  "message": "Wallet balance fetched",
+  "data": {
+    "tokenAddress": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "tokenSymbol": "USDC",
+    "decimals": 6,
+    "balanceRaw": "1200000",
+    "balanceFormatted": "1.2"
+  },
+  "success": true
+}
+```
+
+##### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `tokenAddress` | string | ERC20 token contract address |
+| `tokenSymbol` | string | Token symbol |
+| `decimals` | number | Token decimal places |
+| `balanceRaw` | string | Raw balance in base units (e.g., wei) |
+| `balanceFormatted` | string | Human-readable balance |
+
+##### Common Errors
+
+| Status | Message | Description |
+|--------|---------|-------------|
+| 400 | `network is required` | Missing required `network` query parameter |
+| 400 | `Unsupported network ...` | Network not in supported list |
+| 400 | `Wallet is not active on network ...` | Wallet not configured for the requested network |
+| 400 | `Provide contractAddress, or provide tokenSymbol...` | Missing token identifier |
+| 400 | `RPC URL not configured for ...` | Network RPC not available |
+| 404 | `Wallet not found` | Invalid or non-existent wallet ID |
