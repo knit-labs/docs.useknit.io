@@ -91,7 +91,9 @@
 
 html,
 body {
-  background: var(--knit-bg);
+  /* !important: the theme's own `body` rule would otherwise keep its default
+     dark grey, which shows through on overscroll. */
+  background: var(--knit-bg) !important;
   color: var(--knit-fg-muted);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -156,6 +158,38 @@ body {
   color: var(--knit-fg-faint);
   border-left: 1px solid var(--knit-border-strong);
   padding-left: 0.6rem;
+}
+
+/* Theme switch in the top nav. Nextra puts the className on the <button>
+   itself, so these selectors must target it directly. */
+button.knit-theme-switch {
+  border-radius: 8px !important;
+  border: 1px solid transparent !important;
+  background: transparent !important;
+  color: var(--knit-fg-subtle) !important;
+  padding: 0.5rem !important;
+  transition: color 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+
+button.knit-theme-switch:hover {
+  color: var(--knit-fg) !important;
+  background: var(--knit-surface) !important;
+  border-color: var(--knit-border) !important;
+}
+
+button.knit-theme-switch svg {
+  width: 1rem !important;
+  height: 1rem !important;
+}
+
+/* The dropdown of theme options */
+button.knit-theme-switch + ul,
+button.knit-theme-switch ~ ul {
+  border-radius: 10px !important;
+  border: 1px solid var(--knit-border) !important;
+  background: var(--knit-bg-raised) !important;
+  box-shadow: var(--knit-shadow-md) !important;
+  font-size: 0.8125rem !important;
 }
 
 /* Search — pill field with a visible shortcut affordance */

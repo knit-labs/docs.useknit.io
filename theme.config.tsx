@@ -1,5 +1,5 @@
 import React from "react";
-import { DocsThemeConfig, useConfig } from "nextra-theme-docs";
+import { DocsThemeConfig, useConfig, ThemeSwitch } from "nextra-theme-docs";
 import { useRouter } from "next/router";
 import { Callout, Steps, Tabs, Tab, Cards, Card as NextraCard } from "nextra/components";
 import Footer from "./components/Footer";
@@ -93,9 +93,18 @@ const config: DocsThemeConfig = {
     next: true,
   },
 
-  darkMode: true,
+  // The theme switch lives in the top nav rather than the sidebar footer, so
+  // the sidebar's built-in copy is turned off to avoid two of them.
+  darkMode: false,
+  navbar: {
+    extraContent: <ThemeSwitch lite className="knit-theme-switch" />,
+  },
+
+  // "system" follows the reader's OS preference on first visit; their explicit
+  // choice is remembered from then on. Pinning this to "light" would override
+  // the OS setting and land dark-mode readers in light.
   nextThemes: {
-    defaultTheme: "light",
+    defaultTheme: "system",
   },
 
   docsRepositoryBase: "https://github.com/knit-labs/docs.useknit.io/tree/main",
