@@ -89,10 +89,18 @@
    Base
    ========================================================================== */
 
-html,
+/* The canvas outside the document box — mobile URL-bar collapse, overscroll
+   bounce — is painted from the ROOT element's background, not the body's. The
+   footer is the last thing on every page, so matching the root to the footer
+   makes any such trailing space read as the footer continuing instead of a
+   white band below it. */
+html {
+  background: var(--knit-bg-subtle) !important;
+}
+
 body {
   /* !important: the theme's own `body` rule would otherwise keep its default
-     dark grey, which shows through on overscroll. */
+     dark grey. */
   background: var(--knit-bg) !important;
   color: var(--knit-fg-muted);
   -webkit-font-smoothing: antialiased;
@@ -102,6 +110,18 @@ body {
 .nextra-container {
   background: var(--knit-bg);
 }
+
+/* Mobile browsers resolve `100vh` against the *large* viewport — the height
+   with the URL bar hidden — so a 100vh-sized layout is taller than what is
+   actually on screen while the bar is showing, and you can scroll into dead
+   space past the footer. `dvh` tracks the real viewport. The theme's `vh` rule
+   stays as the fallback where `dvh` is unsupported. */
+@supports (height: 100dvh) {
+  .nextra-content {
+    min-height: calc(100dvh - var(--nextra-navbar-height)) !important;
+  }
+}
+
 
 ::selection {
   background: var(--knit-brand-soft);
