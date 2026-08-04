@@ -1,73 +1,176 @@
-### Authentication & Request Conventions
+---
+title: Authentication
+description: Authenticate to the Knit API with OAuth 2.0 client credentials, scoped access tokens, and IP allow-listing.
+---
 
-Knit’s public API is versioned under `/api/v1`. Use
-`https://api-prod.useknit.io` for production traffic and
-`https://api-dev.useknit.io` for pre-production testing. Throughout the docs we
-refer to these as `{{baseUrl}}`; substitute whichever environment you are
-targeting when making a request.
+# Authentication
 
-#### Request & Response Shape
+Every `/api/v1` endpoint is authenticated with an **OAuth 2.0 client
+credentials** access token. Send it as a bearer token on each request.
 
-- **Content-Type:** all endpoints accept and return JSON. Example payloads in
-  this documentation mirror what the API expects.
+```bash filename="Authenticated request"
+curl https://api-prod.useknit.io/api/v1/payouts \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json"
+```
 
-#### Authentication Options
+<Callout type="warning">
+  **API keys are no longer accepted.** The `X-API-KEY` header is not a valid
+  credential on any `/api/v1` endpoint — requests that rely on it are rejected
+  with `401`. If you are still sending one, migrate to OAuth client
+  credentials.
+</Callout>
 
-All `/api/v1/**` routes accept the following credential types:
+## Environments
 
-| Method | Required Header(s) | When to Use |
-| ------ | ------------------ | ----------- |
-| API Key | `X-API-KEY: <server key>` | Legacy keys that you manage in the Business → Developer → API Keys section of the dashboard. |
-| OAuth 2.0 Client Credentials | `Authorization: Bearer <access token>` | Recommended for new integrations. Create OAuth clients in Business → Developer → OAuth Clients and request scoped access tokens. |
+| Environment | Base URL |
+| ----------- | -------- |
+| Production | `https://api-prod.useknit.io` |
+| Development / sandbox | `https://api-dev.useknit.io` |
 
-> You may send both headers during migrations—the platform prioritises the
-> bearer token and falls back to `X-API-KEY` if it is absent—but note that API
-> keys are being deprecated, so plan to rely solely on OAuth going forward.
+Credentials are issued per environment and are not interchangeable.
 
-#### Getting an OAuth Access Token
+## Create an OAuth client
 
-1. In the Knit dashboard, navigate to **Business → Developer → OAuth Clients**
-   and create (or rotate) a client. Copy the client ID and plain secret. No API
-   call is required for this step.
-2. Request a bearer token via the OAuth 2.0 client credentials grant:
+In the Knit dashboard go to **Business → Developer → OAuth Clients** and create
+a client. Choose only the scopes the integration needs — you can create several
+clients so that, for example, a reporting service holds read scopes only.
 
-```bash
-curl --location '{{baseUrl}}/oauth/token' \
-  --header 'Content-Type: application/json' \
-  --data '{
+Copy the client ID and the plain secret when they are shown. The secret is not
+retrievable afterwards; if you lose it, rotate the client to issue a new one.
+
+<Callout type="info">
+  Creating and rotating clients is a dashboard action. There is no public API
+  for provisioning credentials.
+</Callout>
+
+## Request an access token
+
+<Endpoint method="POST" path="/oauth/token" />
+
+Exchange the client ID and secret for a bearer token using the standard
+`client_credentials` grant.
+
+```bash filename="Request a token"
+curl https://api-prod.useknit.io/oauth/token \
+  -H "Content-Type: application/json" \
+  -d '{
     "grant_type": "client_credentials",
     "client_id": "<client-id>",
-    "client_secret": "<plain-secret>"
+    "client_secret": "<client-secret>"
   }'
 ```
 
-The response contains `token_type`, `expires_in` (default is 900 seconds), and
-`access_token`. Supply that token in the `Authorization` header for subsequent
-API calls.
+```json filename="Token response"
+{
+  "token_type": "Bearer",
+  "expires_in": 7200,
+  "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIs..."
+}
+```
 
-##### Scopes
+<Callout type="warning">
+  Read the lifetime from `expires_in` on each response rather than hardcoding
+  it. Cache the token until shortly before it expires and request a new one on
+  demand — do not mint a token per API call.
+</Callout>
 
-Scopes follow the `resource:action` pattern:
+### Requesting narrower scopes
 
-- `collections:read`, `collections:write`
-- `payouts:read`, `payouts:write`
-- `wallets:read`, `wallets:write`
-- `payout-wallets:read`, `payout-wallets:write`
-- `*` for full access (use sparingly)
+Omit the `scope` parameter and the token is issued with the client's full set
+of scopes. Pass an explicit space-separated `scope` to mint a token that is
+narrower than the client — useful for short-lived tokens handed to a subsystem.
 
-Write scopes implicitly grant read access (e.g. `payouts:write` can also perform
-`GET /api/v1/payouts`). If a request reaches an endpoint without the required
-scope, the API returns `401 Insufficient permissions`.
+```bash filename="Narrower token"
+curl https://api-prod.useknit.io/oauth/token \
+  -H "Content-Type: application/json" \
+  -d '{
+    "grant_type": "client_credentials",
+    "client_id": "<client-id>",
+    "client_secret": "<client-secret>",
+    "scope": "collections:read payouts:read"
+  }'
+```
 
-#### IP Whitelisting
+A token can only ever narrow the client's grant. Requesting a scope the client
+does not hold fails with `401 OAuth token contains scopes not granted to this
+client`.
 
-Provide the outbound IP addresses of your servers in the dashboard and we’ll
-add them to your business whitelist. Any request coming from an IP that is not
-on that list is rejected with `401 IP address not whitelisted`, so be sure to
-register staging/production IPs before going live.
+## Scopes
 
-#### Rate Limiting
+Scopes follow a `resource:action` pattern.
 
-Use the provided API keys or OAuth clients per application/service rather than
-sharing them between environments. This keeps credentials easy to rotate and
-limits blast radius if one integration needs to be paused.
+| Scope | Grants |
+| ----- | ------ |
+| `collections:read` | View and list collections |
+| `collections:write` | Create, update, and delete collections |
+| `payouts:read` | View and list payouts |
+| `payouts:write` | Create payouts |
+| `wallets:read` | View and list API wallets and their transactions |
+| `wallets:write` | Create, update, and delete API wallets |
+| `payout-wallets:read` | View API account balances |
+| `payout-wallets:write` | Create API accounts |
+| `managed-signing:read` | View managed signing wallets, policies, requests, and audit events |
+| `managed-signing:write` | Create and approve managed signing wallets, policies, and requests |
+| `blockchain-notifications:read` | View address notification subscriptions |
+| `blockchain-notifications:write` | Create, update, and delete address notification subscriptions |
+| `custody:read` | View custody owners, wallets, policies, signing requests, and operations |
+| `custody:write` | Create custody resources and confirm or execute operations |
+| `*` | Full access to every resource |
+
+Two rules apply when a scope is checked:
+
+- **Write implies read.** A client holding `payouts:write` can also call
+  `GET /api/v1/payouts`. The reverse is not true.
+- **`*` satisfies everything.** Grant it only when a client genuinely needs the
+  whole surface.
+
+A request that reaches an endpoint without a satisfying scope is rejected:
+
+```json filename="401 — insufficient scope"
+{
+  "statusCode": 401,
+  "message": "Insufficient permissions. This action requires scope: payouts:write",
+  "data": null,
+  "success": false
+}
+```
+
+## IP allow-listing
+
+Access tokens are only accepted from IP addresses on your business's allow
+list. Register the outbound IPs of every environment that will call the API —
+staging included — in the dashboard before going live.
+
+```json filename="401 — IP not allow-listed"
+{
+  "statusCode": 401,
+  "message": "IP address not whitelisted",
+  "data": null,
+  "success": false
+}
+```
+
+If your servers sit behind a NAT gateway or egress proxy, allow-list the
+gateway's address rather than the instance addresses.
+
+## Authentication errors
+
+| Status | Message | What it means |
+| ------ | ------- | ------------- |
+| `401` | `Authentication required. Provide a Bearer token.` | No `Authorization` header was sent |
+| `401` | `Invalid or expired OAuth token` | The token is malformed, revoked, or past `expires_in` |
+| `401` | `OAuth client not found or has been revoked` | The client behind the token no longer exists |
+| `401` | `IP address not whitelisted` | The caller's IP is not on the business allow list |
+| `401` | `Insufficient permissions. This action requires scope: …` | The token lacks the scope the endpoint requires |
+
+## Credential hygiene
+
+- Issue a separate client per application and per environment so a compromised
+  credential can be revoked without a wider outage.
+- Grant the narrowest scope set that works. Prefer several small clients over
+  one `*` client.
+- Store secrets in a secrets manager, never in source control or client-side
+  code. These credentials are for server-to-server use only.
+- Rotate on a schedule and immediately after any suspected exposure. Rotation
+  issues a new secret without changing the client's scopes.

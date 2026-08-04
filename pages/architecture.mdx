@@ -1,91 +1,113 @@
-### Platform Architecture & Money Movement
+---
+title: How money moves
+description: Where Knit holds your balances, and which API calls credit or debit them.
+---
 
-Knit combines a traditional business wallet with a dedicated API account so you
-can collect, store, and disburse crypto without exposing your main treasury.
-This page explains the moving parts so you can reason about balances,
-authentication, and webhook side-effects before touching any endpoint.
+# How money moves
 
-#### Wallet Layers
+Knit separates the funds you hold from the funds your integration can spend.
+Understanding that split is the fastest way to reason about balances, payout
+failures, and webhook side effects.
 
-| Layer | Purpose |
-| ----- | ------- |
-| Business Wallet | Custody account for deposits arriving from on-chain or the dashboard UI. Fees, KYB, and manual withdrawals are governed here. |
-| API Account | A per-token balance that funds API services (collections credit into it, payouts debit from it). Transfer value from the business wallet before issuing payouts. |
-| API Services | The feature layer: collections (single-use addresses), API wallets (reusable addresses), payouts, and the transactions that record each movement. |
+## The two balances
 
-Because API services do not have their own spendable balances, every call that
-credits or debits value ultimately updates the API Account.
+<Fields>
+  <Field name="Business wallet" type="treasury">
+    Your main balance. Deposits from the dashboard land here, and manual
+    withdrawals are made from here. Programmatic API calls never spend from it.
+  </Field>
+  <Field name="API account" type="per-token spendable balance">
+    A balance per token (USDT, USDC) that funds API activity. Collections and
+    wallet deposits credit it; payouts debit it. This is the balance your
+    integration actually draws on.
+  </Field>
+</Fields>
 
-#### Money-Movement Flows (What Merchants Should Know)
+Collections, API wallets, and payouts do not carry their own spendable
+balances. Every movement they represent settles against the API account.
 
-All activity you trigger through the API ultimately affects the **API Account**
-balance. Keep these scenarios in mind when planning your integration:
+<Callout type="info">
+  Where a response includes `balanceBefore` and `balanceAfter`, those values
+  describe the API account ledger for that token. Watching them is the most
+  direct way to know how much runway your integration has left.
+</Callout>
 
-1. **Fund the API Account from the dashboard.** Move USDT/USDC from the business
-   wallet into the API account before creating payouts. This is a manual step so
-   you stay in control of how much balance programmatic flows can touch.
-2. **Collections credit the API Account.** Every one-time collection address you
-   create funnels the confirmed proceeds into the API account automatically—no
-   extra transfer needed.
-3. **API Wallet deposits also credit the API Account.** Reusable wallets (for
-   customer balances or recurring payments) record each deposit and then top up
-   the API account so the funds are ready for payouts or internal transfers.
-4. **Payouts debit the API Account.** When you call `POST /api/v1/payouts`, Knit
-   verifies that the API account for the specified token has enough balance,
-   locks it, and then submits the transfer. Successful completions trigger the
-   `PAYOUT_SUCCESSFUL` webhook.
-5. **Return unused balance when you’re done.** If you want to move funds back to
-   the main business wallet, use the dashboard action to transfer from API
-   account → business wallet.
+## The flows
 
-Whenever you see `balanceBefore` / `balanceAfter` in API responses, those values
-represent the API account ledger. Monitoring that balance is the best way to
-determine how much runway you have left for programmatic payouts.
+<Steps>
 
-#### Authentication Path
+### Fund the API account
 
-Every `/api/v1/**` route expects **OAuth 2.0 client-credential tokens**. Provide
-`Authorization: Bearer <access-token>` and the platform will:
+Move USDT or USDC from your business wallet into the API account from the
+dashboard. This is deliberately a manual step, so you control the ceiling on
+what programmatic flows can spend.
 
-1. Validate the token signature/expiry and extract the OAuth client plus its
-   scopes.
-2. Resolve the business tied to that client, make sure the caller’s IP address
-   is on the approved list, and continue the request on behalf of that business.
-3. Confirm the route’s required scope (for example `payouts:write` for
-   `POST /api/v1/payouts`). Requests without the correct scope are rejected with
-   “Insufficient permissions”.
+Create the account first if it does not exist —
+[`POST /api/v1/business-api-services-wallets`](/API-account/create-an-API-account)
+creates the record with a zero balance; it does not move funds.
 
-> The `X-API-KEY` header still works for **legacy** integrations, but we
-> recommend migrating to OAuth for scoped access control, richer audit logs, and
-> easier credential rotation.
+### Collections credit it
 
-#### Webhooks & Observability
+Each [collection](/collections/create-a-collection) issues a single-use address.
+When the deposit is confirmed on-chain, the proceeds are credited to the API
+account for that token. No transfer step is needed.
 
-- **Webhook delivery:** Knit signs every webhook with your business secret and
-  retries failed deliveries for up to 12 hours (three attempts). Keep your
-  endpoint idempotent so duplicate deliveries are safe.
-- **Event coverage:** Collections emit CREATED/SUCCESSFUL/FAILED events; payouts
-  emit SUCCESSFUL once they are fully settled on-chain.
-- **Usage metrics:** You can monitor request counts, success/error rates, and
-  latency via the Analytics section of the dashboard (`API Glance`).
+### API wallet deposits credit it
 
-#### Error & Response Envelope
+Deposits into a reusable [API wallet](/wallets/create-a-wallet) are recorded as
+wallet transactions and credited to the API account, so the funds are
+immediately available for payouts.
 
-All controllers return the shared `ApiResponse` format:
+### Payouts debit it
 
-```json
+[`POST /api/v1/payouts`](/payouts/create-a-single-payout) checks the API
+account balance for the requested token, holds the amount, and submits the
+transfer. If the balance is short, the payout is rejected with `400` and
+nothing is held.
+
+### Return unused balance
+
+To move value back to the business wallet, use the transfer action in the
+dashboard.
+
+</Steps>
+
+## Request lifecycle
+
+Every authenticated request goes through the same three checks before it
+reaches an endpoint:
+
+1. **Token.** The bearer token is validated and resolved to an OAuth client and
+   the business it belongs to.
+2. **Network.** The caller's IP must be on the business allow list.
+3. **Scope.** The token must satisfy the scope the route requires, for example
+   `payouts:write` for `POST /api/v1/payouts`.
+
+A failure at any step returns `401` with a message describing which check
+failed. See [Authentication](/authentication) for the full list.
+
+## Observability
+
+- **Webhooks.** Every significant state change is delivered to your endpoint,
+  signed with your webhook secret, and retried on failure. See
+  [Webhooks](/webhooks).
+- **Dashboard.** Request volume, success and error rates, collection and payout
+  history, and webhook delivery attempts are all visible in the dashboard.
+- **Reconciliation.** Every collection and payout carries a stable `id`, and
+  payouts additionally carry your own `merchantReference`, so you can reconcile
+  against your ledger without relying on webhook ordering.
+
+## Response format
+
+All endpoints return the same envelope, so you can parse success and failure
+identically. See [Errors & response format](/errors) for status codes and
+validation details.
+
+```json filename="Envelope"
 {
-  "success": true,
   "statusCode": 200,
-  "message": "...",
+  "message": "Payout created successfully",
   "data": {},
-  "pagination": { /* optional */ }
+  "success": true
 }
 ```
-
-Errors reuse the same structure with `success: false` and a descriptive
-`message`. Validation errors include an `errors` object when thrown from a
-`BaseRequest`.
-
-Keep this context in mind as you explore the per-endpoint documentation in the
-sidebar.

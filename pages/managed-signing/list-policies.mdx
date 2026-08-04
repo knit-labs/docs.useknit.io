@@ -1,47 +1,30 @@
-### Knit API Documentation
+---
+title: List Policies
+description: This endpoint retrieves all policies for your business.
+---
 
-#### List Policies
+# List Policies
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#ebfbfa",
-      color: "#194d53",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    GET
-  </span>
-</div>
+<Endpoint method="GET" path="/api/v1/managed-signing/policies" />
 
-```js copy
-{{baseUrl}}/api/v1/managed-signing/policies
-```
+<Meta>
+  <Scope value="managed-signing:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
 
 This endpoint retrieves all policies for your business.
 
-##### Headers
+## Request
 
-- `X-API-KEY`: Your API key for authentication.
-- `Accept`: Set to `application/json` to receive responses in JSON format.
-
-##### Sample Request
-
-```sh copy
-curl --location -g '{{baseUrl}}/api/v1/managed-signing/policies' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json'
+```bash
+curl "https://api-prod.useknit.io/api/v1/managed-signing/policies" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json"
 ```
 
-##### Sample Response
+## Response
 
-```json copy filename="Sample Response"
+```json filename="Response"
 {
   "statusCode": 200,
   "message": "Policies retrieved",
@@ -63,7 +46,7 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/policies' \
 }
 ```
 
-##### Response Fields
+## Response Fields
 
 | Field | Type | Description |
 |-------|------|-------------|

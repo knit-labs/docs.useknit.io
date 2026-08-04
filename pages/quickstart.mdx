@@ -1,0 +1,153 @@
+---
+title: Quickstart
+description: Get an access token, collect a stablecoin payment, and send a payout.
+---
+
+# Quickstart
+
+This walks through a complete integration: authenticate, take a payment, and
+send one back out. Run it against `https://api-dev.useknit.io` first.
+
+<Callout type="info">
+  Before you start you need an approved business, an OAuth client, your server
+  IPs allow-listed, and a webhook URL configured — all set up in the
+  [dashboard](https://dashboard.useknit.io). See
+  [Authentication](/authentication) for the details.
+</Callout>
+
+<Steps>
+
+### Get an access token
+
+```bash filename="1. Authenticate"
+curl https://api-dev.useknit.io/oauth/token \
+  -H "Content-Type: application/json" \
+  -d '{
+    "grant_type": "client_credentials",
+    "client_id": "<client-id>",
+    "client_secret": "<client-secret>"
+  }'
+```
+
+Store `access_token` and reuse it until `expires_in` is nearly up.
+
+```bash
+export KNIT_ACCESS_TOKEN="eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIs..."
+export KNIT_BASE_URL="https://api-dev.useknit.io"
+```
+
+### Check which networks are live
+
+Collection and payout availability differ per network and per token, and change
+over time. Read them rather than hardcoding.
+
+```bash filename="2. List networks"
+curl "$KNIT_BASE_URL/api/v1/networks" \
+  -H "Accept: application/json"
+```
+
+Use a network whose `payoutStatus` is `ACTIVE` for step 5, and one whose
+`collectionStatus` is `ACTIVE` for step 4.
+
+### Create your API account
+
+The API account holds the balance your integration spends. Create one per token
+you plan to use.
+
+```bash filename="3. Create the API account"
+curl -X POST "$KNIT_BASE_URL/api/v1/business-api-services-wallets" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{ "token": "USDT" }'
+```
+
+This creates the account with a zero balance. Fund it from the dashboard by
+transferring from your business wallet, or let a collection fund it in the next
+step.
+
+### Collect a payment
+
+A collection issues a single-use address and a hosted payment link. It expires
+30 minutes after creation.
+
+```bash filename="4. Create a collection"
+curl -X POST "$KNIT_BASE_URL/api/v1/collections" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "network": "MATIC_MAINNET",
+    "token": "USDT",
+    "tokenAmount": 25,
+    "confirmationThreshold": 10,
+    "merchantCallbackUrl": "https://example.com/webhooks/knit",
+    "merchantRedirectUrl": "https://example.com/thanks"
+  }'
+```
+
+Send your customer to `data.paymentLinkUrl`, or show them `data.address`
+directly. When the deposit confirms, the proceeds credit your API account and a
+`COLLECTION_SUCCESSFUL` webhook is delivered.
+
+### Send a payout
+
+```bash filename="5. Create a payout"
+curl -X POST "$KNIT_BASE_URL/api/v1/payouts" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "network": "MATIC_MAINNET",
+    "token": "USDT",
+    "amount": 10,
+    "toAddress": "0x56adfcc254ab3b8142a275c1837bcffaff5aa38b",
+    "merchantReference": "INV-2045"
+  }'
+```
+
+`merchantReference` is required and must be unique across your payouts — it is
+your idempotency handle. Reuse it when retrying a request whose outcome you are
+unsure of.
+
+### Verify the webhook
+
+Every delivery carries an `X-Signature` header: the HMAC-SHA256 of the raw
+request body, keyed with your webhook secret, hex-encoded.
+
+```js filename="6. Verify a delivery"
+import crypto from "node:crypto";
+
+// `rawBody` must be the unparsed request body, byte for byte.
+function isFromKnit(rawBody, signatureHeader, secret) {
+  const expected = crypto
+    .createHmac("sha256", secret)
+    .update(rawBody)
+    .digest("hex");
+
+  const a = Buffer.from(expected, "utf8");
+  const b = Buffer.from(signatureHeader ?? "", "utf8");
+
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+```
+
+Respond `2xx` as soon as the signature checks out, then do your work
+asynchronously. See [Webhooks](/webhooks) for retry behaviour and the full
+event list.
+
+</Steps>
+
+## Next steps
+
+<CardGrid>
+  <Card title="Collections" icon="💳" href="/collections/create-a-collection">
+    Fields, filters, and the collection lifecycle.
+  </Card>
+  <Card title="Payouts" icon="📤" href="/payouts/create-a-single-payout">
+    Validation rules, supported networks, and status tracking.
+  </Card>
+  <Card title="Webhooks" icon="📡" href="/webhooks">
+    Signature verification, retries, and every event payload.
+  </Card>
+  <Card title="Errors" icon="⚠️" href="/errors">
+    Status codes, validation errors, and safe retries.
+  </Card>
+</CardGrid>

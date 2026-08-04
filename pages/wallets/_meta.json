@@ -1,7 +1,8 @@
 {
-    "create-a-wallet": "Create a Wallet",
-    "get-all-wallets": "Get All Wallet",
-    "get-single-wallet": "Get Single Wallet",
-    "get-single-wallet-transactions": "Get Single Wallet Transactions",
-    "delete-single-wallet": "Delete Single Wallet"
+  "create-a-wallet": "Create a Wallet",
+  "get-all-wallets": "List Wallets",
+  "get-single-wallet": "Retrieve a Wallet",
+  "get-single-wallet-transactions": "List Wallet Transactions",
+  "update-single-wallet": "Update a Wallet",
+  "delete-single-wallet": "Delete a Wallet"
 }

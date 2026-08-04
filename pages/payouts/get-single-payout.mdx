@@ -1,68 +1,80 @@
-### Knit API Documentation
+---
+title: Retrieve a payout
+description: Fetch the stored record for one payout by ID.
+---
 
-#### Get Single Payout
+# Retrieve a payout
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#ebfbfa",
-      color: "#194d53",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    GET
-  </span>
-</div>
+Fetches the payout record Knit holds for one payout.
 
-```js copy
- {{baseUrl}}/api/v1/payouts/:id
+<Endpoint method="GET" path="/api/v1/payouts/{id}" />
+
+<Meta>
+  <Scope value="payouts:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+## Path parameters
+
+<Fields>
+  <Field name="id" type="string" required>
+    The payout's `id`, as returned when it was created.
+  </Field>
+</Fields>
+
+## Request
+
+```bash filename="cURL"
+curl "https://api-prod.useknit.io/api/v1/payouts/8e5697e3-8265-455b-984a-0eb40e10b0f9" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json"
 ```
 
-##### Headers
+## Response
 
-- Authentication: `Authorization: Bearer <token>` (preferred) or the legacy
-  `X-API-KEY: {{apiKey}}`.
-- Accept: Set to application/json to receive the response in JSON format.
-
-##### Path Variables
-
-- id: The unique identifier of the wallet you wish to retrieve information for. This should be replaced with the actual wallet ID in your request.
-
-##### Sample Request
-
-```sh copy
-curl --location -g '{{baseUrl}}/api/v1/payouts/8e5697e3-8265-455b-984a-0eb40e10b0f9' \
---header 'Authorization: Bearer {{token}}' \
---header 'Accept: application/json'
-```
-
-##### Sample Response
-
-```json copy filename="Sample Response"
+```json filename="200 OK"
 {
-  "success": true,
-  "message": "Payout fetched successfully",
-  "status": 200,
+  "statusCode": 200,
+  "message": "Payout retrieved successfully",
   "data": {
     "id": "8e5697e3-8265-455b-984a-0eb40e10b0f9",
-    "userId": "8286065b-577e-11ef-9218-96f5ee698dcd",
-    "payoutWalletId": "5c7bb5bd-acb5-453a-9eb9-11380a329d79",
+    "businessId": "b7b93a40-4e18-4e97-9c5f-8a7a4fd0df92",
     "network": "MATIC_MAINNET",
     "token": "USDT",
-    "amount": "0.020000000000000000",
+    "amount": "25.500000000000000000",
     "toAddress": "0x56adfcc254ab3b8142a275c1837bcffaff5aa38b",
-    "transactionHash": null,
-    "status": "PROCESSING",
+    "merchantReference": "INV-2045",
+    "transactionHash": "0xb0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f70819",
+    "status": "COMPLETED",
     "info": null,
-    "payoutExternalRef": "6603f31f-4ebf-461b-89c5-75a13d41b7a9",
     "createdAt": "2024-08-27T13:44:20.000000Z",
-    "updatedAt": "2024-08-27T13:44:21.000000Z"
-  }
+    "updatedAt": "2024-08-27T13:47:03.000000Z"
+  },
+  "success": true
 }
 ```
+
+<Fields>
+  <Field name="status" type="string">
+    `PENDING`, `PROCESSING`, `COMPLETED`, or `FAILED`.
+  </Field>
+  <Field name="transactionHash" type="string | null">
+    Populated once the transfer is on-chain. `null` before then.
+  </Field>
+  <Field name="info" type="string | null">
+    Detail about a failure. `null` on healthy payouts.
+  </Field>
+</Fields>
+
+<Callout type="info">
+  This returns Knit's stored record. For a live check against the settlement
+  layer, use [Get payout status](/payouts/get-payout-status).
+</Callout>
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `payouts:read` |
+| `403` | The payout exists but belongs to another business |
+| `404` | No payout with that ID |

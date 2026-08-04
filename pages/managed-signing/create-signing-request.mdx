@@ -1,32 +1,20 @@
-### Knit API Documentation
+---
+title: Create Signing Request
+description: This endpoint creates a new signing request. Supports EVM transactions, EIP-712 typed data signing, and EIP-191 message signing.
+---
 
-#### Create Signing Request
+# Create Signing Request
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#fff9eb",
-      color: "#d0a626",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    POST
-  </span>
-</div>
+<Endpoint method="POST" path="/api/v1/managed-signing/requests" />
 
-```js copy
-{{baseUrl}}/api/v1/managed-signing/requests
-```
+<Meta>
+  <Scope value="managed-signing:write" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
 
 This endpoint creates a new signing request. Supports EVM transactions, EIP-712 typed data signing, and EIP-191 message signing.
 
-##### Signing Request Types
+## Signing Request Types
 
 | Type | Description |
 |------|-------------|
@@ -34,7 +22,7 @@ This endpoint creates a new signing request. Supports EVM transactions, EIP-712 
 | `eip712` | EIP-712 typed data signing (structured data with domain separator) |
 | `eip191` | EIP-191 message signing (personal sign messages) |
 
-##### Supported Networks
+## Supported Networks
 
 **Production**
 - `ETHEREUM_MAINNET`
@@ -45,13 +33,7 @@ This endpoint creates a new signing request. Supports EVM transactions, EIP-712 
 **Testnet (Sandbox/Dev only)**
 - `MATIC_AMOY` - Polygon Amoy testnet
 
-##### Headers
-
-- `X-API-KEY`: Your API key for authentication.
-- `Accept`: Set to `application/json` to receive responses in JSON format.
-- `Content-Type`: Set to `application/json`.
-
-##### Request Body
+## Body
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -65,9 +47,9 @@ This endpoint creates a new signing request. Supports EVM transactions, EIP-712 
 
 ---
 
-##### EVM Transaction (ERC20 Approve)
+## EVM Transaction (ERC20 Approve)
 
-```json copy
+```json
 {
   "walletId": "<local-wallet-id>",
   "network": "MATIC_MAINNET",
@@ -93,9 +75,9 @@ This endpoint creates a new signing request. Supports EVM transactions, EIP-712 
 
 ---
 
-##### EVM Transaction (ERC20 Transfer)
+## EVM Transaction (ERC20 Transfer)
 
-```json copy
+```json
 {
   "walletId": "<local-wallet-id>",
   "network": "ETH_MAINNET",
@@ -125,9 +107,9 @@ Transfer requests are subject to policy rules including `tokens`, `rateLimits`, 
 
 ---
 
-##### EIP-712 Typed Data
+## EIP-712 Typed Data
 
-```json copy
+```json
 {
   "walletId": "<local-wallet-id>",
   "network": "ETHEREUM_MAINNET",
@@ -169,9 +151,9 @@ Transfer requests are subject to policy rules including `tokens`, `rateLimits`, 
 
 ---
 
-##### EIP-191 Message Signing
+## EIP-191 Message Signing
 
-```json copy
+```json
 {
   "walletId": "<local-wallet-id>",
   "network": "ETHEREUM_MAINNET",
@@ -195,14 +177,14 @@ EIP-191 is commonly used for:
 
 ---
 
-##### Sample Request (EVM TX)
+## Sample Request (EVM TX)
 
-```sh copy
-curl --location -g '{{baseUrl}}/api/v1/managed-signing/requests' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json' \
---header 'Content-Type: application/json' \
---data '{
+```bash
+curl "https://api-prod.useknit.io/api/v1/managed-signing/requests" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
     "walletId": "<local-wallet-id>",
     "network": "MATIC_MAINNET",
     "type": "evm_tx",
@@ -216,9 +198,9 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/requests' \
 }'
 ```
 
-##### Sample Response
+## Response
 
-```json copy filename="Sample Response"
+```json filename="Response"
 {
   "statusCode": 201,
   "message": "Signing request created",
@@ -243,7 +225,7 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/requests' \
 }
 ```
 
-##### Response Fields
+## Response Fields
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -264,7 +246,7 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/requests' \
 | `createdAt` | string | Creation timestamp |
 | `updatedAt` | string | Last update timestamp |
 
-##### Request Statuses
+## Request Statuses
 
 | Status | Description |
 |--------|-------------|

@@ -1,61 +1,56 @@
-### Knit API Documentation
+---
+title: Retrieve an API account
+description: Read the balance of one API account by ID.
+---
 
-#### Get Single API Account
+# Retrieve an API account
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#ebfbfa",
-      color: "#194d53",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    GET
-  </span>
-</div>
+Fetches one API account belonging to your business.
 
-```js copy
- {{baseUrl}}/api/v1/business-api-services-wallets/:id
+<Endpoint method="GET" path="/api/v1/business-api-services-wallets/{id}" />
+
+<Meta>
+  <Scope value="payout-wallets:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+## Path parameters
+
+<Fields>
+  <Field name="id" type="string" required>
+    The API account's `id`.
+  </Field>
+</Fields>
+
+## Request
+
+```bash filename="cURL"
+curl "https://api-prod.useknit.io/api/v1/business-api-services-wallets/c7ddb254-5da1-4136-b19e-733a00a31c70" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json"
 ```
 
-##### Headers
+## Response
 
-- X-API-KEY: Your API key, which authorizes the request.
-- Accept: Set to application/json to receive the response in JSON format.
-
-##### Path Variables
-
-- id: The unique identifier of the wallet you wish to retrieve information for. This should be replaced with the actual wallet ID in your request.
-
-##### Sample Request
-
-```sh copy
-curl --location -g '{{baseUrl}}/api/v1/business-api-services-wallets/c7ddb254-5da1-4136-b19e-733a00a31c70' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json'
-```
-
-##### Sample Response
-
-```json copy filename="Sample Response"
+```json filename="200 OK"
 {
-  "success": true,
-  "status": 200,
+  "statusCode": 200,
+  "message": "Payout Wallet fetched successfully",
   "data": {
     "id": "c7ddb254-5da1-4136-b19e-733a00a31c70",
-    "userId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
-    "amount": "99.950000000000000000",
+    "businessId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
     "token": "USDT",
-    "status": "ACTIVE",
+    "amount": "99.950000000000000000",
     "createdAt": "2024-02-22T14:16:23.000000Z",
     "updatedAt": "2024-02-22T14:35:13.000000Z"
   },
-  "message": "Payout Wallet fetched successfully"
+  "success": true
 }
 ```
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `payout-wallets:read` |
+| `404` | No API account with that ID belongs to your business |

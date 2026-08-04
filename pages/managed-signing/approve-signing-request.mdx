@@ -1,53 +1,36 @@
-### Knit API Documentation
+---
+title: Approve Signing Request
+description: This endpoint approves a pending signing request.
+---
 
-#### Approve Signing Request
+# Approve Signing Request
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#fff9eb",
-      color: "#d0a626",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    POST
-  </span>
-</div>
+<Endpoint method="POST" path="/api/v1/managed-signing/requests/{requestId}/approve" />
 
-```js copy
-{{baseUrl}}/api/v1/managed-signing/requests/{requestId}/approve
-```
+<Meta>
+  <Scope value="managed-signing:write" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
 
 This endpoint approves a pending signing request.
 
-##### Headers
-
-- `X-API-KEY`: Your API key for authentication.
-- `Accept`: Set to `application/json` to receive responses in JSON format.
-
-##### Path Parameters
+## Path Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `requestId` | string | Yes | The local request ID |
 
-##### Sample Request
+## Request
 
-```sh copy
-curl --location -g --request POST '{{baseUrl}}/api/v1/managed-signing/requests/<local-request-id>/approve' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json'
+```bash
+curl -X POST "https://api-prod.useknit.io/api/v1/managed-signing/requests/<local-request-id>/approve" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json"
 ```
 
-##### Sample Response
+## Response
 
-```json copy filename="Sample Response"
+```json filename="Response"
 {
   "statusCode": 200,
   "message": "Signing request approved",
@@ -73,7 +56,7 @@ curl --location -g --request POST '{{baseUrl}}/api/v1/managed-signing/requests/<
 }
 ```
 
-##### Response Fields
+## Response Fields
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -90,7 +73,7 @@ curl --location -g --request POST '{{baseUrl}}/api/v1/managed-signing/requests/<
 | `createdAt` | string | Creation timestamp |
 | `updatedAt` | string | Last update timestamp |
 
-##### Notes
+## Notes
 
 - Only requests with status `AWAITING_APPROVAL` can be approved.
 - After approval, the status changes to `SIGNED`.

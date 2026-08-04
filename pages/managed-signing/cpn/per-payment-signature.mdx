@@ -1,32 +1,20 @@
-### Knit API Documentation
+---
+title: "Step 4: Per-Payment Signature (CPN V2)"
+description: For each CPN V2 payment, Circle provides a `messageToBeSigned` (EIP-712 typed data). You sign it using this endpoint and return the signature to Circle.
+---
 
-#### Step 4: Per-Payment Signature (CPN V2)
+# Step 4: Per-Payment Signature (CPN V2)
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#fff9eb",
-      color: "#d0a626",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    POST
-  </span>
-</div>
+<Endpoint method="POST" path="/api/v1/managed-signing/requests" />
 
-```js copy
-{{baseUrl}}/api/v1/managed-signing/requests
-```
+<Meta>
+  <Scope value="managed-signing:write" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
 
 For each CPN V2 payment, Circle provides a `messageToBeSigned` (EIP-712 typed data). You sign it using this endpoint and return the signature to Circle.
 
-##### How CPN V2 Works
+## How CPN V2 Works
 
 ```
 1. Initiate payment with Circle → Circle returns `messageToBeSigned`
@@ -34,15 +22,9 @@ For each CPN V2 payment, Circle provides a `messageToBeSigned` (EIP-712 typed da
 3. Submit to Circle            → Circle processes the payment
 ```
 
-##### Headers
+## Body
 
-- `X-API-KEY`: Your API key for authentication.
-- `Accept`: Set to `application/json` to receive responses in JSON format.
-- `Content-Type`: Set to `application/json`.
-
-##### Request Body
-
-```json copy
+```json
 {
   "walletId": "<local-wallet-id>",
   "network": "MATIC_MAINNET",
@@ -90,18 +72,18 @@ For each CPN V2 payment, Circle provides a `messageToBeSigned` (EIP-712 typed da
 | `type` | string | Must be `eip712` for typed data signing |
 | `payload.typedData` | object | Circle's `messageToBeSigned` (EIP-712 format) |
 
-##### Important
+## Important
 
 The `typedData` object should be exactly as provided by Circle's API. Do **not** modify or camelCase the keys in `types` or `message` - they must match the EIP-712 schema exactly.
 
-##### Sample Request
+## Request
 
-```sh copy
-curl --location -g '{{baseUrl}}/api/v1/managed-signing/requests' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json' \
---header 'Content-Type: application/json' \
---data '{
+```bash
+curl "https://api-prod.useknit.io/api/v1/managed-signing/requests" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
     "walletId": "<local-wallet-id>",
     "network": "MATIC_MAINNET",
     "type": "eip712",
@@ -111,9 +93,9 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/requests' \
 }'
 ```
 
-##### Sample Response
+## Response
 
-```json copy filename="Sample Response"
+```json filename="Response"
 {
   "statusCode": 201,
   "message": "Signing request created",
@@ -135,7 +117,7 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/requests' \
 }
 ```
 
-##### Using the Signature
+## Using the Signature
 
 Take the `signature` from the response and include it in Circle's payment submission step:
 
@@ -145,18 +127,18 @@ Take the `signature` from the response and include it in Circle's payment submis
 }
 ```
 
-##### Gasless Signing
+## Gasless Signing
 
 Unlike the Permit2 approval step, EIP-712 signing is **completely gasless**. The signature is generated off-chain and no blockchain transaction is required.
 
-##### Error Handling
+## Error Handling
 
 | Error | Cause | Solution |
 |-------|-------|----------|
 | `POLICY_DENIED` | typedData not allowed by policy | Ensure `typedData.allow: true` in your policy |
 | `INVALID_TYPED_DATA` | Malformed EIP-712 data | Verify the typedData matches Circle's format exactly |
 
-##### Integration Example
+## Integration Example
 
 ```javascript
 // 1. Initiate payment with Circle
@@ -166,10 +148,10 @@ const circleResponse = await circle.initiatePayment({
 });
 
 // 2. Sign with Knit
-const knitResponse = await fetch('{{baseUrl}}/api/v1/managed-signing/requests', {
+const knitResponse = await fetch('https://api-prod.useknit.io/api/v1/managed-signing/requests', {
   method: 'POST',
   headers: {
-    'X-API-KEY': apiKey,
+    'Authorization': `Bearer ${accessToken}`,
     'Content-Type': 'application/json'
   },
   body: JSON.stringify({

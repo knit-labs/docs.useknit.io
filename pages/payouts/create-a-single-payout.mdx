@@ -1,122 +1,152 @@
-### Knit API Documentation
+---
+title: Create a payout
+description: Send USDT or USDC from your API account to an external address.
+---
 
-#### Create a single Payout
+# Create a payout
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#fff9eb",
-      color: "#d0a626",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    POST
-  </span>
-</div>
+Sends stablecoin from your API account to an external address. Knit checks the
+balance, holds the amount, and submits the transfer.
 
-```js copy
-{{baseUrl}}/api/v1/payouts
-```
+<Endpoint method="POST" path="/api/v1/payouts" />
 
-##### Supported Networks
+<Meta>
+  <Scope value="payouts:write" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
 
-- BITCOIN_MAINNET: For operations on the Bitcoin main network.
-- ETHEREUM_MAINNET: For activities on the Ethereum main network.
-- MATIC_MAINNET: For activities on the Polygon main network
-- TRON_MAINNET: For activities on the Tron main network
+## Before you call
 
-##### Headers
+1. **The API account must exist and be funded.**
+   [Create it](/API-account/create-an-API-account) for the token you are paying
+   out, then fund it from the dashboard or let collections credit it. A short
+   balance is rejected with `400`, and nothing is held.
+2. **Your server IP must be allow-listed.** Requests from other addresses are
+   rejected before reaching this endpoint.
+3. **The destination address must be valid for the network.** Addresses are
+   checked per chain; a malformed or wrong-chain address fails with `422`.
 
-- Authentication: `Authorization: Bearer <token>` (preferred) or the legacy
-  `X-API-KEY: {{apiKey}}`.
-- Accept: `application/json`
+## Supported networks
 
-##### Prerequisites
+| Network | Identifier |
+| ------- | ---------- |
+| Polygon | `MATIC_MAINNET` |
+| Tron | `TRON_MAINNET` |
+| BNB Smart Chain | `BSC_MAINNET` |
+| Solana | `SOL_MAINNET` |
 
-1. **API Account funded:** `POST /api/v1/business-api-services-wallets` creates
-   the wallet, but you still need to move funds from the business wallet into
-   it (see the dashboard transfer action). If the selected token balance is
-   lower than the `amount`, the API responds with `400 Insufficient balance`.
-2. **IP Whitelist:** both API keys and OAuth clients inherit the business
-   whitelist. Requests from non-approved IPs are rejected before they reach the
-   controller.
-3. **Valid crypto address:** Knit validates `toAddress` per network using the
-   `ValidCryptoAddressRule`. Invalid checksums or formats produce a `422`
-   validation error.
+<Callout type="warning">
+  Payout availability is narrower than collection availability — a network that
+  accepts collections may not support payouts. Check `payoutStatus` in
+  [`GET /api/v1/networks`](/networks/get-supported-networks) before you build
+  against a chain.
+</Callout>
 
-##### Validation & Defaults
+## Body
 
-| Field | Notes |
-| ----- | ----- |
-| `network` | Must be one of `MATIC_MAINNET`, `TRON_MAINNET`, `BSC_MAINNET`, `SOL_MAINNET`. |
-| `token` | Currently `USDT` or `USDC`. |
-| `amount` | Minimum `0.01`. Use token decimals (not fiat). |
-| `toAddress` | Checked against the per-chain format; invalid values block the request. |
-| `merchantReference` | Optional but recommended for idempotency. If supplied it must be unique in `api_payouts`. |
+<Fields>
+  <Field name="network" type="string" required>
+    One of the payout networks above.
+  </Field>
+  <Field name="token" type="string" required>
+    `USDT` or `USDC`.
+  </Field>
+  <Field name="amount" type="number" required>
+    The amount to send, in token units — not fiat. Minimum `0.01`.
+  </Field>
+  <Field name="toAddress" type="string" required>
+    The destination address. Validated against the format and checksum rules of
+    the chosen network.
+  </Field>
+  <Field name="merchantReference" type="string" required>
+    Your own reference for this payout. Must be unique across your payouts —
+    this is what makes retries safe.
+  </Field>
+</Fields>
 
-When the request passes validation the service persists the payout as `PENDING`,
-kicks off KnitCore settlement, and stores the caller’s IP address for auditing.
+<Callout type="warning">
+  `merchantReference` is **required**, not optional. Generate it from something
+  stable on your side — an invoice ID, a ledger entry ID — so that replaying a
+  request whose outcome you are unsure of is rejected as a duplicate rather
+  than sending the money twice.
+</Callout>
 
-##### Request Body
+## Request
 
-```json
-{
-  "network": "MATIC_MAINNET",
-  "token": "USDT",
-  "amount": 0.02,
-  "toAddress": "0x56adfcc254ab3b8142a275c1837bcffaff5aa38b"
-}
-```
-
-##### Sample Request
-
-```sh copy
-curl --location -g '{{baseUrl}}/api/v1/payouts' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json' \
---data '{
+```bash filename="cURL"
+curl -X POST "https://api-prod.useknit.io/api/v1/payouts" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
     "network": "MATIC_MAINNET",
     "token": "USDT",
-    "amount": 0.02,
-    "toAddress": "0x56adfcc254ab3b8142a275c1837bcffaff5aa38b"
-}'
-```
-
-##### Sample Response
-
-```json copy filename="Sample Response"
-{
-  "success": true,
-  "message": "Payout created successfully",
-  "status": 201,
-  "data": {
-    "amount": 0.02,
-    "token": "USDT",
+    "amount": 25.5,
     "toAddress": "0x56adfcc254ab3b8142a275c1837bcffaff5aa38b",
-    "network": "MATIC_MAINNET",
-    "userId": "8286065b-577e-11ef-9218-96f5ee698dcd",
-    "payoutWalletId": "5c7bb5bd-acb5-453a-9eb9-11380a329d79",
+    "merchantReference": "INV-2045"
+  }'
+```
+
+## Response
+
+Returns `201`. The payout starts at `PENDING` — it has not settled on-chain
+yet.
+
+```json filename="201 Created"
+{
+  "statusCode": 201,
+  "message": "Payout created successfully",
+  "data": {
     "id": "8e5697e3-8265-455b-984a-0eb40e10b0f9",
-    "updatedAt": "2024-08-27T13:44:20.000000Z",
-    "createdAt": "2024-08-27T13:44:20.000000Z"
-  }
+    "businessId": "b7b93a40-4e18-4e97-9c5f-8a7a4fd0df92",
+    "network": "MATIC_MAINNET",
+    "token": "USDT",
+    "amount": "25.500000000000000000",
+    "toAddress": "0x56adfcc254ab3b8142a275c1837bcffaff5aa38b",
+    "merchantReference": "INV-2045",
+    "transactionHash": null,
+    "status": "PENDING",
+    "info": null,
+    "createdAt": "2024-08-27T13:44:20.000000Z",
+    "updatedAt": "2024-08-27T13:44:20.000000Z"
+  },
+  "success": true
 }
+```
 
-##### Status Lifecycle & Webhooks
+## Status lifecycle
 
-- `PENDING` → initial state after creation.
-- `COMPLETED` → KnitCore confirms on-chain success; triggers a
-  `PAYOUT_SUCCESSFUL` webhook (see the Webhooks section for payload format) and
-  the listener skips delivery if the payout isn’t completed.
-- `FAILED` → KnitCore or blockchain errors; check dashboard logs and retry with
-  a new payout ID (the service does not auto-retry failed payouts).
+| Status | Meaning |
+| ------ | ------- |
+| `PENDING` | Accepted and queued. The balance has been held |
+| `PROCESSING` | Submitted for settlement; awaiting on-chain confirmation |
+| `COMPLETED` | Confirmed on-chain. `transactionHash` is populated and a `PAYOUT_SUCCESSFUL` webhook is delivered |
+| `FAILED` | Could not be settled. Check `info` for the reason |
 
-Webhook payloads are camelCased and signed with your business webhook secret via
-`X-Signature`. Use that signature plus your stored secret to verify integrity.
+<Callout type="info">
+  A failed payout is not retried automatically at the same `merchantReference`.
+  To try again, submit a new payout with a **new** `merchantReference` once you
+  have resolved the cause.
+</Callout>
+
+Track completion with the [`PAYOUT_SUCCESSFUL` webhook](/webhooks/payout-successful)
+rather than polling. If you need to check state on demand — reconciling after an
+outage, say — use [Retrieve a payout](/payouts/get-single-payout) or
+[Get payout status](/payouts/get-payout-status).
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `400` | Insufficient balance in the API account for that token, or the payout could not be accepted |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `payouts:write` |
+| `404` | `Wallet not found for the specified token` — no API account exists for that token yet |
+| `422` | A field failed validation: `amount` below `0.01`, an unsupported `network`, an invalid `toAddress`, or a `merchantReference` you have already used |
+
+```json filename="400 — insufficient balance"
+{
+  "statusCode": 400,
+  "message": "Insufficient balance",
+  "data": null,
+  "success": false
+}
 ```

@@ -1,0 +1,62 @@
+---
+title: Get payout status
+description: Check a payout's settlement state on demand.
+---
+
+# Get payout status
+
+Returns a live settlement status for one payout. Use it when you need the
+current state right now — reconciling after downtime, or investigating a payout
+that has been `PROCESSING` longer than you expect.
+
+<Endpoint method="GET" path="/api/v1/payouts/{id}/status" />
+
+<Meta>
+  <Scope value="payouts:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+<Callout type="warning">
+  This is an on-demand check, not a polling endpoint. For normal operation rely
+  on the [`PAYOUT_SUCCESSFUL` webhook](/webhooks/payout-successful); if you must
+  poll, back off between attempts.
+</Callout>
+
+## Path parameters
+
+<Fields>
+  <Field name="id" type="string" required>
+    The payout's `id`.
+  </Field>
+</Fields>
+
+## Request
+
+```bash filename="cURL"
+curl "https://api-prod.useknit.io/api/v1/payouts/8e5697e3-8265-455b-984a-0eb40e10b0f9/status" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json"
+```
+
+## Response
+
+```json filename="200 OK"
+{
+  "statusCode": 200,
+  "message": "Payout status retrieved successfully",
+  "data": {
+    "status": "COMPLETED",
+    "transactionHash": "0xb0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f70819"
+  },
+  "success": true
+}
+```
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `400` | The status could not be retrieved. Retry with backoff; the stored record from [Retrieve a payout](/payouts/get-single-payout) remains available |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `payouts:read` |
+| `403` | The payout exists but belongs to another business |
+| `404` | No payout with that ID |

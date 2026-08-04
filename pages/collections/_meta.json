@@ -1,5 +1,7 @@
 {
-    "create-a-collection": "Create a Collection",
-    "get-all-collections": "Get All Collections",
-    "get-single-collection": "Get Single Collection"
+  "create-a-collection": "Create a Collection",
+  "get-all-collections": "List Collections",
+  "get-single-collection": "Retrieve a Collection",
+  "update-a-collection": "Update a Collection",
+  "delete-a-collection": "Delete a Collection"
 }

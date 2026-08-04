@@ -1,57 +1,52 @@
-### Knit API Documentation
+---
+title: Create Managed Signing Wallet
+description: This endpoint creates a new managed signing wallet for a specified blockchain network type.
+---
 
-#### Create Managed Signing Wallet
+# Create Managed Signing Wallet
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#fff9eb",
-      color: "#d0a626",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    POST
-  </span>
-</div>
+<Endpoint method="POST" path="/api/v1/managed-signing/wallets" />
 
-```js copy
-{{baseUrl}}/api/v1/managed-signing/wallets
-```
+<Meta>
+  <Scope value="managed-signing:write" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
 
 This endpoint creates a new managed signing wallet for a specified blockchain network type.
 
-##### Supported Networks
+## Supported Networks
 
-**Production**
-- `ETHEREUM_MAINNET`
-- `MATIC_MAINNET`
-- `BSC_MAINNET`
-- `BASE_MAINNET`
+| Network | Identifier |
+| ------- | ---------- |
+| Ethereum | `ETHEREUM_MAINNET` (alias `ETH_MAINNET`) |
+| Polygon | `MATIC_MAINNET` |
+| BNB Smart Chain | `BSC_MAINNET` |
+| Base | `BASE_MAINNET` |
+| Polygon Amoy — sandbox only | `MATIC_AMOY` |
 
-**Testnet (Sandbox/Dev only)**
-- `MATIC_AMOY` - Polygon Amoy testnet (commonly used for CPN testing)
+## Body
 
-##### Headers
+<Fields>
+  <Field name="type" type="string" required>
+    The wallet type. Currently `EVM` is the only accepted value.
+  </Field>
+  <Field name="networks" type="string[]" required>
+    The networks the wallet should be usable on. Must contain at least one
+    entry, and every entry must be a supported network.
+  </Field>
+  <Field name="merchantCallbackUrl" type="string" required>
+    Where callbacks for this wallet are delivered. Must be a publicly
+    reachable `http://` or `https://` URL — private, loopback, and internal
+    addresses are rejected.
+  </Field>
+</Fields>
 
-- `X-API-KEY`: Your API key for authentication.
-- `Accept`: Set to `application/json` to receive responses in JSON format.
-- `Content-Type`: Set to `application/json`.
+<Callout type="warning">
+  `merchantCallbackUrl` is **required**. A wallet cannot be created without a
+  reachable callback URL.
+</Callout>
 
-##### Request Body
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `type` | string | Yes | Wallet type (e.g., `EVM`) |
-| `networks` | array | Yes | Array of supported networks |
-| `merchantCallbackUrl` | string | No | URL for receiving callbacks |
-
-```json copy
+```json filename="Request body"
 {
   "type": "EVM",
   "networks": ["ETHEREUM_MAINNET"],
@@ -59,23 +54,23 @@ This endpoint creates a new managed signing wallet for a specified blockchain ne
 }
 ```
 
-##### Sample Request
+## Request
 
-```sh copy
-curl --location -g '{{baseUrl}}/api/v1/managed-signing/wallets' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json' \
---header 'Content-Type: application/json' \
---data '{
+```bash
+curl "https://api-prod.useknit.io/api/v1/managed-signing/wallets" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
     "type": "EVM",
     "networks": ["ETHEREUM_MAINNET"],
     "merchantCallbackUrl": "https://example.com/callback"
 }'
 ```
 
-##### Sample Response
+## Response
 
-```json copy filename="Sample Response"
+```json filename="Response"
 {
   "statusCode": 201,
   "message": "Wallet created",
@@ -97,7 +92,7 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/wallets' \
 }
 ```
 
-##### Response Fields
+## Response Fields
 
 | Field | Type | Description |
 |-------|------|-------------|

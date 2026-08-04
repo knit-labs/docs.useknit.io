@@ -1,10 +1,13 @@
-### Knit API Documentation
+---
+title: CPN Onboarding Checklist
+description: This checklist maps Circle CPN V2 requirements to Knit's Managed Signing API.
+---
 
-#### CPN Onboarding Checklist
+# CPN Onboarding Checklist
 
 This checklist maps Circle CPN V2 requirements to Knit's Managed Signing API.
 
-##### Overview
+## Overview
 
 | Step | Action | Endpoint | Frequency |
 |------|--------|----------|-----------|
@@ -15,12 +18,12 @@ This checklist maps Circle CPN V2 requirements to Knit's Managed Signing API.
 
 ---
 
-##### Step 1: Create a Managed Signing Wallet
+## Step 1: Create a Managed Signing Wallet
 
 Create a wallet that will hold funds and sign CPN transactions.
 
 **Production:**
-```json copy
+```json
 {
   "type": "EVM",
   "networks": ["MATIC_MAINNET"]
@@ -28,7 +31,7 @@ Create a wallet that will hold funds and sign CPN transactions.
 ```
 
 **Testing (Sandbox/Dev):**
-```json copy
+```json
 {
   "type": "EVM",
   "networks": ["MATIC_AMOY"]
@@ -39,12 +42,12 @@ See: [Create Wallet](/managed-signing/cpn/create-wallet)
 
 ---
 
-##### Step 2: Create a CPN Policy
+## Step 2: Create a CPN Policy
 
 Configure policy rules that allow CPN V2 signature flows.
 
 **Production:**
-```json copy
+```json
 {
   "name": "cpn-v2",
   "rules": {
@@ -59,7 +62,7 @@ Configure policy rules that allow CPN V2 signature flows.
 ```
 
 **Testing (Sandbox/Dev):**
-```json copy
+```json
 {
   "name": "cpn-v2-test",
   "rules": {
@@ -77,11 +80,11 @@ See: [Create Policy](/managed-signing/cpn/create-policy)
 
 ---
 
-##### Step 3: One-Time Permit2 Approval
+## Step 3: One-Time Permit2 Approval
 
 Approve the Permit2 contract to spend USDC on behalf of your wallet.
 
-```json copy
+```json
 {
   "walletId": "<wallet-id>",
   "network": "MATIC_MAINNET",
@@ -102,11 +105,11 @@ See: [Permit2 Approval](/managed-signing/cpn/permit2-approval)
 
 ---
 
-##### Step 4: Per-Payment Signature
+## Step 4: Per-Payment Signature
 
 For each payment, Circle provides `messageToBeSigned` (EIP-712 typed data). Sign it and return the signature.
 
-```json copy
+```json
 {
   "walletId": "<wallet-id>",
   "network": "MATIC_MAINNET",
@@ -123,7 +126,7 @@ See: [Per-Payment Signature](/managed-signing/cpn/per-payment-signature)
 
 ---
 
-##### (Optional) Step 5: CPN V1 Raw Transaction
+## (Optional) Step 5: CPN V1 Raw Transaction
 
 Only needed for legacy CPN V1 integration.
 
@@ -131,7 +134,7 @@ See: [CPN V1 Raw TX](/managed-signing/cpn/cpn-v1-raw-tx)
 
 ---
 
-##### Key Addresses
+## Key Addresses
 
 **Production Networks**
 

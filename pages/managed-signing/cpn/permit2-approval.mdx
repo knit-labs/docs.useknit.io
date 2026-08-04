@@ -1,46 +1,28 @@
-### Knit API Documentation
+---
+title: "Step 3: Permit2 Approval (One-Time)"
+description: This is a **one-time on-chain transaction** that approves the Permit2 contract to spend USDC on behalf of your wallet. After this approval, all subsequent CPN V2 payments use gasless EIP-712 signatures.
+---
 
-#### Step 3: Permit2 Approval (One-Time)
+# Step 3: Permit2 Approval (One-Time)
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#fff9eb",
-      color: "#d0a626",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    POST
-  </span>
-</div>
+<Endpoint method="POST" path="/api/v1/managed-signing/requests" />
 
-```js copy
-{{baseUrl}}/api/v1/managed-signing/requests
-```
+<Meta>
+  <Scope value="managed-signing:write" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
 
 This is a **one-time on-chain transaction** that approves the Permit2 contract to spend USDC on behalf of your wallet. After this approval, all subsequent CPN V2 payments use gasless EIP-712 signatures.
 
-##### Prerequisites
+## Prerequisites
 
 - Wallet must have MATIC (or native token) for gas fees
 - USDC token address for your network
 - Permit2 contract address for your network
 
-##### Headers
+## Body
 
-- `X-API-KEY`: Your API key for authentication.
-- `Accept`: Set to `application/json` to receive responses in JSON format.
-- `Content-Type`: Set to `application/json`.
-
-##### Request Body
-
-```json copy
+```json
 {
   "walletId": "<local-wallet-id>",
   "network": "MATIC_MAINNET",
@@ -66,19 +48,19 @@ This is a **one-time on-chain transaction** that approves the Permit2 contract t
 | `payload.amount` | string | Approval amount (use max for unlimited) |
 | `broadcast` | boolean | Set to `true` to broadcast on-chain |
 
-##### Approval Amount
+## Approval Amount
 
 - For unlimited approval: use a large number like `115792089237316195423570985008687907853269984665640564039457584007913129639935` (max uint256)
 - For limited approval: specify the exact amount in token units
 
-##### Sample Request
+## Request
 
-```sh copy
-curl --location -g '{{baseUrl}}/api/v1/managed-signing/requests' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json' \
---header 'Content-Type: application/json' \
---data '{
+```bash
+curl "https://api-prod.useknit.io/api/v1/managed-signing/requests" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
     "walletId": "<local-wallet-id>",
     "network": "MATIC_MAINNET",
     "type": "evm_tx",
@@ -92,9 +74,9 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/requests' \
 }'
 ```
 
-##### Sample Response
+## Response
 
-```json copy filename="Sample Response"
+```json filename="Response"
 {
   "statusCode": 201,
   "message": "Signing request created",
@@ -120,13 +102,13 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/requests' \
 }
 ```
 
-##### Important Notes
+## Important Notes
 
 - This transaction requires gas paid by the wallet
 - The service will auto-fill gas/fees/nonce if an RPC is configured for the network
 - If `broadcast` is `false`, you'll receive the signed transaction to broadcast yourself
 - This approval only needs to be done **once per token**
 
-##### Next Step
+## Next Step
 
 Proceed to [Per-Payment Signature](/managed-signing/cpn/per-payment-signature) to sign individual payments.

@@ -1,0 +1,77 @@
+---
+title: Update a wallet
+description: Amend an API wallet's stored attributes.
+---
+
+# Update a wallet
+
+Amends an existing API wallet. Send only the fields you want to change.
+
+<Endpoint method="PUT" path="/api/v1/wallets/{id}" />
+
+<Meta>
+  <Scope value="wallets:write" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+<Callout type="warning">
+  Updating a wallet does not re-provision its on-chain address. The `address`
+  returned when the wallet was created stays the same.
+</Callout>
+
+## Path parameters
+
+<Fields>
+  <Field name="id" type="string" required>
+    The wallet's `id`.
+  </Field>
+</Fields>
+
+## Body
+
+<Fields>
+  <Field name="network" type="string" required={false}>
+    The wallet's primary network identifier.
+  </Field>
+  <Field name="type" type="string" required={false}>
+    The wallet's type classification.
+  </Field>
+</Fields>
+
+## Request
+
+```bash filename="cURL"
+curl -X PUT "https://api-prod.useknit.io/api/v1/wallets/d95143d2-c076-49da-b121-b3beed054bf3" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{ "network": "MATIC_MAINNET" }'
+```
+
+## Response
+
+```json filename="200 OK"
+{
+  "statusCode": 200,
+  "message": "Wallet updated successfully",
+  "data": {
+    "id": "d95143d2-c076-49da-b121-b3beed054bf3",
+    "businessId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
+    "network": "MATIC_MAINNET",
+    "networkId": "MATIC_MAINNET",
+    "networks": ["MATIC_MAINNET"],
+    "address": "0x1adb0a39bde00fa0957e519584cb5c51fefcb37f",
+    "isActive": true,
+    "createdAt": "2024-02-26T13:59:19.000000Z",
+    "updatedAt": "2024-03-04T09:12:41.000000Z"
+  },
+  "success": true
+}
+```
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `wallets:write` |
+| `404` | No wallet with that ID belongs to your business |
+| `422` | A supplied field failed validation |

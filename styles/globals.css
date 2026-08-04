@@ -1,3 +1,920 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ==========================================================================
+   Knit Docs — design tokens
+   ========================================================================== */
+
+:root {
+  --knit-brand: #4c38cb;
+  --knit-brand-strong: #3f2cb0;
+  --knit-brand-soft: rgba(76, 56, 203, 0.08);
+
+  --knit-fg: #0f1117;
+  --knit-fg-muted: #4b5563;
+  --knit-fg-subtle: #6b7280;
+  --knit-fg-faint: #9ca3af;
+
+  --knit-bg: #ffffff;
+  --knit-bg-subtle: #fafafa;
+  --knit-bg-raised: #ffffff;
+  --knit-surface: #f7f7f8;
+
+  --knit-border: #e8e8ec;
+  --knit-border-strong: #d8d8df;
+
+  --knit-code-bg: #f7f7f9;
+  --knit-code-border: #e8e8ec;
+  --knit-code-header: #f2f2f5;
+
+  --knit-get: #0a7b83;
+  --knit-get-bg: rgba(10, 123, 131, 0.09);
+  --knit-post: #1a6f3c;
+  --knit-post-bg: rgba(26, 111, 60, 0.09);
+  --knit-put: #9a6212;
+  --knit-put-bg: rgba(154, 98, 18, 0.1);
+  --knit-patch: #7a4bbd;
+  --knit-patch-bg: rgba(122, 75, 189, 0.1);
+  --knit-delete: #b3261e;
+  --knit-delete-bg: rgba(179, 38, 30, 0.09);
+
+  --knit-shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.04);
+  --knit-shadow-md: 0 4px 12px rgba(16, 24, 40, 0.07);
+
+  --knit-radius: 10px;
+  --knit-radius-lg: 14px;
+
+  --knit-content-width: 48rem;
+}
+
+.dark {
+  --knit-brand: #a99bff;
+  --knit-brand-strong: #c4b9ff;
+  --knit-brand-soft: rgba(169, 155, 255, 0.12);
+
+  --knit-fg: #f4f4f6;
+  --knit-fg-muted: #a8adb8;
+  --knit-fg-subtle: #8b909c;
+  --knit-fg-faint: #6d727d;
+
+  --knit-bg: #0b0c10;
+  --knit-bg-subtle: #0e1016;
+  --knit-bg-raised: #111319;
+  --knit-surface: #14161d;
+
+  --knit-border: #22242c;
+  --knit-border-strong: #2e3038;
+
+  --knit-code-bg: #0f1116;
+  --knit-code-border: #22242c;
+  --knit-code-header: #14161d;
+
+  --knit-get: #5ecfd6;
+  --knit-get-bg: rgba(94, 207, 214, 0.12);
+  --knit-post: #6dd58c;
+  --knit-post-bg: rgba(109, 213, 140, 0.12);
+  --knit-put: #e3b341;
+  --knit-put-bg: rgba(227, 179, 65, 0.12);
+  --knit-patch: #c9a9ff;
+  --knit-patch-bg: rgba(201, 169, 255, 0.12);
+  --knit-delete: #ff7b72;
+  --knit-delete-bg: rgba(255, 123, 114, 0.12);
+
+  --knit-shadow-sm: none;
+  --knit-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+html,
+body {
+  background: var(--knit-bg);
+  color: var(--knit-fg-muted);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.nextra-container {
+  background: var(--knit-bg);
+}
+
+::selection {
+  background: var(--knit-brand-soft);
+}
+
+/* ==========================================================================
+   Top navigation
+   ========================================================================== */
+
+.nextra-nav-container {
+  border-bottom: 1px solid var(--knit-border);
+}
+
+.nextra-nav-container .nextra-nav-container-blur {
+  box-shadow: none !important;
+  background: var(--knit-bg) !important;
+  opacity: 0.85;
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+}
+
+.nextra-nav-container nav {
+  gap: 0.75rem;
+}
+
+.knit-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.knit-logo__mark {
+  height: 20px;
+  width: auto;
+  flex: none;
+}
+
+.knit-logo__mark--dark {
+  display: none;
+}
+
+.dark .knit-logo__mark--light {
+  display: none;
+}
+
+.dark .knit-logo__mark--dark {
+  display: block;
+}
+
+.knit-logo__tag {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--knit-fg-faint);
+  border-left: 1px solid var(--knit-border-strong);
+  padding-left: 0.6rem;
+}
+
+/* Search — pill field with a visible shortcut affordance */
+.nextra-search input {
+  border-radius: 999px !important;
+  border: 1px solid var(--knit-border) !important;
+  background: var(--knit-bg-subtle) !important;
+  font-size: 0.8125rem !important;
+  height: 2.25rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.nextra-search input:focus {
+  border-color: var(--knit-brand) !important;
+  background: var(--knit-bg) !important;
+  box-shadow: 0 0 0 3px var(--knit-brand-soft);
+  outline: none !important;
+}
+
+.nextra-search kbd {
+  border-radius: 6px !important;
+  border: 1px solid var(--knit-border) !important;
+  background: var(--knit-bg) !important;
+  color: var(--knit-fg-faint) !important;
+  font-size: 0.6875rem !important;
+}
+
+.nextra-search ul {
+  border-radius: var(--knit-radius-lg) !important;
+  border: 1px solid var(--knit-border) !important;
+  box-shadow: var(--knit-shadow-md) !important;
+  background: var(--knit-bg-raised) !important;
+}
+
+/* ==========================================================================
+   Sidebar
+   ========================================================================== */
+
+.nextra-sidebar-container {
+  border-right: 1px solid var(--knit-border);
+  background: var(--knit-bg);
+  box-shadow: none !important;
+}
+
+.nextra-sidebar-container .nextra-scrollbar {
+  padding-top: 1.5rem;
+}
+
+.nextra-sidebar-container li > a,
+.nextra-sidebar-container li > button {
+  border-radius: 8px !important;
+  padding: 0.375rem 0.625rem !important;
+  font-size: 0.8125rem !important;
+  line-height: 1.45 !important;
+  color: var(--knit-fg-subtle) !important;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.nextra-sidebar-container li > a:hover,
+.nextra-sidebar-container li > button:hover {
+  background: var(--knit-surface) !important;
+  color: var(--knit-fg) !important;
+}
+
+/* Active item — brand tint pill. Matched on the exact utility token: a
+   substring match would also catch `dark:hover:nx-bg-primary-100/5`, which
+   every inactive item carries. */
+.nextra-sidebar-container li > a.nx-bg-primary-100,
+.nextra-sidebar-container li > button.nx-bg-primary-100 {
+  background: var(--knit-brand-soft) !important;
+  color: var(--knit-brand) !important;
+  font-weight: 600 !important;
+}
+
+/* Top-level entries read as group labels */
+.nextra-sidebar-container .nextra-menu-desktop > li > button,
+.nextra-sidebar-container .nextra-menu-desktop > li > a {
+  font-weight: 600;
+  color: var(--knit-fg) !important;
+  letter-spacing: -0.005em;
+}
+
+.nextra-sidebar-container .nextra-menu-desktop > li > a.nx-bg-primary-100 {
+  color: var(--knit-brand) !important;
+}
+
+.nextra-sidebar-container li ul {
+  margin-left: 0.55rem !important;
+}
+
+.nextra-sidebar-container li ul::before,
+.nextra-sidebar-container .nx-relative::before {
+  background: var(--knit-border) !important;
+}
+
+.nextra-sidebar-container .nx-sticky.nx-bottom-0 {
+  border-top: 1px solid var(--knit-border);
+  background: var(--knit-bg) !important;
+  box-shadow: none !important;
+}
+
+/* ==========================================================================
+   Table of contents
+   ========================================================================== */
+
+.nextra-toc > div {
+  padding-top: 1.75rem;
+}
+
+.nextra-toc > div > p {
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--knit-fg-faint) !important;
+}
+
+.nextra-toc li a {
+  font-size: 0.8125rem !important;
+  color: var(--knit-fg-subtle) !important;
+  transition: color 0.12s ease;
+}
+
+.nextra-toc li a:hover {
+  color: var(--knit-fg) !important;
+}
+
+.nextra-toc li a.nx-text-primary-600 {
+  color: var(--knit-brand) !important;
+  font-weight: 500 !important;
+}
+
+.nextra-toc [class*="nx-border-t"] {
+  border-color: var(--knit-border) !important;
+}
+
+/* ==========================================================================
+   Content column
+   ========================================================================== */
+
+article.nextra-content main {
+  max-width: var(--knit-content-width);
+}
+
+main .nextra-breadcrumb {
+  font-size: 0.75rem;
+  color: var(--knit-fg-faint);
+  margin-bottom: 0.75rem;
+}
+
+/* ==========================================================================
+   Typography
+   ========================================================================== */
+
+main h1 {
+  font-size: 2.125rem !important;
+  line-height: 1.2 !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.028em !important;
+  color: var(--knit-fg) !important;
+  margin-top: 0.5rem !important;
+}
+
+main h2 {
+  font-size: 1.375rem !important;
+  line-height: 1.35 !important;
+  font-weight: 620 !important;
+  letter-spacing: -0.018em !important;
+  color: var(--knit-fg) !important;
+  margin-top: 3rem !important;
+  padding-bottom: 0.6rem !important;
+  border-bottom: 1px solid var(--knit-border) !important;
+}
+
+main h3 {
+  font-size: 1.0625rem !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.012em !important;
+  color: var(--knit-fg) !important;
+  margin-top: 2.25rem !important;
+}
+
+main h4 {
+  font-size: 0.9375rem !important;
+  font-weight: 600 !important;
+  color: var(--knit-fg) !important;
+  margin-top: 1.75rem !important;
+}
+
+main p {
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  color: var(--knit-fg-muted);
+  margin-top: 1.25rem;
+}
+
+/* The paragraph immediately after the page title reads as a lede. */
+main h1 + p {
+  font-size: 1.0625rem !important;
+  line-height: 1.65 !important;
+  color: var(--knit-fg-subtle) !important;
+  margin-top: 0.9rem !important;
+}
+
+main li {
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--knit-fg-muted);
+}
+
+main ul,
+main ol {
+  margin-top: 1.1rem;
+}
+
+main strong {
+  color: var(--knit-fg);
+  font-weight: 600;
+}
+
+main a:not(.knit-card) {
+  color: var(--knit-brand) !important;
+  text-decoration: none !important;
+  font-weight: 500;
+  border-bottom: 1px solid color-mix(in srgb, var(--knit-brand) 35%, transparent);
+  transition: border-color 0.12s ease;
+}
+
+main a:not(.knit-card):hover {
+  border-bottom-color: var(--knit-brand);
+}
+
+main hr {
+  border-color: var(--knit-border) !important;
+  margin: 2.75rem 0 !important;
+}
+
+main blockquote {
+  border-left: 3px solid var(--knit-border-strong) !important;
+  color: var(--knit-fg-subtle) !important;
+  font-style: normal !important;
+  padding-left: 1rem !important;
+}
+
+/* Inline code */
+main :not(pre) > code {
+  background: var(--knit-surface) !important;
+  border: 1px solid var(--knit-border) !important;
+  border-radius: 5px !important;
+  padding: 0.12em 0.38em !important;
+  font-size: 0.845em !important;
+  color: var(--knit-fg) !important;
+}
+
+main h1 :not(pre) > code,
+main h2 :not(pre) > code,
+main h3 :not(pre) > code {
+  font-size: 0.9em !important;
+}
+
+/* ==========================================================================
+   Code blocks
+   ========================================================================== */
+
+.nextra-code-block {
+  margin-top: 1.4rem !important;
+}
+
+.nextra-code-block pre {
+  border-radius: var(--knit-radius) !important;
+  border: 1px solid var(--knit-code-border) !important;
+  background: var(--knit-code-bg) !important;
+  padding-top: 0.95rem !important;
+  padding-bottom: 0.95rem !important;
+  font-size: 0.8125rem !important;
+  line-height: 1.65 !important;
+  box-shadow: var(--knit-shadow-sm);
+}
+
+.nextra-code-block pre code {
+  font-size: 0.8125rem !important;
+}
+
+/* When a filename bar is present it sits on top of the <pre>, so the first
+   line needs the space back that the rule above collapses. */
+.nextra-code-block > div.nx-absolute + pre {
+  padding-top: 2.9rem !important;
+}
+
+/* Filename bar. Nextra renders it absolutely positioned over the top of the
+   <pre>, which is padded down to make room — so it is styled as an inset
+   header rather than a preceding sibling. */
+.nextra-code-block > div.nx-absolute {
+  background: var(--knit-code-header) !important;
+  border-bottom: 1px solid var(--knit-code-border) !important;
+  border-radius: var(--knit-radius) var(--knit-radius) 0 0 !important;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  color: var(--knit-fg-subtle) !important;
+  padding: 0.55rem 0.9rem !important;
+  letter-spacing: 0.01em;
+}
+
+.nextra-code-block button {
+  border-radius: 6px !important;
+  border: 1px solid var(--knit-border) !important;
+  background: var(--knit-bg-raised) !important;
+  color: var(--knit-fg-subtle) !important;
+  transition: color 0.12s ease, border-color 0.12s ease;
+}
+
+.nextra-code-block button:hover {
+  color: var(--knit-fg) !important;
+  border-color: var(--knit-border-strong) !important;
+}
+
+/* ==========================================================================
+   Tables
+   ========================================================================== */
+
+main table {
+  display: table !important;
+  width: 100% !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border: 1px solid var(--knit-border) !important;
+  border-radius: var(--knit-radius) !important;
+  overflow: hidden !important;
+  font-size: 0.875rem !important;
+  margin-top: 1.4rem !important;
+}
+
+main table th {
+  background: var(--knit-bg-subtle) !important;
+  border: none !important;
+  border-bottom: 1px solid var(--knit-border) !important;
+  padding: 0.65rem 0.9rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--knit-fg-subtle) !important;
+  text-align: left !important;
+}
+
+main table td {
+  border: none !important;
+  border-bottom: 1px solid var(--knit-border) !important;
+  padding: 0.7rem 0.9rem !important;
+  color: var(--knit-fg-muted) !important;
+  vertical-align: top;
+}
+
+main table tr:last-child td {
+  border-bottom: none !important;
+}
+
+main table td:first-child {
+  color: var(--knit-fg) !important;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   Callouts
+   ========================================================================== */
+
+.nextra-callout {
+  border-radius: var(--knit-radius) !important;
+  border-width: 1px !important;
+  font-size: 0.875rem !important;
+  padding: 0.85rem 1rem !important;
+  margin-top: 1.5rem !important;
+  align-items: flex-start !important;
+}
+
+.nextra-callout p {
+  font-size: 0.875rem !important;
+  margin-top: 0 !important;
+  line-height: 1.65 !important;
+}
+
+/* ==========================================================================
+   Steps
+   ========================================================================== */
+
+.nextra-steps {
+  border-left-color: var(--knit-border) !important;
+}
+
+.nextra-steps h3 {
+  font-size: 1rem !important;
+  margin-top: 1.75rem !important;
+}
+
+.nextra-steps h3::before,
+.nextra-steps h4::before {
+  background: var(--knit-surface) !important;
+  border: 1px solid var(--knit-border) !important;
+  color: var(--knit-fg-subtle) !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+}
+
+/* ==========================================================================
+   Tabs
+   ========================================================================== */
+
+main [role="tablist"] {
+  border-bottom: 1px solid var(--knit-border) !important;
+  gap: 0.25rem;
+}
+
+main [role="tab"] {
+  font-size: 0.8125rem !important;
+  font-weight: 500 !important;
+  color: var(--knit-fg-subtle) !important;
+  padding: 0.5rem 0.75rem !important;
+}
+
+main [role="tab"][aria-selected="true"] {
+  color: var(--knit-brand) !important;
+  border-color: var(--knit-brand) !important;
+}
+
+main .nx-border-t {
+  border-color: var(--knit-border) !important;
+}
+
+/* ==========================================================================
+   Custom MDX components
+   ========================================================================== */
+
+/* --- Method badge --- */
+.knit-method {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  padding: 0.34rem 0.5rem;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+.knit-method--get {
+  color: var(--knit-get);
+  background: var(--knit-get-bg);
+}
+.knit-method--post {
+  color: var(--knit-post);
+  background: var(--knit-post-bg);
+}
+.knit-method--put {
+  color: var(--knit-put);
+  background: var(--knit-put-bg);
+}
+.knit-method--patch {
+  color: var(--knit-patch);
+  background: var(--knit-patch-bg);
+}
+.knit-method--delete {
+  color: var(--knit-delete);
+  background: var(--knit-delete-bg);
+}
+
+/* --- Endpoint bar --- */
+.knit-endpoint {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 1.5rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--knit-border);
+  border-radius: var(--knit-radius);
+  background: var(--knit-bg-subtle);
+  box-shadow: var(--knit-shadow-sm);
+}
+
+.knit-endpoint__path {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.8125rem;
+  color: var(--knit-fg);
+  scrollbar-width: none;
+}
+
+.knit-endpoint__path::-webkit-scrollbar {
+  display: none;
+}
+
+.knit-endpoint__base {
+  color: var(--knit-fg-faint);
+}
+
+.knit-endpoint__param {
+  color: var(--knit-brand);
+}
+
+.knit-endpoint__copy {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  color: var(--knit-fg-faint);
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+
+.knit-endpoint__copy:hover {
+  color: var(--knit-fg);
+  background: var(--knit-bg);
+  border-color: var(--knit-border);
+}
+
+/* --- Meta chips --- */
+.knit-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+.knit-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--knit-border);
+  background: var(--knit-bg-subtle);
+  color: var(--knit-fg-subtle);
+}
+
+.knit-chip code {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  font-size: 0.75rem !important;
+  color: var(--knit-fg) !important;
+  font-weight: 500;
+}
+
+.knit-chip--brand {
+  border-color: color-mix(in srgb, var(--knit-brand) 30%, transparent);
+  background: var(--knit-brand-soft);
+  color: var(--knit-brand);
+}
+
+.knit-chip--brand code {
+  color: var(--knit-brand) !important;
+}
+
+/* --- Parameter / response fields --- */
+.knit-fields {
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--knit-border);
+}
+
+.knit-field {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--knit-border);
+}
+
+.knit-field__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.knit-field__name {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--knit-fg);
+}
+
+.knit-field__type {
+  font-size: 0.75rem;
+  color: var(--knit-fg-faint);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+.knit-field__flag {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}
+
+.knit-field__flag--required {
+  color: var(--knit-delete);
+  background: var(--knit-delete-bg);
+}
+
+.knit-field__flag--optional {
+  color: var(--knit-fg-faint);
+  background: var(--knit-surface);
+}
+
+.knit-field__body {
+  margin-top: 0.4rem;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--knit-fg-muted);
+}
+
+.knit-field__body > p {
+  margin-top: 0 !important;
+  font-size: 0.875rem !important;
+}
+
+.knit-field__body > p + p {
+  margin-top: 0.6rem !important;
+}
+
+/* --- Cards --- */
+.knit-cards {
+  display: grid;
+  grid-template-columns: repeat(var(--knit-cards-cols, 2), minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-top: 1.6rem;
+}
+
+@media (max-width: 720px) {
+  .knit-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.knit-card {
+  display: block;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--knit-border) !important;
+  border-radius: var(--knit-radius-lg);
+  background: var(--knit-bg-raised);
+  text-decoration: none !important;
+  box-shadow: var(--knit-shadow-sm);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+a.knit-card:hover {
+  border-color: color-mix(in srgb, var(--knit-brand) 45%, var(--knit-border)) !important;
+  box-shadow: var(--knit-shadow-md);
+  transform: translateY(-1px);
+}
+
+.knit-card__title {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--knit-fg);
+}
+
+.knit-card__body {
+  margin-top: 0.35rem;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--knit-fg-subtle);
+}
+
+.knit-card__icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.knit-card__body code {
+  font-size: 0.72rem !important;
+  padding: 0.08em 0.3em !important;
+}
+
+/* --- Hero --- */
+.knit-hero {
+  margin-top: 0.25rem;
+}
+
+.knit-hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--knit-brand);
+  background: var(--knit-brand-soft);
+  border-radius: 999px;
+  padding: 0.28rem 0.7rem;
+}
+
+.knit-hero__title {
+  margin-top: 1rem;
+  font-size: 2.5rem;
+  line-height: 1.1;
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  color: var(--knit-fg);
+}
+
+.knit-hero__subtitle {
+  margin-top: 0.9rem;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--knit-fg-subtle);
+  max-width: 40rem;
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+
+.knit-footer {
+  border-top: 1px solid var(--knit-border);
+  background: var(--knit-bg-subtle);
+}
+
+.knit-footer a {
+  color: var(--knit-fg-subtle);
+  text-decoration: none;
+  transition: color 0.12s ease;
+}
+
+.knit-footer a:hover {
+  color: var(--knit-fg);
+}
+
+/* ==========================================================================
+   Scrollbars
+   ========================================================================== */
+
+.nextra-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.nextra-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--knit-border-strong);
+  border-radius: 999px;
+}
+
+.nextra-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}

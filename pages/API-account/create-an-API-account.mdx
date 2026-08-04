@@ -1,86 +1,75 @@
-### Knit API Documentation
+---
+title: Create an API account
+description: Create the per-token balance that funds your programmatic payouts.
+---
 
-#### Create an API Account
+# Create an API account
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#fff9eb",
-      color: "#d0a626",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    POST
-  </span>
-</div>
+Creates the per-token balance your integration spends from. You need one API
+account per token you plan to pay out in.
 
-```js copy
-{{baseUrl}}/api/v1/business-api-services-wallets
+<Endpoint method="POST" path="/api/v1/business-api-services-wallets" />
+
+<Meta>
+  <Scope value="payout-wallets:write" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+<Callout type="warning">
+  This creates the account with a **zero balance** — it does not move any money.
+  Fund it from the dashboard by transferring from your business wallet, or let
+  [collections](/collections/create-a-collection) and
+  [wallet deposits](/wallets/create-a-wallet) credit it. Payouts fail with `400`
+  until there is enough balance.
+</Callout>
+
+## Body
+
+<Fields>
+  <Field name="token" type="string" required>
+    The token this account holds. One of `USDT` or `USDC`.
+  </Field>
+</Fields>
+
+## Request
+
+```bash filename="cURL"
+curl -X POST "https://api-prod.useknit.io/api/v1/business-api-services-wallets" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{ "token": "USDT" }'
 ```
 
-##### Headers
+## Response
 
-- Authentication: `Authorization: Bearer <token>` (recommended) or the legacy
-  `X-API-KEY: {{apiKey}}`.
-- Accept: `application/json`
+Returns `201` with the new account.
 
-##### Prerequisites
-
-- Your business must be KYB-approved and have access to the Developer → API
-  section inside the Knit dashboard.
-- An API account is created **per token** (e.g. one for USDT, another for
-  USDC). Duplicate creations return `409 Payout wallet already exists`.
-- Fund the business wallet first; transferring from business wallet → API
-  account is how you load balance for payouts.
-
-##### Behavior Notes
-
-- Newly created accounts start at `amount = 0` and will only change when
-  collections/wallets credit funds or payouts debit funds.
-- The controller automatically binds the account to the authenticated business,
-  so the `token` field is the only required input.
-- API accounts correspond to the `BusinessApiServicesWallet` model in the core
-  repo; each payout references one via `business_api_services_wallet_id`.
-
-##### Request Body
-
-```json
+```json filename="201 Created"
 {
-  "token": "USDT"
-}
-```
-
-##### Sample Request
-
-```sh copy
-curl --location -g '{{baseUrl}}/api/v1/business-api-services-wallets' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json' \
---data '{
-    "token": "USDT"
-}'
-```
-
-##### Sample Response
-
-```json copy filename="Sample Response"
-{
-  "success": true,
-  "status": 201,
+  "statusCode": 201,
+  "message": "Payout wallet created successfully",
   "data": {
+    "id": "c7ddb254-5da1-4136-b19e-733a00a31c70",
+    "businessId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
     "token": "USDT",
-    "userId": "a266545-2c6c-43c9-a288-6167e2b2b591",
-    "amount": 0,
-    "id": "c7ddb254-5da1-4136-b19e-733a00ar5646",
-    "updatedAt": "2024-02-22T14:16:23.000000Z",
-    "createdAt": "2024-02-22T14:16:23.000000Z"
+    "amount": "0",
+    "createdAt": "2024-02-22T14:16:23.000000Z",
+    "updatedAt": "2024-02-22T14:16:23.000000Z"
   },
-  "message": "Payout wallets fetched successfully"
+  "success": true
 }
 ```
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `payout-wallets:write` |
+| `409` | An API account already exists for that token — fetch it with [List API accounts](/API-account/get-all-API-accounts) instead |
+| `422` | `token` is missing or is not `USDT` or `USDC` |
+
+<Callout type="info">
+  Creating accounts is idempotent in practice: a `409` means the account you
+  wanted already exists, so it is safe to treat as success and read the
+  existing account.
+</Callout>

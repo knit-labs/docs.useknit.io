@@ -1,68 +1,105 @@
-### Knit API Documentation
+---
+title: List wallet transactions
+description: Page through the deposits and transfers recorded against an API wallet.
+---
 
-#### Get Single Wallet Transactions
+# List wallet transactions
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#ebfbfa",
-      color: "#194d53",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    GET
-  </span>
-</div>
+Returns the transactions recorded against one API wallet, with filtering and
+pagination.
 
-```js copy
-{{baseUrl}}/api/v1/wallets/:id/transactions
+<Endpoint method="GET" path="/api/v1/wallets/{id}/transactions" />
+
+<Meta>
+  <Scope value="wallets:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+## Path parameters
+
+<Fields>
+  <Field name="id" type="string" required>
+    The wallet's `id`.
+  </Field>
+</Fields>
+
+## Query parameters
+
+<Fields>
+  <Field name="page" type="integer" required={false} defaultValue="1">
+    The page to fetch. Minimum `1`.
+  </Field>
+  <Field name="perPage" type="integer" required={false} defaultValue="10">
+    Items per page. Minimum `1`, maximum `100`.
+  </Field>
+  <Field name="network" type="string" required={false}>
+    Filter to one network identifier.
+  </Field>
+  <Field name="token" type="string" required={false}>
+    Filter to one token symbol.
+  </Field>
+  <Field name="status" type="string" required={false}>
+    Filter to one transaction status, for example `SUCCESSFUL`.
+  </Field>
+  <Field name="dateFrom" type="date" required={false}>
+    Only transactions on or after this date.
+  </Field>
+  <Field name="dateTo" type="date" required={false}>
+    Only transactions on or before this date. Must not be earlier than
+    `dateFrom`.
+  </Field>
+</Fields>
+
+## Request
+
+```bash filename="cURL"
+curl -G "https://api-prod.useknit.io/api/v1/wallets/d95143d2-c076-49da-b121-b3beed054bf3/transactions" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json" \
+  --data-urlencode "status=SUCCESSFUL" \
+  --data-urlencode "perPage=25" \
+  --data-urlencode "page=1"
 ```
 
-##### Headers
+## Response
 
-- X-API-KEY: Your API key, which authorizes the request.
-- Accept: Set to application/json to receive the response in JSON format.
+This endpoint paginates, so the envelope carries a `pagination` object
+alongside `data`.
 
-##### Path Variables
-
-- id: The unique identifier of the wallet you wish to retrieve information for. This should be replaced with the actual wallet ID in your request.
-
-##### Sample Request
-
-```sh copy filename="Sample Request"
-curl --location -g '{{baseUrl}}/api/v1/wallets/134a9423-0524-4dfc-85b0-06513841d7a2/transactions' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json'
-```
-
-##### Sample Response
-
-```json copy filename="Sample Request"
+```json filename="200 OK"
 {
-  "success": true,
-  "message": "Wallet Transactions fetched successfully",
-  "status": 200,
+  "statusCode": 200,
+  "message": "Wallet transactions fetched successfully",
   "data": [
     {
       "id": "75229581-5709-4b0a-886d-12ea1328e6a7",
-      "walletId": "3cb5ace1-5a1a-4ad0-b748-d1a8a6edf97f",
+      "walletId": "d95143d2-c076-49da-b121-b3beed054bf3",
       "network": "MATIC_MAINNET",
       "token": "USDT",
       "fromAddress": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
-      "toAddress": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+      "toAddress": "0x1adb0a39bde00fa0957e519584cb5c51fefcb37f",
       "value": "1.00000000",
-      "numberOfConfirmations": 1,
+      "numberOfConfirmations": 12,
       "status": "SUCCESSFUL",
       "transactionHash": "0xa8ba7949431a95f71430ae6ce30aa5c2e488e6206996",
       "createdAt": "2024-02-23T18:20:40.000000Z",
       "updatedAt": "2024-02-23T18:20:40.000000Z"
     }
-  ]
+  ],
+  "pagination": {
+    "totalItems": 128,
+    "page": 1,
+    "perPage": 25,
+    "currentPage": 1,
+    "lastPage": 6
+  },
+  "success": true
 }
 ```
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `wallets:read` |
+| `422` | `perPage` is above 100, or `dateTo` is earlier than `dateFrom` |

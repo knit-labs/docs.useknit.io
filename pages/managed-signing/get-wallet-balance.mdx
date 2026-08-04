@@ -1,43 +1,26 @@
-### Knit API Documentation
+---
+title: Get Wallet Balance
+description: This endpoint fetches the balance of a single token for an EVM wallet. This is a live query to the blockchain — no balance data is stored locally.
+---
 
-#### Get Wallet Balance
+# Get Wallet Balance
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#ebfbfa",
-      color: "#194d53",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    GET
-  </span>
-</div>
+<Endpoint method="GET" path="/api/v1/managed-signing/wallets/{walletId}/balance" />
 
-```js copy
-{{baseUrl}}/api/v1/managed-signing/wallets/{walletId}/balance
-```
+<Meta>
+  <Scope value="managed-signing:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
 
 This endpoint fetches the balance of a single token for an EVM wallet. This is a live query to the blockchain — no balance data is stored locally.
 
-##### Headers
-
-- `X-API-KEY`: Your API key for authentication.
-- `Accept`: Set to `application/json` to receive responses in JSON format.
-
-##### Path Parameters
+## Path Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `walletId` | string | Yes | The local wallet ID returned by create/list endpoints |
 
-##### Query Parameters
+## Query Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
@@ -47,17 +30,17 @@ This endpoint fetches the balance of a single token for an EVM wallet. This is a
 
 **Note:** If both `contractAddress` and `tokenSymbol` are provided, `contractAddress` takes precedence. If only `tokenSymbol` is provided, the token is resolved from the supported tokens for that network.
 
-##### Sample Request
+## Request
 
-```sh copy
-curl --location -g '{{baseUrl}}/api/v1/managed-signing/wallets/<local-wallet-id>/balance?network=ETH_MAINNET&tokenSymbol=USDC' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json'
+```bash
+curl "https://api-prod.useknit.io/api/v1/managed-signing/wallets/<local-wallet-id>/balance?network=ETH_MAINNET&tokenSymbol=USDC" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json"
 ```
 
-##### Sample Response
+## Response
 
-```json copy filename="Sample Response"
+```json filename="Response"
 {
   "statusCode": 200,
   "message": "Wallet balance fetched",
@@ -72,7 +55,7 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/wallets/<local-wallet-id>
 }
 ```
 
-##### Response Fields
+## Response Fields
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -82,7 +65,7 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/wallets/<local-wallet-id>
 | `balanceRaw` | string | Raw balance in base units (e.g., wei) |
 | `balanceFormatted` | string | Human-readable balance |
 
-##### Common Errors
+## Common Errors
 
 | Status | Message | Description |
 |--------|---------|-------------|

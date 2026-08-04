@@ -1,6 +1,6 @@
 {
   "name": "Knit Docs",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Knit Docs",
   "scripts": {
     "dev": "next dev",
@@ -9,32 +9,28 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gbxnga/docs.useknit.io.git"
+    "url": "git+https://github.com/knit-labs/docs.useknit.io.git"
   },
-  "author": "Shu Ding <g@shud.in>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/gbxnga/docs.useknit.io"
+    "url": "https://github.com/knit-labs/docs.useknit.io/issues"
   },
-  "homepage": "https://github.com/gbxnga/docs.useknit.io#readme",
+  "homepage": "https://docs.useknit.io",
   "dependencies": {
     "@heroicons/react": "^2.2.0",
-    "@material-tailwind/react": "^2.1.10",
     "@sendgrid/mail": "^8.1.5",
     "axios": "^1.7.4",
     "browserslist": "^4.24.5",
     "next": "^13.0.6",
-    "nextra": "^2.2.14",
-    "nextra-theme-docs": "latest",
+    "nextra": "^2.13.4",
+    "nextra-theme-docs": "^2.13.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-spinners": "^0.17.0",
-    "react-syntax-highlighter": "^15.5.0",
-    "sass": "^1.71.0"
+    "react-spinners": "^0.17.0"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.7",
     "@types/node": "18.11.10",
+    "@types/react": "^18.2.0",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.0",

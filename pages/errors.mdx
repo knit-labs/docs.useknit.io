@@ -1,0 +1,138 @@
+---
+title: Errors & response format
+description: The shared Knit API response envelope, status codes, and validation error shape.
+---
+
+# Errors & response format
+
+Every Knit API response — success or failure — uses the same envelope, so a
+single parser handles both.
+
+```json filename="Success"
+{
+  "statusCode": 200,
+  "message": "Collections fetched successfully",
+  "data": [],
+  "success": true
+}
+```
+
+```json filename="Failure"
+{
+  "statusCode": 400,
+  "message": "Insufficient balance",
+  "data": null,
+  "success": false
+}
+```
+
+<Fields>
+  <Field name="statusCode" type="integer">
+    Mirrors the HTTP status code of the response.
+  </Field>
+  <Field name="message" type="string">
+    A human-readable summary. Useful in logs; do not branch on its exact text.
+  </Field>
+  <Field name="data" type="object | array | null">
+    The payload. `null` on errors and on endpoints that return nothing.
+  </Field>
+  <Field name="success" type="boolean">
+    `true` only for 2xx responses. Branch on this or on the HTTP status.
+  </Field>
+  <Field name="pagination" type="object">
+    Present only on paginated endpoints. See below.
+  </Field>
+  <Field name="errors" type="object">
+    Present only on `422` validation failures. Maps field names to arrays of
+    messages.
+  </Field>
+</Fields>
+
+<Callout type="warning">
+  The status field is named `statusCode`, not `status`. A `status` key appearing
+  inside `data` is a resource's own state (for example a payout's `PENDING`),
+  which is a different thing entirely.
+</Callout>
+
+## Status codes
+
+| Status | When you'll see it |
+| ------ | ------------------ |
+| `200` | The request succeeded |
+| `201` | A resource was created |
+| `400` | The request was valid JSON but could not be fulfilled — insufficient balance, an unsupported network, a downstream failure |
+| `401` | Missing, invalid, or expired token; IP not allow-listed; token lacks the required scope |
+| `403` | Authenticated, but the resource belongs to another business |
+| `404` | The resource does not exist, or is not visible to your business |
+| `409` | The resource already exists — for example creating a second API account for the same token |
+| `422` | Request body or query parameters failed validation |
+| `500` | An unexpected error on our side. Retry with backoff; if it persists, contact support |
+
+## Validation errors
+
+A `422` includes an `errors` object alongside the envelope. Each key is a field
+from your request body and each value is an array of messages.
+
+```json filename="422 — validation failed"
+{
+  "statusCode": 422,
+  "message": "The given data was invalid.",
+  "data": null,
+  "errors": {
+    "merchantReference": ["The merchant reference has already been taken."],
+    "amount": ["The amount must be at least 0.01."]
+  },
+  "success": false
+}
+```
+
+Field names in `errors` match the camelCase keys you sent.
+
+## Pagination
+
+Endpoints that paginate accept `page` and `perPage` query parameters and return
+a `pagination` object next to `data`.
+
+<Fields>
+  <Field name="page" type="integer" defaultValue="1">
+    The page to fetch. Minimum `1`.
+  </Field>
+  <Field name="perPage" type="integer" defaultValue="10">
+    Items per page. Minimum `1`, maximum `100`.
+  </Field>
+</Fields>
+
+```json filename="Paginated response"
+{
+  "statusCode": 200,
+  "message": "Wallet transactions fetched successfully",
+  "data": [],
+  "pagination": {
+    "totalItems": 128,
+    "page": 2,
+    "perPage": 25,
+    "currentPage": 2,
+    "lastPage": 6
+  },
+  "success": true
+}
+```
+
+<Callout type="info">
+  Not every list endpoint paginates. Where a `pagination` object is absent, the
+  endpoint returns the full result set — each endpoint page states which
+  behaviour applies.
+</Callout>
+
+## Retrying safely
+
+- **Reads** (`GET`) are safe to retry unconditionally.
+- **Payouts** are protected by `merchantReference`, which must be unique.
+  Retrying with the same reference fails validation instead of sending twice —
+  so reuse the reference when you retry a request whose outcome you are unsure
+  of, and only generate a new one for a genuinely new payout.
+- **Managed signing requests** accept an `idempotencyKey` in the body; replaying
+  the same key returns the original request rather than creating another.
+- **`5xx` and network timeouts** should be retried with exponential backoff. A
+  timeout does not mean the request was rejected — re-read the resource before
+  assuming it was not created.

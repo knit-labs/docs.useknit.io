@@ -1,56 +1,47 @@
-### Knit API Documentation
+---
+title: List supported networks
+description: Discover which chains and tokens are currently open for collections and payouts.
+---
 
-#### Get Supported Networks
+# List supported networks
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#ebfbfa",
-      color: "#194d53",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    GET
-  </span>
-</div>
+Returns every network Knit supports, the tokens available on each, and whether
+collections and payouts are currently enabled for them.
 
-```js copy
-{{baseUrl}}/api/v1/networks
+<Endpoint method="GET" path="/api/v1/networks" />
+
+<Meta>
+  <Chip label="Auth" value="None — public endpoint" />
+</Meta>
+
+<Callout type="warning">
+  Availability changes. A chain can be paused for payouts while still accepting
+  collections, and individual tokens can be toggled independently of their
+  network. Read this endpoint at startup or on a schedule rather than
+  hardcoding a list.
+</Callout>
+
+## Request
+
+No authentication is required.
+
+```bash filename="cURL"
+curl "https://api-prod.useknit.io/api/v1/networks" \
+  -H "Accept: application/json"
 ```
 
-##### Headers
+## Response
 
-- Authentication: Provide either `Authorization: Bearer <token>` (preferred) or
-  the legacy `X-API-KEY: {{apiKey}}` header.
-- Accept: Set to application/json to receive the response in JSON format.
-
-##### Sample Request
-
-```js copy filename="Sample Request"
-curl --location -g '{{baseUrl}}/api/v1/networks' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json'
-```
-
-##### Sample Response
-
-```json copy filename="Sample Response"
+```json filename="200 OK"
 {
-  "success": true,
+  "statusCode": 200,
   "message": "Networks fetched successfully",
-  "status": 200,
   "data": [
     {
-      "id": 0,
-      "name": "BSC (BEP 20)",
-      "identifier": "BSC_MAINNET",
-      "logo": "https://demo.useknit.io/coins/bsc.svg",
+      "id": 2,
+      "name": "Polygon",
+      "identifier": "MATIC_MAINNET",
+      "logo": "https://demo.useknit.io/coins/polygon.svg",
       "collectionStatus": "ACTIVE",
       "payoutStatus": "ACTIVE",
       "tokens": [
@@ -59,7 +50,7 @@ curl --location -g '{{baseUrl}}/api/v1/networks' \
           "name": "USDT",
           "symbol": "USDT",
           "logo": "https://demo.useknit.io/coins/usdt.svg",
-          "address": "0x1234567890",
+          "address": "0xc2132d05d31c914a87c6611c10748aeb04b58e8f",
           "collectionStatus": "ACTIVE",
           "payoutStatus": "ACTIVE"
         },
@@ -68,7 +59,7 @@ curl --location -g '{{baseUrl}}/api/v1/networks' \
           "name": "USDC",
           "symbol": "USDC",
           "logo": "https://demo.useknit.io/coins/usdc.svg",
-          "address": "0x0987654321",
+          "address": "0x3c499c542cef5e3811e1192ce70d8cc03d5c3359",
           "collectionStatus": "ACTIVE",
           "payoutStatus": "ACTIVE"
         }
@@ -87,106 +78,54 @@ curl --location -g '{{baseUrl}}/api/v1/networks' \
           "name": "USDT",
           "symbol": "USDT",
           "logo": "https://demo.useknit.io/coins/usdt.svg",
-          "address": "0x1234567890",
-          "collectionStatus": "ACTIVE",
-          "payoutStatus": "INACTIVE"
-        }
-      ]
-    },
-    {
-      "id": 2,
-      "name": "Polygon",
-      "identifier": "MATIC_MAINNET",
-      "logo": "https://demo.useknit.io/coins/polygon.svg",
-      "collectionStatus": "ACTIVE",
-      "payoutStatus": "ACTIVE",
-      "tokens": [
-        {
-          "id": 1,
-          "name": "USDT",
-          "symbol": "USDT",
-          "logo": "https://demo.useknit.io/coins/usdt.svg",
-          "address": "0x1234567890",
-          "collectionStatus": "ACTIVE",
-          "payoutStatus": "ACTIVE"
-        },
-        {
-          "id": 2,
-          "name": "USDC",
-          "symbol": "USDC",
-          "logo": "https://demo.useknit.io/coins/usdc.svg",
-          "address": "0x0987654321",
-          "collectionStatus": "ACTIVE",
-          "payoutStatus": "ACTIVE"
-        }
-      ]
-    },
-    {
-      "id": 3,
-      "name": "Tron (TRC 20)",
-      "identifier": "TRON_MAINNET",
-      "logo": "https://demo.useknit.io/coins/tron.svg",
-      "collectionStatus": "ACTIVE",
-      "payoutStatus": "ACTIVE",
-      "tokens": [
-        {
-          "id": 1,
-          "name": "USDT",
-          "symbol": "USDT",
-          "logo": "https://demo.useknit.io/coins/usdt.svg",
-          "address": "0x1234567890",
-          "collectionStatus": "ACTIVE",
-          "payoutStatus": "ACTIVE"
-        }
-      ]
-    },
-    {
-      "id": 4,
-      "name": "Solana",
-      "identifier": "SOL_MAINNET",
-      "logo": "https://demo.useknit.io/coins/solana.svg",
-      "collectionStatus": "ACTIVE",
-      "payoutStatus": "ACTIVE",
-      "tokens": [
-        {
-          "id": 1,
-          "name": "USDT",
-          "symbol": "USDT",
-          "logo": "https://demo.useknit.io/coins/usdt.svg",
-          "address": "0x1234567890",
-          "collectionStatus": "ACTIVE",
-          "payoutStatus": "INACTIVE"
-        },
-        {
-          "id": 2,
-          "name": "USDC",
-          "symbol": "USDC",
-          "logo": "https://demo.useknit.io/coins/usdc.svg",
-          "address": "0x0987654321",
-          "collectionStatus": "ACTIVE",
-          "payoutStatus": "ACTIVE"
-        }
-      ]
-    },
-    {
-      "id": 5,
-      "name": "Base Network",
-      "identifier": "BASE_MAINNET",
-      "logo": "https://images.mirror-media.xyz/publication-images/cgqxxPdUFBDjgKna_dDir.png?height=400&width=400",
-      "collectionStatus": "ACTIVE",
-      "payoutStatus": "INACTIVE",
-      "tokens": [
-        {
-          "id": 2,
-          "name": "USDC",
-          "symbol": "USDC",
-          "logo": "https://demo.useknit.io/coins/usdc.svg",
-          "address": "0x0987654321",
+          "address": "0xdac17f958d2ee523a2206206994597c13d831ec7",
           "collectionStatus": "ACTIVE",
           "payoutStatus": "INACTIVE"
         }
       ]
     }
-  ]
+  ],
+  "success": true
 }
 ```
+
+## Fields
+
+<Fields>
+  <Field name="identifier" type="string">
+    The value to send as `network` in every other request — for example
+    `MATIC_MAINNET`. Use this, not `name`.
+  </Field>
+  <Field name="name" type="string">
+    A display label for your UI.
+  </Field>
+  <Field name="collectionStatus" type="string">
+    `ACTIVE` or `INACTIVE`. Whether
+    [collections](/collections/create-a-collection) can be created on this
+    network.
+  </Field>
+  <Field name="payoutStatus" type="string">
+    `ACTIVE` or `INACTIVE`. Whether
+    [payouts](/payouts/create-a-single-payout) can be sent on this network.
+  </Field>
+  <Field name="tokens" type="object[]">
+    The tokens on this network, each with its own `collectionStatus` and
+    `payoutStatus`. A token can be inactive on an otherwise active network — so
+    check both levels.
+  </Field>
+  <Field name="tokens[].address" type="string">
+    The token's contract address on that chain.
+  </Field>
+</Fields>
+
+<Callout type="info">
+  Use this endpoint to drive the network and token pickers in your product. It
+  keeps your UI in step with what the API will actually accept, and avoids
+  showing customers an option that will fail at submission.
+</Callout>
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `400` | The network list could not be retrieved. Retry with backoff |

@@ -1,0 +1,95 @@
+---
+title: BLOCKCHAIN_TRANSACTION_DETECTED
+description: Delivered when an address you subscribed to sends or receives stablecoin.
+---
+
+# `BLOCKCHAIN_TRANSACTION_DETECTED`
+
+Delivered when an address covered by one of your
+[blockchain notification subscriptions](/blockchain-notifications) sends or
+receives a matching token.
+
+<Meta>
+  <Chip label="Envelope" value="top level — no body wrapper" />
+  <Chip label="Keys" value="camelCase" />
+</Meta>
+
+Delivered to the subscription's `webhookUrl`, falling back to your business
+webhook URL.
+
+<Callout type="warning">
+  This payload is **not** wrapped in a `body` object — `eventType` sits at the
+  top level, alongside the transaction fields.
+</Callout>
+
+## Payload
+
+```json filename="BLOCKCHAIN_TRANSACTION_DETECTED"
+{
+  "eventType": "BLOCKCHAIN_TRANSACTION_DETECTED",
+  "id": "0a52d1c4-2f43-4e58-9d40-2f0c5cbb9e77",
+  "subscriptionId": "3f6f9d1a-64b2-4c7f-9a1e-7a2f0c8c7e11",
+  "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+  "type": "EVM",
+  "network": "MATIC_MAINNET",
+  "token": "USDC",
+  "direction": "INCOMING",
+  "amount": "125.50",
+  "rawAmount": "125500000",
+  "fromAddress": "0x1111111111111111111111111111111111111111",
+  "toAddress": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+  "transactionHash": "0xb0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f70819",
+  "eventIndex": 3,
+  "blockNumber": 61234567,
+  "metadata": { "customerId": "cus_8121" }
+}
+```
+
+<Fields>
+  <Field name="subscriptionId" type="string">
+    The subscription that matched. Route on this to find what you were
+    watching for.
+  </Field>
+  <Field name="address" type="string">
+    The watched address, as stored on the subscription.
+  </Field>
+  <Field name="direction" type="string">
+    `INCOMING` or `OUTGOING`, relative to the watched address.
+  </Field>
+  <Field name="amount" type="string">
+    The transfer amount in token units, as a decimal string.
+  </Field>
+  <Field name="rawAmount" type="string">
+    The same amount in the token's base units.
+  </Field>
+  <Field name="eventIndex" type="integer">
+    The transfer's position within the transaction. A single transaction can
+    contain several transfers, so `transactionHash` alone is not unique.
+  </Field>
+  <Field name="metadata" type="object | null">
+    Whatever you stored on the subscription, returned verbatim.
+  </Field>
+</Fields>
+
+## Deduplication
+
+Use `transactionHash` **and** `eventIndex` together as the idempotency key. A
+transaction that moves stablecoin more than once produces one event per
+transfer, all sharing the same hash.
+
+```js filename="Idempotency key"
+const key = `${payload.transactionHash}:${payload.eventIndex}`;
+```
+
+<Callout type="warning">
+  Knit does not hold the funds these events describe. The webhook tells you
+  money moved; acting on it — crediting a customer, releasing goods — is
+  entirely your decision, and you should apply your own confirmation policy
+  before treating a transfer as final.
+</Callout>
+
+## See also
+
+- [Blockchain notifications](/blockchain-notifications)
+- [Create a subscription](/blockchain-notifications/create-subscription)
+- [Webhooks overview](/webhooks) — signature verification and retries

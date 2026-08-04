@@ -1,0 +1,55 @@
+---
+title: Delete a collection
+description: Remove an unpaid collection so its payment link can no longer be used.
+---
+
+# Delete a collection
+
+Removes a collection from your business. Use it to retire a payment link that
+was created in error or is no longer needed.
+
+<Endpoint method="DELETE" path="/api/v1/collections/{id}" />
+
+<Meta>
+  <Scope value="collections:write" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+<Callout type="warning">
+  Deleting a collection does not reverse anything on-chain. Do not delete a
+  collection whose address may still receive a deposit — let it expire instead.
+</Callout>
+
+## Path parameters
+
+<Fields>
+  <Field name="id" type="string" required>
+    The collection's `id`.
+  </Field>
+</Fields>
+
+## Request
+
+```bash filename="cURL"
+curl -X DELETE "https://api-prod.useknit.io/api/v1/collections/9cddd3ad-c2a8-463c-a703-158b900beea8" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json"
+```
+
+## Response
+
+```json filename="200 OK"
+{
+  "statusCode": 200,
+  "message": "Collection deleted successfully",
+  "data": null,
+  "success": true
+}
+```
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `collections:write` |
+| `404` | No collection with that ID belongs to your business |

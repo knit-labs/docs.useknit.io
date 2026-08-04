@@ -1,91 +1,119 @@
-### Knit API Documentation
+---
+title: Create a wallet
+description: Provision a reusable deposit address on one or more supported networks.
+---
 
-#### Overview
+# Create a wallet
 
-Knit API allows users to create digital currency wallets, supporting a variety of blockchain networks. This powerful feature enables seamless integration of cryptocurrency functionalities into your application, ensuring users can safely manage their digital assets.
+Provisions a reusable address you can hand out repeatedly — for a customer
+balance, a recurring subscriber, or any long-lived deposit destination. Unlike a
+[collection](/collections/create-a-collection), an API wallet does not expire
+and accepts any number of deposits.
 
-#### Create a Wallet
+<Endpoint method="POST" path="/api/v1/wallets" />
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#fff9eb",
-      color: "#d0a626",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    POST
-  </span>
-</div>
+<Meta>
+  <Scope value="wallets:write" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
 
-```js copy
-{{baseUrl}}/api/v1/wallets
+## Supported networks
+
+| Network | Identifier |
+| ------- | ---------- |
+| Polygon | `MATIC_MAINNET` |
+| Polygon Amoy (testnet) | `MATIC_AMOY` |
+| BNB Smart Chain | `BSC_MAINNET` |
+| Ethereum | `ETHEREUM_MAINNET` |
+| Bitcoin | `BITCOIN_MAINNET` |
+| Tron | `TRON_MAINNET` |
+
+## Body
+
+Provide either `network` or `networks` — not both.
+
+<Fields>
+  <Field name="network" type="string" required={false}>
+    A single network identifier. Required unless `networks` is supplied.
+  </Field>
+  <Field name="networks" type="string[]" required={false}>
+    One or more network identifiers, for an address usable across compatible
+    chains. Required unless `network` is supplied; must contain at least one
+    entry.
+  </Field>
+</Fields>
+
+<Callout type="warning">
+  Sending `network` and `networks` in the same request is a validation error.
+  Pick one form.
+</Callout>
+
+## Request
+
+```bash filename="Single network"
+curl -X POST "https://api-prod.useknit.io/api/v1/wallets" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{ "network": "MATIC_MAINNET" }'
 ```
 
-This endpoint creates a new wallet for a specified blockchain network. It supports multiple networks, allowing for flexibility in managing different cryptocurrencies.
+```bash filename="Multiple networks"
+curl -X POST "https://api-prod.useknit.io/api/v1/wallets" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{ "networks": ["MATIC_MAINNET", "BSC_MAINNET", "ETHEREUM_MAINNET"] }'
+```
 
-##### Supported Networks
+## Response
 
-- BITCOIN_MAINNET: For operations on the Bitcoin main network.
-- ETHEREUM_MAINNET: For activities on the Ethereum main network.
-- MATIC_MAINNET: For activities on the Polygon main network
-- TRON_MAINNET: For activities on the Tron main network
+Returns `201` with the new wallet.
 
-##### Headers
-
-- X-API-KEY: Your API key for authentication.
-- Accept: Set to application/json to receive responses in JSON format.
-
-##### Request Body
-
-The request body must be in JSON format specifying the network for which the wallet is being created:
-
-```json
+```json filename="201 Created"
 {
-  "network": "ETHEREUM_MAINNET"
-}
-```
-
-##### Sample Request
-
-Here's a curl example to create a wallet on the Ethereum main network:
-
-```sh copy
-curl --location -g '{{baseUrl}}/api/v1/wallets' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json' \
---data-raw '{
-    "network": "ETHEREUM_MAINNET"
-}'
-```
-
-##### Sample Response
-
-A successful request returns the newly created wallet's details, including its unique ID, network information, and addresses:
-
-```json copy filename="Sample Response"
-{
-  "success": true,
+  "statusCode": 201,
   "message": "Wallet created successfully",
-  "status": 201,
   "data": {
-    "userId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
-    "network": "ETHEREUM_MAINNET",
-    "networkId": "ETHEREUM_MAINNET",
-    "address": "0x1adb0a39bde00fa0957e519584cb5c51fefcb37f",
     "id": "d95143d2-c076-49da-b121-b3beed054bf3",
-    "updatedAt": "2024-02-26T13:59:19.000000Z",
-    "createdAt": "2024-02-26T13:59:19.000000Z"
-  }
+    "businessId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
+    "network": "MATIC_MAINNET",
+    "networkId": "MATIC_MAINNET",
+    "networks": ["MATIC_MAINNET"],
+    "address": "0x1adb0a39bde00fa0957e519584cb5c51fefcb37f",
+    "isActive": true,
+    "createdAt": "2024-02-26T13:59:19.000000Z",
+    "updatedAt": "2024-02-26T13:59:19.000000Z"
+  },
+  "success": true
 }
 ```
 
-#### Description
+<Fields>
+  <Field name="id" type="string">
+    Use this in every subsequent wallet request.
+  </Field>
+  <Field name="address" type="string">
+    The deposit address. Safe to display and reuse.
+  </Field>
+  <Field name="network" type="string">
+    The wallet's primary network. When you supplied `networks`, this is the
+    first entry.
+  </Field>
+  <Field name="networks" type="string[]">
+    Every network the address is usable on.
+  </Field>
+</Fields>
 
-This API is designed for developers looking to integrate wallet functionalities into their applications or services. It provides an easy-to-use interface for creating wallets on various blockchain networks, thus facilitating the secure management of digital assets. By leveraging this API, developers can offer their users a robust tool for cryptocurrency transactions and asset management.
+## What happens on a deposit
+
+Deposits into an API wallet are recorded as
+[wallet transactions](/wallets/get-single-wallet-transactions) and credited to
+your API account, so the funds are immediately available to
+[payouts](/payouts/create-a-single-payout). A
+`WALLET_FUNDING_SUCCESSFUL` webhook is delivered for each confirmed deposit.
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `wallets:write` |
+| `422` | Neither `network` nor `networks` was supplied, both were supplied, or a network identifier is not supported |

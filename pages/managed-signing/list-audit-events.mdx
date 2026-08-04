@@ -1,53 +1,36 @@
-### Knit API Documentation
+---
+title: List Audit Events
+description: This endpoint retrieves audit events for signing requests. Audit events are fetched from Knit Core but mapped by local request ID.
+---
 
-#### List Audit Events
+# List Audit Events
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#ebfbfa",
-      color: "#194d53",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    GET
-  </span>
-</div>
+<Endpoint method="GET" path="/api/v1/managed-signing/audit" />
 
-```js copy
-{{baseUrl}}/api/v1/managed-signing/audit
-```
+<Meta>
+  <Scope value="managed-signing:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
 
 This endpoint retrieves audit events for signing requests. Audit events are fetched from Knit Core but mapped by local request ID.
 
-##### Headers
-
-- `X-API-KEY`: Your API key for authentication.
-- `Accept`: Set to `application/json` to receive responses in JSON format.
-
-##### Query Parameters
+## Query Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `requestId` | string | No | Filter by local request ID |
 
-##### Sample Request
+## Request
 
-```sh copy
-curl --location -g '{{baseUrl}}/api/v1/managed-signing/audit?requestId=<local-request-id>' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json'
+```bash
+curl "https://api-prod.useknit.io/api/v1/managed-signing/audit?requestId=<local-request-id>" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json"
 ```
 
-##### Sample Response
+## Response
 
-```json copy filename="Sample Response"
+```json filename="Response"
 {
   "statusCode": 200,
   "message": "Audit events retrieved",
@@ -80,7 +63,7 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/audit?requestId=<local-re
 }
 ```
 
-##### Response Fields
+## Response Fields
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -91,7 +74,7 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/audit?requestId=<local-re
 | `timestamp` | string | When the action occurred |
 | `metadata` | object | Additional event metadata |
 
-##### Audit Actions
+## Audit Actions
 
 | Action | Description |
 |--------|-------------|
@@ -100,7 +83,7 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/audit?requestId=<local-re
 | `SIGNING_REQUEST_DENIED` | A signing request was denied by policy |
 | `SIGNING_REQUEST_FAILED` | A signing request failed |
 
-##### Notes
+## Notes
 
 - Audit events provide a complete history of actions taken on signing requests.
 - Use the `requestId` query parameter to filter events for a specific signing request.

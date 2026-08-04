@@ -1,13 +1,23 @@
 {
   "index": "Introduction",
-  "architecture": "Architecture",
+  "quickstart": "Quickstart",
   "authentication": "Authentication",
-  "wallets": "Wallets",
-  "managed-signing": "Managed Signing",
-  "user": "User",
+  "architecture": "How Money Moves",
+  "errors": "Errors & Response Format",
+  "-- api": {
+    "type": "separator",
+    "title": "API Reference"
+  },
+  "networks": "Networks",
   "collections": "Collections",
+  "wallets": "Wallets",
   "API-account": "API Account",
   "payouts": "Payouts",
-  "webhooks": "Webhooks",
-  "networks": "Networks"
+  "blockchain-notifications": "Blockchain Notifications",
+  "managed-signing": "Managed Signing",
+  "-- events": {
+    "type": "separator",
+    "title": "Events"
+  },
+  "webhooks": "Webhooks"
 }
