@@ -1,53 +1,36 @@
-### Knit API Documentation
+---
+title: Get Wallet Assets
+description: This endpoint fetches balances for all supported tokens across all networks the wallet is active on. This is a live query to the blockchain — no balance data is stored locally.
+---
 
-#### Get Wallet Assets
+# Get Wallet Assets
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#ebfbfa",
-      color: "#194d53",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    GET
-  </span>
-</div>
+<Endpoint method="GET" path="/api/v1/managed-signing/wallets/{walletId}/assets" />
 
-```js copy
-{{baseUrl}}/api/v1/managed-signing/wallets/{walletId}/assets
-```
+<Meta>
+  <Scope value="managed-signing:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
 
 This endpoint fetches balances for all supported tokens across all networks the wallet is active on. This is a live query to the blockchain — no balance data is stored locally.
 
-##### Headers
-
-- `X-API-KEY`: Your API key for authentication.
-- `Accept`: Set to `application/json` to receive responses in JSON format.
-
-##### Path Parameters
+## Path Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `walletId` | string | Yes | The local wallet ID returned by create/list endpoints |
 
-##### Sample Request
+## Request
 
-```sh copy
-curl --location -g '{{baseUrl}}/api/v1/managed-signing/wallets/<local-wallet-id>/assets' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json'
+```bash
+curl "https://api-prod.useknit.io/api/v1/managed-signing/wallets/<local-wallet-id>/assets" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json"
 ```
 
-##### Sample Response
+## Response
 
-```json copy filename="Sample Response"
+```json filename="Response"
 {
   "statusCode": 200,
   "message": "Managed signing wallet assets fetched",
@@ -86,7 +69,7 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/wallets/<local-wallet-id>
 }
 ```
 
-##### Response Fields
+## Response Fields
 
 | Field | Type | Description |
 |-------|------|-------------|

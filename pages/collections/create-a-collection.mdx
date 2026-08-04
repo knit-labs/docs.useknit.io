@@ -1,114 +1,151 @@
-### Knit API Documentation
+---
+title: Create a collection
+description: Issue a single-use deposit address and hosted payment link for a stablecoin payment.
+---
 
-#### Create A Collection
+# Create a collection
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#fff9eb",
-      color: "#d0a626",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    POST
-  </span>
-</div>
+Creates a **single-use** deposit address and a hosted payment link for one
+payment. When the deposit is confirmed on-chain, the proceeds are credited to
+your API account.
 
-```js copy
-{{baseUrl}}/api/v1/collections
-```
+<Endpoint method="POST" path="/api/v1/collections" />
 
-##### Supported Networks
+<Meta>
+  <Scope value="collections:write" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
 
-- BITCOIN_MAINNET: For operations on the Bitcoin main network.
-- ETHEREUM_MAINNET: For activities on the Ethereum main network.
-- MATIC_MAINNET: For activities on the Polygon main network
-- TRON_MAINNET: For activities on the Tron main network
+<Callout type="warning">
+  A collection address expires **30 minutes** after creation and accepts one
+  payment. Create it when your customer is ready to pay, not when the invoice is
+  drafted — and create a fresh one if the window lapses.
+</Callout>
 
-##### Headers
+## Body
 
-- Authentication: `Authorization: Bearer <token>` (preferred) or the legacy
-  `X-API-KEY: {{apiKey}}`. See [Authentication](/authentication) for details.
-- Accept: Set to application/json to receive responses in JSON format.
+<Fields>
+  <Field name="network" type="string" required>
+    The chain the payment will arrive on. Must be a network whose
+    `collectionStatus` is `ACTIVE` in
+    [`GET /api/v1/networks`](/networks/get-supported-networks).
+  </Field>
+  <Field name="token" type="string" required>
+    The token being collected, for example `USDT` or `USDC`. Must be active for
+    collections on the chosen network.
+  </Field>
+  <Field name="tokenAmount" type="number" required>
+    The amount to collect, in token units. Must be greater than zero.
+  </Field>
+  <Field name="confirmationThreshold" type="integer" required>
+    How many on-chain confirmations to wait for before the collection is
+    treated as confirmed. Must be greater than zero. Higher values trade
+    settlement speed for finality — pick a value appropriate to the network and
+    the size of the payment.
+  </Field>
+  <Field name="merchantCallbackUrl" type="string" required>
+    Where this collection's webhooks are delivered. Must be a publicly
+    reachable `http://` or `https://` URL — private, loopback, and internal
+    addresses are rejected.
+  </Field>
+  <Field name="merchantRedirectUrl" type="string" required={false}>
+    Where the hosted payment page sends the customer after payment. Must be a
+    valid `http://` or `https://` URL if supplied.
+  </Field>
+</Fields>
 
-##### Prerequisites & Behavior
+<Callout type="info">
+  `merchantCallbackUrl` is a delivery target, not a label. Collection webhooks
+  go to this URL; only if it is somehow absent do they fall back to the webhook
+  URL configured on your business.
+</Callout>
 
-- Each collection is a **single-use** address that expires 30 minutes after
-  creation. After expiry you must create a new collection.
-- Knit automatically creates/looks up the KnitCore user for your business, so
-  the only required fields are the ones in the body above.
-- `merchantCallbackUrl` is stored as metadata and echoed back via webhook events
-  so you can reconcile requests on your side.
+## Request
 
-##### Event Timeline
-
-1. `CollectionCreatedEvent` fires immediately; you can observe it on the
-   dashboard.
-2. When KnitCore detects on-chain funds, `CollectionSuccessfulEvent` credits the
-   API account via `ApiAccountTransaction`.
-3. If confirmation thresholds are not met or the transfer fails, a
-   `collectionFailed` webhook is emitted (see the Webhooks section).
-
-Every webhook payload is camelCased and signed with your business secret key.
-
-##### Request Body
-
-```json copy filename="json"
-{
-  "network": "MATIC_MAINNET",
-  "token": "USDT",
-  "tokenAmount": 2500,
-  "confirmationThreshold": 10,
-  "merchantRedirectUrl": "https://example.com/test",
-  "merchantCallbackUrl": "https://webhook.site/34b47e03-38ac-4040-a6fc-3dcb44a922e9"
-}
-```
-
-##### Sample Request
-
-```sh copy filename="Sample Request"
-curl --location -g '{{baseUrl}}/api/v1/collections' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json' \
---data '{
-    "network": "POLYGON_MAINNET",
+```bash filename="cURL"
+curl -X POST "https://api-prod.useknit.io/api/v1/collections" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "network": "MATIC_MAINNET",
     "token": "USDT",
-    "tokenAmount": 0.1,
-    "merchantRedirectUrl": "https://example.com",
-    "merchantCallbackUrl": "https://example.com"
-}'
+    "tokenAmount": 2500,
+    "confirmationThreshold": 10,
+    "merchantCallbackUrl": "https://example.com/webhooks/knit",
+    "merchantRedirectUrl": "https://example.com/thanks"
+  }'
 ```
 
-##### Sample Response
+## Response
 
-```json copy filename="Sample Response"
+Returns `200` with the created collection.
+
+```json filename="200 OK"
 {
-  "success": true,
+  "statusCode": 200,
   "message": "Collection created successfully",
-  "status": 201,
   "data": {
+    "id": "9cddd3ad-c2a8-463c-a703-158b900beea8",
     "network": "MATIC_MAINNET",
     "token": "USDT",
     "address": "0x3761f3504104f4faa8959963a5d8dce89989d45b",
     "status": "PENDING",
+    "tokenAmountRequested": 2500,
+    "tokenAmount": 2500,
     "tokenToUsd": 1,
     "feeInUsd": 0,
     "feeByToken": 0,
-    "expiresAt": "2024-08-27T14:02:10.000000Z",
-    "tokenAmountRequested": 2500,
-    "tokenAmount": 2500,
     "confirmationThreshold": 10,
-    "merchantCallbackUrl": "https://example.com",
-    "id": "9cddd3ad-c2a8-463c-a703-158b900beea8",
-    "updatedAt": "2024-08-27T13:32:10.000000Z",
+    "merchantCallbackUrl": "https://example.com/webhooks/knit",
+    "merchantRedirectUrl": "https://example.com/thanks",
+    "paymentLinkUrl": "https://checkout.collection.useknit.io/9cddd3ad-c2a8-463c-a703-158b900beea8",
+    "expiresAt": "2024-08-27T14:02:10.000000Z",
     "createdAt": "2024-08-27T13:32:10.000000Z",
-    "paymentLinkUrl": "https://checkout-dev.collection.useknit.io/9cddd3ad-c2a8-463c-a703-158b900beea8"
-  }
+    "updatedAt": "2024-08-27T13:32:10.000000Z"
+  },
+  "success": true
 }
 ```
+
+<Fields>
+  <Field name="address" type="string">
+    The single-use deposit address. Show it to the customer, or embed it in a
+    QR code.
+  </Field>
+  <Field name="paymentLinkUrl" type="string">
+    A hosted checkout page for this collection. The simplest integration is to
+    redirect the customer here.
+  </Field>
+  <Field name="expiresAt" type="string">
+    ISO-8601 timestamp, 30 minutes after creation.
+  </Field>
+  <Field name="status" type="string">
+    Starts at `PENDING`. See the lifecycle below.
+  </Field>
+</Fields>
+
+## Lifecycle
+
+| Status | Meaning |
+| ------ | ------- |
+| `PENDING` | Address issued, waiting for a deposit |
+| `SUCCESSFUL` | Deposit received and credited to your API account |
+| `SUCCESSFUL_PARTIAL` | Less than the requested amount arrived; the received amount was credited |
+| `FAILED` | The payment could not be completed |
+
+Each transition emits a webhook:
+
+1. `COLLECTION_CREATED` — fired immediately on creation.
+2. `COLLECTION_CONFIRMED` — fired once your `confirmationThreshold` is reached.
+3. `COLLECTION_SUCCESSFUL` — fired when the funds are credited.
+4. `COLLECTION_FAILED` — fired if the payment cannot be completed.
+
+See [Webhooks](/webhooks) for payloads and signature verification.
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `collections:write` |
+| `400` | A required field is missing, `tokenAmount` or `confirmationThreshold` is not greater than zero, or a URL is invalid or not publicly reachable |
+| `500` | The collection could not be created. Retry; if it persists, contact support |

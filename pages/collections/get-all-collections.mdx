@@ -1,49 +1,70 @@
-### Knit API Documentation
+---
+title: List collections
+description: Fetch and filter every collection created by your business.
+---
 
-#### Get All Collections
+# List collections
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#ebfbfa",
-      color: "#194d53",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    GET
-  </span>
-</div>
+Returns your business's collections, newest first.
 
-```js copy
-{{baseUrl}}/api/v1/collections
+<Endpoint method="GET" path="/api/v1/collections" />
+
+<Meta>
+  <Scope value="collections:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+## Query parameters
+
+All filters are optional and combine with AND.
+
+<Fields>
+  <Field name="status" type="string" required={false}>
+    Exact match on collection status, for example `PENDING` or `SUCCESSFUL`.
+  </Field>
+  <Field name="network" type="string" required={false}>
+    Exact match on network identifier, for example `MATIC_MAINNET`.
+  </Field>
+  <Field name="token" type="string" required={false}>
+    Exact match on token symbol, for example `USDT`.
+  </Field>
+  <Field name="minAmount" type="number" required={false}>
+    Only collections whose `tokenAmount` is greater than or equal to this.
+  </Field>
+  <Field name="maxAmount" type="number" required={false}>
+    Only collections whose `tokenAmount` is less than or equal to this.
+  </Field>
+  <Field name="startDate" type="date" required={false}>
+    Only collections created at or after this date.
+  </Field>
+  <Field name="endDate" type="date" required={false}>
+    Only collections created at or before this date.
+  </Field>
+</Fields>
+
+<Callout type="info">
+  This endpoint returns the full filtered result set — there is no `pagination`
+  object in the response. Narrow with `startDate` / `endDate` rather than
+  fetching everything on a schedule.
+</Callout>
+
+## Request
+
+```bash filename="cURL"
+curl -G "https://api-prod.useknit.io/api/v1/collections" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json" \
+  --data-urlencode "status=SUCCESSFUL" \
+  --data-urlencode "token=USDT" \
+  --data-urlencode "startDate=2024-08-01"
 ```
 
-##### Headers
+## Response
 
-- X-API-KEY: Your unique API key for authentication.
-- Accept: Set to application/json to ensure the response is in JSON format.
-
-##### Sample Request
-
-```sh copy filename="Sample Request"
-curl --location -g '{{baseUrl}}/api/v1/collections' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json'
-```
-
-##### Sample Response
-
-```json copy filename="Sample Response"
+```json filename="200 OK"
 {
-  "success": true,
+  "statusCode": 200,
   "message": "Collections fetched successfully",
-  "status": 200,
   "data": [
     {
       "id": "9cddd3ad-c2a8-463c-a703-158b900beea8",
@@ -51,9 +72,9 @@ curl --location -g '{{baseUrl}}/api/v1/collections' \
       "token": "USDT",
       "address": "0x3761f3504104f4faa8959963a5d8dce89989d45b",
       "tokenAmount": "2500.000000000000000000",
-      "tokenToUsd": "1.00000000",
       "tokenAmountRequested": "2500.000000000000000000",
       "tokenAmountReceived": null,
+      "tokenToUsd": "1.00000000",
       "feeInUsd": "0.00000000",
       "feeByToken": "0.000000000000000000",
       "fiatExchangeRateToUsd": null,
@@ -66,12 +87,25 @@ curl --location -g '{{baseUrl}}/api/v1/collections' \
       "numberOfConfirmations": null,
       "confirmationThreshold": 10,
       "merchantRedirectUrl": null,
-      "merchantCallbackUrl": "https://example.com",
-      "paymentLinkUrl": "https://checkout-dev.collection.useknit.io/9cddd3ad-c2a8-463c-a703-158b900beea8",
+      "merchantCallbackUrl": "https://example.com/webhooks/knit",
+      "paymentLinkUrl": "https://checkout.collection.useknit.io/9cddd3ad-c2a8-463c-a703-158b900beea8",
       "expiresAt": "2024-08-27T14:02:10.000000Z",
       "createdAt": "2024-08-27T13:32:10.000000Z",
       "updatedAt": "2024-08-27T13:32:10.000000Z"
     }
-  ]
+  ],
+  "success": true
 }
 ```
+
+<Callout type="info">
+  Decimal fields come back as strings to preserve full precision. Parse them
+  with a decimal library rather than a float.
+</Callout>
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `collections:read` |
+| `422` | A filter value has the wrong type, for example a non-date `startDate`. Query-parameter failures on this endpoint return the full envelope with `errors` — see [Requests & responses](/conventions#validation-errors) |

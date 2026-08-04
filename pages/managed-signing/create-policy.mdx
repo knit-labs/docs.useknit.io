@@ -1,47 +1,29 @@
-### Knit API Documentation
+---
+title: Create Policy
+description: This endpoint creates a new policy for managing signing request rules.
+---
 
-#### Create Policy
+# Create Policy
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#fff9eb",
-      color: "#d0a626",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    POST
-  </span>
-</div>
+<Endpoint method="POST" path="/api/v1/managed-signing/policies" />
 
-```js copy
-{{baseUrl}}/api/v1/managed-signing/policies
-```
+<Meta>
+  <Scope value="managed-signing:write" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
 
 This endpoint creates a new policy for managing signing request rules.
 
-##### Headers
-
-- `X-API-KEY`: Your API key for authentication.
-- `Accept`: Set to `application/json` to receive responses in JSON format.
-- `Content-Type`: Set to `application/json`.
-
-##### Request Body
+## Body
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `name` | string | Yes | Policy name |
 | `rules` | object | Yes | Policy rules configuration |
 
-##### Basic Example
+## Basic Example
 
-```json copy
+```json
 {
   "name": "default",
   "rules": {
@@ -52,9 +34,9 @@ This endpoint creates a new policy for managing signing request rules.
 }
 ```
 
-##### Full Policy Rules Schema
+## Full Policy Rules Schema
 
-```json copy
+```json
 {
   "name": "comprehensive-policy",
   "rules": {
@@ -92,7 +74,7 @@ This endpoint creates a new policy for managing signing request rules.
 }
 ```
 
-##### Policy Rules Reference
+## Policy Rules Reference
 
 **Transaction Controls**
 
@@ -140,14 +122,14 @@ This endpoint creates a new policy for managing signing request rules.
 | `message.maxBytes` | number | Max message size in bytes |
 | `message.allowedPrefixes` | string[] | Required message prefixes |
 
-##### Sample Request
+## Request
 
-```sh copy
-curl --location -g '{{baseUrl}}/api/v1/managed-signing/policies' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json' \
---header 'Content-Type: application/json' \
---data '{
+```bash
+curl "https://api-prod.useknit.io/api/v1/managed-signing/policies" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
     "name": "default",
     "rules": {
         "chains": ["ETHEREUM_MAINNET"],
@@ -157,9 +139,9 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/policies' \
 }'
 ```
 
-##### Sample Response
+## Response
 
-```json copy filename="Sample Response"
+```json filename="Response"
 {
   "statusCode": 201,
   "message": "Policy created",
@@ -179,7 +161,7 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/policies' \
 }
 ```
 
-##### Response Fields
+## Response Fields
 
 | Field | Type | Description |
 |-------|------|-------------|

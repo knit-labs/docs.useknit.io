@@ -1,59 +1,64 @@
-### Knit API Documentation
+---
+title: List API accounts
+description: Read the balance of every API account your business holds.
+---
 
-#### Get All API Accounts
+# List API accounts
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#ebfbfa",
-      color: "#194d53",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    GET
-  </span>
-</div>
+Returns every API account your business holds, one per token, with its current
+balance. This is the balance [payouts](/payouts/create-a-single-payout) draw
+on.
 
-```js copy
-{{baseUrl}}/api/v1/business-api-services-wallets
+<Endpoint method="GET" path="/api/v1/business-api-services-wallets" />
+
+<Meta>
+  <Scope value="payout-wallets:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+## Request
+
+```bash filename="cURL"
+curl "https://api-prod.useknit.io/api/v1/business-api-services-wallets" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json"
 ```
 
-##### Headers
+## Response
 
-- X-API-KEY: Your unique API key for authentication.
-- Accept: Set to application/json to ensure the response is in JSON format.
-
-##### Sample Request
-
-```sh copy
-curl --location -g '{{baseUrl}}/api/v1/business-api-services-wallets' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json'
-```
-
-##### Sample Response
-
-```json copy filename="Sample Response"
+```json filename="200 OK"
 {
-  "success": true,
-  "status": 200,
+  "statusCode": 200,
+  "message": "Payout wallets fetched successfully",
   "data": [
     {
       "id": "c7ddb254-5da1-4136-b19e-733a00a31c70",
-      "userId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
-      "amount": "99.897000000000000000",
+      "businessId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
       "token": "USDT",
-      "status": "ACTIVE",
+      "amount": "99.897000000000000000",
       "createdAt": "2024-02-22T14:16:23.000000Z",
       "updatedAt": "2024-02-22T14:43:21.000000Z"
     }
   ],
-  "message": "Payout wallets fetched successfully"
+  "success": true
 }
 ```
+
+<Fields>
+  <Field name="amount" type="string">
+    The spendable balance in token units, as a decimal string. Parse it with a
+    decimal library — the precision does not survive a float.
+  </Field>
+</Fields>
+
+<Callout type="info">
+  Poll this before a batch of payouts, or alert on it falling below your
+  expected daily volume. It is the single number that tells you whether
+  programmatic disbursement will keep working.
+</Callout>
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `payout-wallets:read` |

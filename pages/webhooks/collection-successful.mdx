@@ -1,35 +1,83 @@
-### Knit API Documentation
+---
+title: COLLECTION_SUCCESSFUL
+description: Delivered when a collection's funds are credited to your API account.
+---
 
-#### Collection Successful
+# `COLLECTION_SUCCESSFUL`
 
-##### Sample Response
+Delivered when a collection's funds have been credited to your API account.
+This is the event to act on: the money is yours and available to
+[pay out](/payouts/create-a-single-payout).
 
-```json copy filename="Sample Response"
+<Meta>
+  <Chip label="Envelope" value="body wrapper" />
+  <Chip label="Keys" value="snake_case" />
+</Meta>
+
+Delivered to the collection's `merchantCallbackUrl`, falling back to your
+business webhook URL.
+
+## Payload
+
+```json filename="COLLECTION_SUCCESSFUL"
 {
   "body": {
     "eventType": "COLLECTION_SUCCESSFUL",
     "collection": {
       "id": "4ebdfe45-a62b-47a9-ac31-7599305666b1",
-      "userId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
+      "business_id": "b7b93a40-4e18-4e97-9c5f-8a7a4fd0df92",
       "network": "MATIC_MAINNET",
       "token": "USDT",
       "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
-      "tokenAmount": "25.000000000000000000",
-      "tokenToUsd": null,
-      "fiatExchangeRateToUsd": null,
-      "fiatAmountInUsd": null,
-      "fiatAmount": null,
-      "fiatAmountCurrency": null,
+      "token_amount": "25.000000000000000000",
+      "token_amount_requested": "25.000000000000000000",
+      "token_amount_received": "25.000000000000000000",
+      "token_to_usd": "1.00000000",
+      "fee_in_usd": "0.00000000",
       "status": "SUCCESSFUL",
-      "transactionHash": "b480ed44a275f042e482a78d9c5b54fcf612441c",
-      "transactionBlockNumber": null,
-      "numberOfConfirmations": null,
-      "merchantRedirectUrl": "https://example.com",
-      "merchantCallbackUrl": "https://example.com",
-      "expiresAt": "2024-02-22T17:29:33.000000Z",
-      "createdAt": "2024-02-22T16:59:33.000000Z",
-      "updatedAt": "2024-02-22T17:00:30.000000Z"
+      "transaction_hash": "0xb480ed44a275f042e482a78d9c5b54fcf612441c",
+      "transaction_block_number": 61234567,
+      "number_of_confirmations": 12,
+      "confirmation_threshold": 10,
+      "merchant_redirect_url": "https://example.com/thanks",
+      "merchant_callback_url": "https://example.com/webhooks/knit",
+      "expires_at": "2024-02-22T17:29:33.000000Z",
+      "created_at": "2024-02-22T16:59:33.000000Z",
+      "updated_at": "2024-02-22T17:00:30.000000Z"
     }
   }
 }
 ```
+
+## Partial payments
+
+`status` is `SUCCESSFUL_PARTIAL` when less than the requested amount arrived.
+The received amount is still credited, so treat this event as money-in — but
+reconcile the shortfall.
+
+```js filename="Distinguishing full from partial"
+const c = payload.collection;
+const paidInFull = c.status === "SUCCESSFUL";
+const shortfall =
+  Number(c.token_amount_requested) - Number(c.token_amount_received ?? 0);
+```
+
+<Callout type="warning">
+  Always credit your customer against `token_amount_received`, never against
+  `token_amount_requested`. Amounts are decimal strings — parse them with a
+  decimal library rather than a float.
+</Callout>
+
+## Handling
+
+1. Verify the signature and return `2xx` promptly.
+2. Look the collection up by `id` on your side and check you have not already
+   processed it — this event can arrive more than once.
+3. Credit against `token_amount_received`.
+4. Fulfil the order.
+
+## See also
+
+- [`COLLECTION_FAILED`](/webhooks/collection-failed)
+- [Retrieve a collection](/collections/get-single-collection) — to reconcile
+- [Webhooks overview](/webhooks) — signature verification and retries

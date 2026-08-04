@@ -1,0 +1,104 @@
+---
+title: Update a subscription
+description: Change what an address subscription watches, or pause it.
+---
+
+# Update a subscription
+
+Amends a subscription. Send only the fields you want to change.
+
+<Endpoint method="PATCH" path="/api/v1/blockchain-notifications/subscriptions/{id}" />
+
+<Meta>
+  <Scope value="blockchain-notifications:write" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+<Callout type="info">
+  `address` and `type` are fixed at creation. To watch a different address,
+  create a new subscription.
+</Callout>
+
+## Path parameters
+
+<Fields>
+  <Field name="id" type="string" required>
+    The subscription's `id`.
+  </Field>
+</Fields>
+
+## Body
+
+<Fields>
+  <Field name="networks" type="string[]" required={false}>
+    Replaces the watched networks. Every entry must belong to the
+    subscription's existing `type`. Must contain at least one entry.
+  </Field>
+  <Field name="tokens" type="string[]" required={false}>
+    Replaces the watched tokens: `USDC`, `USDT`, or `PYUSD`. Must contain at
+    least one entry.
+  </Field>
+  <Field name="direction" type="string" required={false}>
+    `INCOMING`, `OUTGOING`, or `BOTH`.
+  </Field>
+  <Field name="webhookUrl" type="string" required={false}>
+    A publicly reachable `http://` or `https://` URL.
+  </Field>
+  <Field name="metadata" type="object" required={false}>
+    Replaces the stored metadata. Send `null` to clear it.
+  </Field>
+  <Field name="isActive" type="boolean" required={false}>
+    Set to `false` to pause delivery without deleting, and back to `true` to
+    resume.
+  </Field>
+</Fields>
+
+<Callout type="warning">
+  `networks` and `tokens` replace the stored arrays rather than merging into
+  them. Send the complete list you want, not just the additions.
+</Callout>
+
+## Request
+
+```bash filename="cURL"
+curl -X PATCH "https://api-prod.useknit.io/api/v1/blockchain-notifications/subscriptions/3f6f9d1a-64b2-4c7f-9a1e-7a2f0c8c7e11" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "direction": "BOTH",
+    "networks": ["MATIC_MAINNET", "BASE_MAINNET", "BSC_MAINNET"]
+  }'
+```
+
+## Response
+
+```json filename="200 OK"
+{
+  "statusCode": 200,
+  "message": "Address notification subscription updated",
+  "data": {
+    "id": "3f6f9d1a-64b2-4c7f-9a1e-7a2f0c8c7e11",
+    "businessId": "b7b93a40-4e18-4e97-9c5f-8a7a4fd0df92",
+    "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+    "type": "EVM",
+    "networks": ["MATIC_MAINNET", "BASE_MAINNET", "BSC_MAINNET"],
+    "tokens": ["USDC", "USDT"],
+    "direction": "BOTH",
+    "webhookUrl": "https://example.com/webhooks/knit",
+    "metadata": { "customerId": "cus_8121" },
+    "isActive": true,
+    "createdAt": "2024-10-02T11:21:33.000000Z",
+    "updatedAt": "2024-10-04T08:02:19.000000Z"
+  },
+  "success": true
+}
+```
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `400` | A supplied field failed validation, or `networks` / `tokens` was sent empty — carries an `errors` object |
+| `400` | A network does not belong to the subscription's `type`, or `webhookUrl` is not a public HTTP(S) URL |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `blockchain-notifications:write` |
+| `404` | No subscription with that ID belongs to your business |

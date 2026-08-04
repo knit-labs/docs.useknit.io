@@ -1,79 +1,80 @@
-### Knit API Documentation
+---
+title: Retrieve a collection
+description: Fetch the current state of a single collection by ID.
+---
 
-#### Get Single Collection
+# Retrieve a collection
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#ebfbfa",
-      color: "#194d53",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    GET
-  </span>
-</div>
+Fetches one collection belonging to your business.
 
-```js copy
-{{baseUrl}}/api/v1/collections/:id
+<Endpoint method="GET" path="/api/v1/collections/{id}" />
+
+<Meta>
+  <Scope value="collections:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+## Path parameters
+
+<Fields>
+  <Field name="id" type="string" required>
+    The collection's `id`, as returned when it was created.
+  </Field>
+</Fields>
+
+## Request
+
+```bash filename="cURL"
+curl "https://api-prod.useknit.io/api/v1/collections/9cddd3ad-c2a8-463c-a703-158b900beea8" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json"
 ```
 
-##### Headers
+## Response
 
-- X-API-KEY: Your API key, which authorizes the request.
-- Accept: Set to application/json to receive the response in JSON format.
-
-##### Path Variables
-
-- id: The unique identifier of the wallet you wish to retrieve information for. This should be replaced with the actual collection ID in your request.
-
-##### Sample Request
-
-```sh copy filename="Sample Request"
-curl --location -g '{{baseUrl}}/api/v1/collections/9cddd3ad-c2a8-463c-a703-158b900beea8' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json'
-```
-
-##### Sample Response
-
-```json copy filename="Sample Response"
+```json filename="200 OK"
 {
-  "success": true,
+  "statusCode": 200,
   "message": "Collection fetched successfully",
-  "status": 200,
   "data": {
     "id": "9cddd3ad-c2a8-463c-a703-158b900beea8",
     "network": "MATIC_MAINNET",
     "token": "USDT",
     "address": "0x3761f3504104f4faa8959963a5d8dce89989d45b",
     "tokenAmount": "2500.000000000000000000",
-    "tokenToUsd": "1.00000000",
     "tokenAmountRequested": "2500.000000000000000000",
-    "tokenAmountReceived": null,
+    "tokenAmountReceived": "2500.000000000000000000",
+    "tokenToUsd": "1.00000000",
     "feeInUsd": "0.00000000",
     "feeByToken": "0.000000000000000000",
     "fiatExchangeRateToUsd": null,
     "fiatAmountInUsd": null,
     "fiatAmount": null,
     "fiatAmountCurrency": null,
-    "status": "PENDING",
-    "transactionHash": null,
-    "transactionBlockNumber": null,
-    "numberOfConfirmations": null,
+    "status": "SUCCESSFUL",
+    "transactionHash": "0xb480ed44a275f042e482a78d9c5b54fcf612441c",
+    "transactionBlockNumber": 61234567,
+    "numberOfConfirmations": 12,
     "confirmationThreshold": 10,
-    "merchantRedirectUrl": null,
-    "merchantCallbackUrl": "https://example.com",
-    "paymentLinkUrl": "https://checkout-dev.collection.useknit.io/9cddd3ad-c2a8-463c-a703-158b900beea8",
+    "merchantRedirectUrl": "https://example.com/thanks",
+    "merchantCallbackUrl": "https://example.com/webhooks/knit",
+    "paymentLinkUrl": "https://checkout.collection.useknit.io/9cddd3ad-c2a8-463c-a703-158b900beea8",
     "expiresAt": "2024-08-27T14:02:10.000000Z",
     "createdAt": "2024-08-27T13:32:10.000000Z",
-    "updatedAt": "2024-08-27T13:32:10.000000Z"
-  }
+    "updatedAt": "2024-08-27T13:35:44.000000Z"
+  },
+  "success": true
 }
 ```
+
+<Callout type="info">
+  Prefer [webhooks](/webhooks) over polling this endpoint. If you do poll — for
+  example to reconcile after downtime — back off rather than looping tightly.
+</Callout>
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `collections:read` |
+| `404` | No collection with that ID belongs to your business |

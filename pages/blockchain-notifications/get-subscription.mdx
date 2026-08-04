@@ -1,0 +1,62 @@
+---
+title: Retrieve a subscription
+description: Fetch one address notification subscription by ID.
+---
+
+# Retrieve a subscription
+
+Fetches one subscription belonging to your business.
+
+<Endpoint method="GET" path="/api/v1/blockchain-notifications/subscriptions/{id}" />
+
+<Meta>
+  <Scope value="blockchain-notifications:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+## Path parameters
+
+<Fields>
+  <Field name="id" type="string" required>
+    The subscription's `id`.
+  </Field>
+</Fields>
+
+## Request
+
+```bash filename="cURL"
+curl "https://api-prod.useknit.io/api/v1/blockchain-notifications/subscriptions/3f6f9d1a-64b2-4c7f-9a1e-7a2f0c8c7e11" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json"
+```
+
+## Response
+
+```json filename="200 OK"
+{
+  "statusCode": 200,
+  "message": "Address notification subscription fetched",
+  "data": {
+    "id": "3f6f9d1a-64b2-4c7f-9a1e-7a2f0c8c7e11",
+    "businessId": "b7b93a40-4e18-4e97-9c5f-8a7a4fd0df92",
+    "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+    "type": "EVM",
+    "networks": ["MATIC_MAINNET", "BASE_MAINNET"],
+    "tokens": ["USDC", "USDT"],
+    "direction": "INCOMING",
+    "webhookUrl": "https://example.com/webhooks/knit",
+    "metadata": { "customerId": "cus_8121" },
+    "isActive": true,
+    "createdAt": "2024-10-02T11:21:33.000000Z",
+    "updatedAt": "2024-10-02T11:21:33.000000Z"
+  },
+  "success": true
+}
+```
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `blockchain-notifications:read` |
+| `404` | No subscription with that ID belongs to your business |

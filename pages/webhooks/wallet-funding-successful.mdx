@@ -1,37 +1,80 @@
-### Knit API Documentation
+---
+title: WALLET_FUNDING_SUCCESSFUL
+description: Delivered when an API wallet receives a confirmed deposit.
+---
 
-#### Wallet Funding Successful
+# `WALLET_FUNDING_SUCCESSFUL`
 
-##### Sample Response
+Delivered when one of your [API wallets](/wallets/create-a-wallet) receives a
+confirmed deposit. The funds are credited to your API account and available to
+pay out.
 
-```json copy filename="Sample Response"
+<Meta>
+  <Chip label="Envelope" value="top level — no body wrapper" />
+  <Chip label="Keys" value="snake_case" />
+</Meta>
+
+Delivered to your business webhook URL.
+
+<Callout type="warning">
+  This payload is **not** wrapped in a `body` object — `eventType` sits at the
+  top level. Collection and payout events are wrapped; this one is not.
+</Callout>
+
+## Payload
+
+```json filename="WALLET_FUNDING_SUCCESSFUL"
 {
-  "body": {
-    "eventType": "WALLET_FUNDING_SUCCESSFUL",
-    "wallet": {
-      "id": "3db04cff-3ea7-4387-891f-c1657a02a272",
-      "userId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
-      "network": "TRON_MAINNET",
-      "networkId": "MATIC_MAINNET",
-      "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
-      "isActive": true,
-      "createdAt": "2024-02-22T17:12:50.000000Z",
-      "updatedAt": "2024-02-22T17:12:50.000000Z"
-    },
-    "transaction": {
-      "id": "b147db2c-4861-4fa5-9dff-086d6e06d116",
-      "walletId": "3db04cff-3ea7-4387-891f-c1657a02a272",
-      "network": "MATIC_MAINNET",
-      "token": "USDT",
-      "fromAddress": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
-      "toAddress": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
-      "value": "250.00000000",
-      "numberOfConfirmations": 1,
-      "status": "SUCCESSFUL",
-      "transactionHash": "6c3db59292c98c2a2c14f820",
-      "createdAt": "2024-02-23T16:44:49.000000Z",
-      "updatedAt": "2024-02-23T16:44:49.000000Z"
-    }
+  "eventType": "WALLET_FUNDING_SUCCESSFUL",
+  "wallet": {
+    "id": "3db04cff-3ea7-4387-891f-c1657a02a272",
+    "business_id": "b7b93a40-4e18-4e97-9c5f-8a7a4fd0df92",
+    "network": "MATIC_MAINNET",
+    "network_id": "MATIC_MAINNET",
+    "networks": ["MATIC_MAINNET"],
+    "address": "0x1adb0a39bde00fa0957e519584cb5c51fefcb37f",
+    "is_active": true,
+    "created_at": "2024-02-22T17:12:50.000000Z",
+    "updated_at": "2024-02-22T17:12:50.000000Z"
+  },
+  "transaction": {
+    "id": "b147db2c-4861-4fa5-9dff-086d6e06d116",
+    "wallet_id": "3db04cff-3ea7-4387-891f-c1657a02a272",
+    "business_id": "b7b93a40-4e18-4e97-9c5f-8a7a4fd0df92",
+    "network": "MATIC_MAINNET",
+    "token": "USDT",
+    "from_address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+    "to_address": "0x1adb0a39bde00fa0957e519584cb5c51fefcb37f",
+    "value": "250.00000000",
+    "fee_by_token": "0.00000000",
+    "number_of_confirmations": 12,
+    "status": "SUCCESSFUL",
+    "transaction_hash": "0x6c3db59292c98c2a2c14f820",
+    "created_at": "2024-02-23T16:44:49.000000Z",
+    "updated_at": "2024-02-23T16:44:49.000000Z"
   }
 }
 ```
+
+<Fields>
+  <Field name="wallet" type="object">
+    The API wallet that received the deposit. Match `wallet.id` against the
+    customer or ledger you associated with it.
+  </Field>
+  <Field name="transaction" type="object">
+    The deposit itself. `value` is the amount received, as a decimal string.
+  </Field>
+</Fields>
+
+## Handling
+
+Credit against `transaction.value`, and use `transaction.transaction_hash` for
+deduplication — a chain reorganisation or a redelivery can produce the same
+transaction twice.
+
+## See also
+
+- [Create a wallet](/wallets/create-a-wallet)
+- [List wallet transactions](/wallets/get-single-wallet-transactions) — to
+  reconcile
+- [Webhooks overview](/webhooks) — signature verification and retries

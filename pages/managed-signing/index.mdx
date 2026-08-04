@@ -1,75 +1,119 @@
-### Knit API Documentation
+---
+title: Managed Signing
+description: Create policy-governed signing wallets and submit transactions, typed data, or messages for signature.
+---
 
-#### Managed Signing API (Merchants)
+# Managed Signing
 
-The Managed Signing API provides merchant endpoints for creating and managing wallets with secure signing capabilities. These endpoints are used by merchants integrating managed signing via API keys.
+Managed Signing gives you signing wallets whose keys Knit holds, governed by
+policies you define. You submit a transaction, a piece of EIP-712 typed data,
+or a message; the policy is evaluated; and — if it passes — the payload is
+signed and, optionally, broadcast.
 
-##### Base URL
+<CardGrid>
+  <Card title="Create a wallet" icon="👛" href="/managed-signing/create-wallet">
+    Provision a signing wallet on one or more networks.
+  </Card>
+  <Card title="Create a policy" icon="🛡️" href="/managed-signing/create-policy">
+    Constrain what the wallet is allowed to sign.
+  </Card>
+  <Card title="Create a signing request" icon="✍️" href="/managed-signing/create-signing-request">
+    Submit a transaction, typed data, or a message.
+  </Card>
+  <Card title="Circle Payment Network" icon="🔄" href="/managed-signing/cpn">
+    An end-to-end CPN integration guide.
+  </Card>
+</CardGrid>
 
-```js copy
-{{baseUrl}}/api/v1/managed-signing
+## Base path
+
+All endpoints live under:
+
+```
+https://api-prod.useknit.io/api/v1/managed-signing
 ```
 
-##### Authentication
+## Authentication
 
-- **Header:** `X-API-KEY: <api-key>`
-- **IP Whitelist:** Requests must originate from a whitelisted IP.
-- **Forwarded IP Header:** `x-forwarded-for` should contain the client IP.
+Managed Signing uses the same OAuth 2.0 client credentials as the rest of the
+API — send `Authorization: Bearer <access-token>`.
 
-##### Conventions
+| Operation | Required scope |
+| --------- | -------------- |
+| `GET` — wallets, policies, requests, audit | `managed-signing:read` |
+| `POST` / `PATCH` — create, update, approve | `managed-signing:write` |
 
-- All IDs returned are **local DB UUIDs** (not Knit Core IDs).
-- You must use **local IDs** in requests (path params and body filters like `walletId`).
-- `businessId` is included in responses; Knit Core IDs and `userId` are never returned.
-- All request bodies use **camelCase**.
-- All response keys are **camelCase**.
+Requests must also originate from an IP on your business allow list. See
+[Authentication](/authentication) for tokens, scopes, and allow-listing.
 
-##### Supported Networks
+<Callout type="warning">
+  The `X-API-KEY` header is no longer a valid credential anywhere on the Knit
+  API, Managed Signing included. Use a bearer token.
+</Callout>
 
-**Production Networks**
-- `ETHEREUM_MAINNET`
-- `MATIC_MAINNET`
-- `BSC_MAINNET`
-- `BASE_MAINNET`
+## Conventions
 
-**Testnet Networks (Sandbox/Dev only)**
-- `MATIC_AMOY` - Polygon Amoy testnet (commonly used for CPN testing)
+- **Use the IDs this API returns.** Every `id` in a path parameter or a body
+  filter such as `walletId` must be an ID you received from a Managed Signing
+  response.
+- **camelCase in and out.** Request bodies and response payloads both use
+  camelCase — except inside `payload.typedData`, where `types` and `message`
+  must match the EIP-712 schema exactly and are passed through untouched.
+- **Shared envelope.** Responses use the standard `statusCode` / `message` /
+  `data` / `success` envelope. See [Requests & responses](/conventions).
 
-##### Available Endpoints
+## Supported networks
+
+| Network | Identifier |
+| ------- | ---------- |
+| Ethereum | `ETHEREUM_MAINNET` (alias `ETH_MAINNET`) |
+| Polygon | `MATIC_MAINNET` |
+| BNB Smart Chain | `BSC_MAINNET` |
+| Base | `BASE_MAINNET` |
+| Polygon Amoy — sandbox only | `MATIC_AMOY` |
+
+## Endpoints
 
 **Wallets**
-- `POST /wallets` - Create a managed signing wallet
-- `GET /wallets` - List all managed signing wallets
-- `GET /wallets/{walletId}` - Get a specific wallet
-- `GET /wallets/{walletId}/balance` - Get token balance for a wallet
-- `GET /wallets/{walletId}/assets` - Get all token balances across networks
+
+| Method | Path | Purpose |
+| ------ | ---- | ------- |
+| `POST` | `/wallets` | [Create a wallet](/managed-signing/create-wallet) |
+| `GET` | `/wallets` | [List wallets](/managed-signing/list-wallets) |
+| `GET` | `/wallets/{walletId}` | [Retrieve a wallet](/managed-signing/get-wallet) |
+| `GET` | `/wallets/{walletId}/balance` | [Get a token balance](/managed-signing/get-wallet-balance) |
+| `GET` | `/wallets/{walletId}/assets` | [List balances across networks](/managed-signing/get-wallet-assets) |
 
 **Policies**
-- `POST /policies` - Create a policy
-- `PATCH /policies/{policyId}` - Update a policy
-- `GET /policies` - List all policies
-- `GET /policies/{policyId}` - Get a specific policy
 
-**Signing Requests**
-- `POST /requests` - Create a signing request
-- `POST /requests/{requestId}/approve` - Approve a signing request
-- `GET /requests/{requestId}` - Get a signing request
-- `GET /requests` - List signing requests
+| Method | Path | Purpose |
+| ------ | ---- | ------- |
+| `POST` | `/policies` | [Create a policy](/managed-signing/create-policy) |
+| `PATCH` | `/policies/{policyId}` | [Update a policy](/managed-signing/update-policy) |
+| `GET` | `/policies` | [List policies](/managed-signing/list-policies) |
+| `GET` | `/policies/{policyId}` | [Retrieve a policy](/managed-signing/get-policy) |
+
+**Signing requests**
+
+| Method | Path | Purpose |
+| ------ | ---- | ------- |
+| `POST` | `/requests` | [Create a signing request](/managed-signing/create-signing-request) |
+| `POST` | `/requests/{requestId}/approve` | [Approve a request](/managed-signing/approve-signing-request) |
+| `GET` | `/requests` | [List requests](/managed-signing/list-signing-requests) |
+| `GET` | `/requests/{requestId}` | [Retrieve a request](/managed-signing/get-signing-request) |
 
 **Audit**
-- `GET /audit` - List audit events
 
-##### Common Errors
+| Method | Path | Purpose |
+| ------ | ---- | ------- |
+| `GET` | `/audit` | [List audit events](/managed-signing/list-audit-events) |
 
-| Status Code | Description |
-|-------------|-------------|
-| 401 Unauthorized | Invalid API key or IP not whitelisted |
-| 403 Forbidden | Missing permission |
-| 404 Not Found | Invalid local IDs |
-| 400 Validation Error | Invalid request body or query parameters |
+## Common errors
 
-##### Notes
-
-- All IDs used in requests and responses are local DB UUIDs.
-- Knit Core identifiers are stored internally and are not exposed.
-- If you need to filter requests by wallet or policy, always use the **local IDs** returned by this API.
+| Status | Cause |
+| ------ | ----- |
+| `400` | Invalid request body, unsupported network, or the wallet is not active on the requested network |
+| `401` | Missing or invalid token, IP not allow-listed, or the token lacks the required `managed-signing` scope |
+| `404` | The wallet, policy, or request does not exist under your business |
+| `400` | A field failed validation |
+| `500` | The signing request could not be processed. Retry with backoff |

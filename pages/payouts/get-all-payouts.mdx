@@ -1,66 +1,60 @@
-### Knit API Documentation
+---
+title: List payouts
+description: Fetch every payout your business has created.
+---
 
-#### Get All Payouts
+# List payouts
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#ebfbfa",
-      color: "#194d53",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    GET
-  </span>
-</div>
+Returns the payouts belonging to your business.
 
-```js copy
-{{baseUrl}}/api/v1/payouts
+<Endpoint method="GET" path="/api/v1/payouts" />
+
+<Meta>
+  <Scope value="payouts:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+## Request
+
+```bash filename="cURL"
+curl "https://api-prod.useknit.io/api/v1/payouts" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json"
 ```
 
-##### Headers
+## Response
 
-- Authentication: `Authorization: Bearer <token>` (preferred) or the legacy
-  `X-API-KEY: {{apiKey}}`.
-- Accept: Set to application/json to ensure the response is in JSON format.
-
-##### Sample Request
-
-```sh copy
-curl --location -g '{{baseUrl}}/api/v1/payouts' \
---header 'Authorization: Bearer {{token}}' \
---header 'Accept: application/json'
-```
-
-##### Sample Response
-
-```json copy filename="Sample Response"
+```json filename="200 OK"
 {
-  "success": true,
-  "message": "Payouts fetched successfully",
-  "status": 200,
+  "statusCode": 200,
+  "message": "Payouts retrieved successfully",
   "data": [
     {
       "id": "8e5697e3-8265-455b-984a-0eb40e10b0f9",
-      "userId": "8286065b-577e-11ef-9218-96f5ee698dcd",
-      "payoutWalletId": "5c7bb5bd-acb5-453a-9eb9-11380a329d79",
+      "businessId": "b7b93a40-4e18-4e97-9c5f-8a7a4fd0df92",
       "network": "MATIC_MAINNET",
       "token": "USDT",
-      "amount": "0.020000000000000000",
+      "amount": "25.500000000000000000",
       "toAddress": "0x56adfcc254ab3b8142a275c1837bcffaff5aa38b",
-      "transactionHash": null,
-      "status": "PROCESSING",
+      "merchantReference": "INV-2045",
+      "transactionHash": "0xb0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f70819",
+      "status": "COMPLETED",
       "info": null,
-      "payoutExternalRef": "6603f31f-4ebf-461b-89c5-75a13d41b7a9",
       "createdAt": "2024-08-27T13:44:20.000000Z",
-      "updatedAt": "2024-08-27T13:44:21.000000Z"
+      "updatedAt": "2024-08-27T13:47:03.000000Z"
     }
-  ]
+  ],
+  "success": true
 }
 ```
+
+<Callout type="info">
+  Reconcile on `merchantReference` — it is the value you control and the one
+  that stays stable across your own retries.
+</Callout>
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `payouts:read` |

@@ -1,44 +1,26 @@
-### Knit API Documentation
+---
+title: Update Policy
+description: This endpoint updates an existing policy by its local ID.
+---
 
-#### Update Policy
+# Update Policy
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#f0e6ff",
-      color: "#6b21a8",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    PATCH
-  </span>
-</div>
+<Endpoint method="PATCH" path="/api/v1/managed-signing/policies/{policyId}" />
 
-```js copy
-{{baseUrl}}/api/v1/managed-signing/policies/{policyId}
-```
+<Meta>
+  <Scope value="managed-signing:write" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
 
 This endpoint updates an existing policy by its local ID.
 
-##### Headers
-
-- `X-API-KEY`: Your API key for authentication.
-- `Accept`: Set to `application/json` to receive responses in JSON format.
-- `Content-Type`: Set to `application/json`.
-
-##### Path Parameters
+## Path Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `policyId` | string | Yes | The local policy ID |
 
-##### Request Body
+## Body
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -49,7 +31,7 @@ This endpoint updates an existing policy by its local ID.
 | `rules.maxTransferAmount` | string | No | Maximum transfer amount per transaction (in base units) |
 | `rules.denyUnlimitedApprovals` | boolean | No | Whether to deny unlimited approvals |
 
-```json copy
+```json
 {
   "rules": {
     "maxApprovalAmount": "2000000",
@@ -58,14 +40,14 @@ This endpoint updates an existing policy by its local ID.
 }
 ```
 
-##### Sample Request
+## Request
 
-```sh copy
-curl --location -g --request PATCH '{{baseUrl}}/api/v1/managed-signing/policies/<local-policy-id>' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json' \
---header 'Content-Type: application/json' \
---data '{
+```bash
+curl -X PATCH "https://api-prod.useknit.io/api/v1/managed-signing/policies/<local-policy-id>" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
     "rules": {
         "maxApprovalAmount": "2000000",
         "denyUnlimitedApprovals": false
@@ -73,9 +55,9 @@ curl --location -g --request PATCH '{{baseUrl}}/api/v1/managed-signing/policies/
 }'
 ```
 
-##### Sample Response
+## Response
 
-```json copy filename="Sample Response"
+```json filename="Response"
 {
   "statusCode": 200,
   "message": "Policy updated",
@@ -95,7 +77,7 @@ curl --location -g --request PATCH '{{baseUrl}}/api/v1/managed-signing/policies/
 }
 ```
 
-##### Response Fields
+## Response Fields
 
 | Field | Type | Description |
 |-------|------|-------------|

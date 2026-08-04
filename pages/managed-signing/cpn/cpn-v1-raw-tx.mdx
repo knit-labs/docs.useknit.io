@@ -1,43 +1,31 @@
-### Knit API Documentation
+---
+title: "CPN V1: Raw Transaction Signing (Optional)"
+description: CPN V1 uses traditional on-chain transactions instead of EIP-712 signatures. **Only use this if you specifically need CPN V1 support.**
+---
 
-#### CPN V1: Raw Transaction Signing (Optional)
+# CPN V1: Raw Transaction Signing (Optional)
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#fff9eb",
-      color: "#d0a626",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    POST
-  </span>
-</div>
+<Endpoint method="POST" path="/api/v1/managed-signing/requests" />
 
-```js copy
-{{baseUrl}}/api/v1/managed-signing/requests
-```
+<Meta>
+  <Scope value="managed-signing:write" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
 
 CPN V1 uses traditional on-chain transactions instead of EIP-712 signatures. **Only use this if you specifically need CPN V1 support.**
 
-##### When to Use CPN V1
+## When to Use CPN V1
 
 - Legacy integrations that don't support Permit2
 - Specific Circle requirements for your use case
 
 For new integrations, **CPN V2 is recommended** as it's gasless and more efficient.
 
-##### Prerequisites
+## Prerequisites
 
 1. Update your policy to allow raw transactions:
 
-```json copy
+```json
 {
   "name": "cpn-v1",
   "rules": {
@@ -47,15 +35,9 @@ For new integrations, **CPN V2 is recommended** as it's gasless and more efficie
 }
 ```
 
-##### Headers
+## Body
 
-- `X-API-KEY`: Your API key for authentication.
-- `Accept`: Set to `application/json` to receive responses in JSON format.
-- `Content-Type`: Set to `application/json`.
-
-##### Request Body
-
-```json copy
+```json
 {
   "walletId": "<local-wallet-id>",
   "network": "MATIC_MAINNET",
@@ -85,7 +67,7 @@ For new integrations, **CPN V2 is recommended** as it's gasless and more efficie
 | `payload.tx` | object | Raw transaction object |
 | `broadcast` | boolean | Whether to broadcast (usually `false` for CPN V1) |
 
-##### Transaction Fields
+## Transaction Fields
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -97,14 +79,14 @@ For new integrations, **CPN V2 is recommended** as it's gasless and more efficie
 | `maxPriorityFeePerGas` | string | Priority fee in hex (EIP-1559) |
 | `nonce` | number | Transaction nonce |
 
-##### Sample Request
+## Request
 
-```sh copy
-curl --location -g '{{baseUrl}}/api/v1/managed-signing/requests' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json' \
---header 'Content-Type: application/json' \
---data '{
+```bash
+curl "https://api-prod.useknit.io/api/v1/managed-signing/requests" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
     "walletId": "<local-wallet-id>",
     "network": "MATIC_MAINNET",
     "type": "evm_tx",
@@ -124,9 +106,9 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/requests' \
 }'
 ```
 
-##### Sample Response
+## Response
 
-```json copy filename="Sample Response"
+```json filename="Response"
 {
   "statusCode": 201,
   "message": "Signing request created",
@@ -150,14 +132,14 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/requests' \
 }
 ```
 
-##### Important Notes
+## Important Notes
 
 - Raw transaction signing requires **all fields** to be provided (gas, fees, nonce)
 - If RPCs are configured, the service can auto-fill gas estimation
 - The `signedTx` in the response is the signed raw transaction to submit to Circle
 - CPN V1 transactions require gas fees paid by the wallet
 
-##### Security Considerations
+## Security Considerations
 
 Enabling `allowRawTx: true` in your policy allows signing arbitrary transactions. Consider:
 

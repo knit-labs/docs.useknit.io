@@ -1,57 +1,92 @@
-### Payout Successful Webhook
+---
+title: PAYOUT_SUCCESSFUL
+description: Delivered when a payout settles on-chain.
+---
 
-Knit sends this webhook whenever a payout you initiated reaches the `COMPLETED`
-state on-chain. Use it to reconcile your ledger, unlock downstream workflows, or
-notify your end customer.
+# `PAYOUT_SUCCESSFUL`
 
-#### Event Type
+Delivered when a payout reaches `COMPLETED` — the transfer is confirmed
+on-chain. Use it to reconcile your ledger, release downstream workflows, or
+notify your customer.
 
-```
-PAYOUT_SUCCESSFUL
-```
+<Meta>
+  <Chip label="Envelope" value="body wrapper" />
+  <Chip label="Keys" value="camelCase" />
+</Meta>
 
-#### Delivery
+Delivered to your business webhook URL.
 
-- **URL:** The webhook URL configured under Business → Developer → Webhooks.
-- **Method:** `POST`
-- **Headers:**
-  - `Content-Type: application/json`
-  - `X-Signature: <HMAC SHA-256>` (generated from the raw JSON body using your
-    business webhook secret)
+<Callout type="info">
+  This event fires **only** for completed payouts. There is no webhook for
+  `PENDING`, `PROCESSING`, or `FAILED` — to detect a failure, read the payout
+  back with
+  [Retrieve a payout](/payouts/get-single-payout) or
+  [Get payout status](/payouts/get-payout-status).
+</Callout>
 
-#### Sample Payload
+## Payload
 
-```json copy
+```json filename="PAYOUT_SUCCESSFUL"
 {
-  "eventType": "PAYOUT_SUCCESSFUL",
-  "payout": {
-    "id": "8e5697e3-8265-455b-984a-0eb40e10b0f9",
-    "businessId": "b7b93a40-4e18-4e97-9c5f-8a7a4fd0df92",
-    "token": "USDT",
-    "network": "MATIC_MAINNET",
-    "amount": "100.25",
-    "merchantReference": "INV-2045",
-    "toAddress": "0x56adfcc254ab3b8142a275c1837bcffaff5aa38b",
-    "transactionHash": "0xb0b1...f2",
-    "status": "COMPLETED",
-    "createdAt": "2024-10-02T11:21:33Z",
-    "updatedAt": "2024-10-02T11:32:01Z"
+  "body": {
+    "eventType": "PAYOUT_SUCCESSFUL",
+    "payout": {
+      "id": "8e5697e3-8265-455b-984a-0eb40e10b0f9",
+      "businessId": "b7b93a40-4e18-4e97-9c5f-8a7a4fd0df92",
+      "network": "MATIC_MAINNET",
+      "token": "USDT",
+      "amount": "100.250000000000000000",
+      "toAddress": "0x56adfcc254ab3b8142a275c1837bcffaff5aa38b",
+      "merchantReference": "INV-2045",
+      "transactionHash": "0xb0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f70819",
+      "status": "COMPLETED",
+      "info": null,
+      "createdAt": "2024-10-02T11:21:33.000000Z",
+      "updatedAt": "2024-10-02T11:32:01.000000Z"
+    }
   }
 }
 ```
 
-All keys are camelCase to match the rest of the API surface.
+<Callout type="warning">
+  Unlike the collection events, this payload uses **camelCase** keys. Do not
+  share a parser between the two without normalising first.
+</Callout>
 
-#### Handling Guidance
+## Handling
 
-1. **Verify authenticity.** Recreate the `X-Signature` using your webhook secret
-   and compare before processing.
-2. **Idempotency.** Make the handler idempotent; Knit retries failed deliveries
-   for up to 12 hours (max three attempts), so you may receive duplicates.
-3. **Reconcile balances.** Use the payload to mark the payout as complete in your
-   system and release any funds you were holding.
-4. **Fetch more details if needed.** Call `GET /api/v1/payouts/{id}` to retrieve
-   the latest record if you need additional metadata.
+<Steps>
 
-If you are not receiving these notifications, double-check the webhook URL,
-secret, and IP restrictions in the dashboard.
+### Verify and acknowledge
+
+Check `X-Signature` against the raw body, then return `2xx` straight away. See
+[Webhooks](/webhooks) for the verification snippet.
+
+### Deduplicate on `merchantReference`
+
+`merchantReference` is the value you supplied when creating the payout, so it
+maps directly to your own ledger entry. Check whether you have already marked
+it complete before doing anything else — this event can arrive more than once.
+
+### Settle
+
+Mark the payout complete, release any funds you were holding, and record
+`transactionHash` for your audit trail.
+
+</Steps>
+
+## Not receiving it?
+
+- Confirm the webhook URL and secret in **Business → Developer → Webhooks**,
+  and that the endpoint is publicly reachable.
+- Check the delivery attempts in the dashboard — a `4xx` from your endpoint is
+  recorded there along with the response body.
+- Confirm the payout actually reached `COMPLETED`; a payout stuck in
+  `PROCESSING` produces no event.
+- Remember the retry window is roughly 36 minutes. Past that, reconcile with
+  [List payouts](/payouts/get-all-payouts).
+
+## See also
+
+- [Create a payout](/payouts/create-a-single-payout)
+- [Webhooks overview](/webhooks) — signature verification and retries

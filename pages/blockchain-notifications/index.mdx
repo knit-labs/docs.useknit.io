@@ -1,0 +1,74 @@
+---
+title: Blockchain notifications
+description: Watch any on-chain address and receive a webhook whenever it sends or receives stablecoin.
+---
+
+# Blockchain notifications
+
+Subscribe to activity on an address and receive a
+[`BLOCKCHAIN_TRANSACTION_DETECTED`](/webhooks/blockchain-transaction-detected)
+webhook whenever it moves stablecoin. The address does not have to be one Knit
+issued — you can watch a treasury address, an exchange deposit address, or a
+customer's self-custodied wallet.
+
+<CardGrid>
+  <Card title="Create a subscription" icon="➕" href="/blockchain-notifications/create-subscription">
+    Start watching an address.
+  </Card>
+  <Card title="List subscriptions" icon="📋" href="/blockchain-notifications/list-subscriptions">
+    See everything you are watching.
+  </Card>
+  <Card title="Update a subscription" icon="✏️" href="/blockchain-notifications/update-subscription">
+    Change networks, tokens, direction, or pause it.
+  </Card>
+  <Card title="Delete a subscription" icon="🗑️" href="/blockchain-notifications/delete-subscription">
+    Stop watching an address.
+  </Card>
+</CardGrid>
+
+## Address types
+
+Every subscription has a `type` that determines which address format is
+accepted and which networks it can watch.
+
+| Type | Address format | Networks |
+| ---- | -------------- | -------- |
+| `EVM` | `0x` followed by 40 hex characters | `ETH_MAINNET`, `MATIC_MAINNET`, `MATIC_AMOY`, `BSC_MAINNET`, `BASE_MAINNET` |
+| `TRON` | `T` followed by 33 base58 characters | `TRON_MAINNET`, `TRON_TESTNET` |
+| `SOLANA` | 32–44 base58 characters | `SOL_MAINNET`, `SOL_DEVNET` |
+
+<Callout type="info">
+  `ETHEREUM_MAINNET` and `SOLANA_MAINNET` are accepted as aliases and stored as
+  `ETH_MAINNET` and `SOL_MAINNET`. Read the network back from the response
+  rather than assuming the value you sent is echoed verbatim.
+</Callout>
+
+If the address format does not match the `type`, or a network does not belong
+to that type, the request fails with `400`.
+
+## Defaults
+
+Omitting `networks` or `tokens` applies a sensible default for the type.
+
+| Type | Default networks | Default tokens |
+| ---- | ---------------- | -------------- |
+| `EVM` | `ETH_MAINNET`, `MATIC_MAINNET`, `BSC_MAINNET`, `BASE_MAINNET` | `USDC`, `USDT` |
+| `TRON` | `TRON_MAINNET` | `USDT` |
+| `SOLANA` | `SOL_MAINNET` | `USDC`, `USDT` |
+
+Supported tokens are `USDC`, `USDT`, and `PYUSD`.
+
+## Delivery
+
+Events go to the subscription's `webhookUrl`. If you omit it, your business's
+configured webhook URL is used instead — and if neither is set, the request
+fails with `400`.
+
+The URL must be publicly reachable over HTTP or HTTPS; private, loopback, and
+internal addresses are rejected. Payloads are signed exactly like every other
+Knit webhook — see [Webhooks](/webhooks) for verification and retries.
+
+<Callout type="warning">
+  A subscription watches an address, not a balance. Knit does not custody these
+  funds and cannot move them — notifications are observational only.
+</Callout>

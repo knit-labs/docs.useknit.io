@@ -1,0 +1,103 @@
+---
+title: Create a subscription
+description: Start watching an on-chain address for stablecoin activity.
+---
+
+# Create a subscription
+
+Starts watching an address. From then on, matching transfers produce a
+[`BLOCKCHAIN_TRANSACTION_DETECTED`](/webhooks/blockchain-transaction-detected)
+webhook.
+
+<Endpoint method="POST" path="/api/v1/blockchain-notifications/subscriptions" />
+
+<Meta>
+  <Scope value="blockchain-notifications:write" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+## Body
+
+<Fields>
+  <Field name="address" type="string" required>
+    The address to watch. Its format must match `type` — see
+    [address types](/blockchain-notifications).
+  </Field>
+  <Field name="type" type="string" required>
+    `EVM`, `TRON`, or `SOLANA`.
+  </Field>
+  <Field name="networks" type="string[]" required={false}>
+    Networks to watch. Every entry must belong to the chosen `type`. Defaults
+    to the full mainnet set for that type.
+  </Field>
+  <Field name="tokens" type="string[]" required={false}>
+    Tokens to watch: `USDC`, `USDT`, or `PYUSD`. Defaults to `USDC` and `USDT`
+    (`USDT` alone for `TRON`).
+  </Field>
+  <Field name="direction" type="string" required={false} defaultValue="BOTH">
+    `INCOMING`, `OUTGOING`, or `BOTH`.
+  </Field>
+  <Field name="webhookUrl" type="string" required={false}>
+    Where to deliver events for this subscription. Must be a publicly reachable
+    `http://` or `https://` URL. Falls back to your business's webhook URL.
+  </Field>
+  <Field name="metadata" type="object" required={false}>
+    Arbitrary JSON of your own. It is stored with the subscription and echoed
+    back on every event — useful for carrying your customer ID.
+  </Field>
+</Fields>
+
+## Request
+
+```bash filename="cURL"
+curl -X POST "https://api-prod.useknit.io/api/v1/blockchain-notifications/subscriptions" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+    "type": "EVM",
+    "networks": ["MATIC_MAINNET", "BASE_MAINNET"],
+    "tokens": ["USDC", "USDT"],
+    "direction": "INCOMING",
+    "webhookUrl": "https://example.com/webhooks/knit",
+    "metadata": { "customerId": "cus_8121" }
+  }'
+```
+
+## Response
+
+```json filename="201 Created"
+{
+  "statusCode": 201,
+  "message": "Address notification subscription created",
+  "data": {
+    "id": "3f6f9d1a-64b2-4c7f-9a1e-7a2f0c8c7e11",
+    "businessId": "b7b93a40-4e18-4e97-9c5f-8a7a4fd0df92",
+    "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+    "type": "EVM",
+    "networks": ["MATIC_MAINNET", "BASE_MAINNET"],
+    "tokens": ["USDC", "USDT"],
+    "direction": "INCOMING",
+    "webhookUrl": "https://example.com/webhooks/knit",
+    "metadata": { "customerId": "cus_8121" },
+    "isActive": true,
+    "createdAt": "2024-10-02T11:21:33.000000Z",
+    "updatedAt": "2024-10-02T11:21:33.000000Z"
+  },
+  "success": true
+}
+```
+
+<Callout type="info">
+  Keep the returned `id`. It arrives on every event as `subscriptionId`, which
+  is how you route an incoming notification back to the thing you were
+  watching for.
+</Callout>
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `400` | `address` or `type` is missing, `type` is not one of the three values, or a network or token is unsupported — carries an `errors` object |
+| `400` | The address format does not match `type`, a network does not belong to `type`, or no webhook URL is available and none is configured on your business |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `blockchain-notifications:write` |

@@ -1,0 +1,177 @@
+---
+title: Webhooks
+description: Receive signed notifications when collections, payouts, and watched addresses change state.
+---
+
+# Webhooks
+
+Knit delivers a signed `POST` to your endpoint whenever something you care
+about changes state. Webhooks are the intended way to track collections and
+payouts — polling is a fallback for reconciliation, not a primary integration.
+
+## Configure your endpoint
+
+Set your webhook URL and secret in the dashboard under **Business → Developer →
+Webhooks**. There is no public API for changing them.
+
+Your endpoint must be:
+
+- **Publicly reachable** over `http://` or `https://`. Private, loopback, and
+  internal addresses are rejected.
+- **Fast.** Deliveries time out after 10 seconds. Verify the signature,
+  enqueue the work, and return `2xx` immediately.
+- **Idempotent.** The same event can arrive more than once.
+
+<Callout type="info">
+  [Collections](/collections/create-a-collection) and
+  [blockchain notification subscriptions](/blockchain-notifications) can each
+  carry their own `merchantCallbackUrl` / `webhookUrl`, which takes precedence
+  over the business-level URL for that resource's events. Everything else goes
+  to the business-level URL.
+</Callout>
+
+## Verifying the signature
+
+Every delivery carries an `X-Signature` header: the **HMAC-SHA256 of the raw
+request body**, keyed with your webhook secret, hex-encoded.
+
+| Header | Value |
+| ------ | ----- |
+| `Content-Type` | `application/json` |
+| `Accept` | `application/json` |
+| `X-Signature` | Hex-encoded HMAC-SHA256 of the raw body |
+
+```js filename="Node.js"
+import crypto from "node:crypto";
+
+// `rawBody` must be the unparsed body. Re-serialising the parsed JSON will
+// produce a different byte sequence and the signature will not match.
+function verify(rawBody, signatureHeader, secret) {
+  const expected = crypto
+    .createHmac("sha256", secret)
+    .update(rawBody)
+    .digest("hex");
+
+  const a = Buffer.from(expected, "utf8");
+  const b = Buffer.from(signatureHeader ?? "", "utf8");
+
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+```
+
+```python filename="Python"
+import hashlib
+import hmac
+
+def verify(raw_body: bytes, signature_header: str, secret: str) -> bool:
+    expected = hmac.new(
+        secret.encode(), raw_body, hashlib.sha256
+    ).hexdigest()
+    return hmac.compare_digest(expected, signature_header or "")
+```
+
+<Callout type="warning">
+  Capture the raw body before any JSON middleware parses it. Signing a
+  re-serialised object is the single most common cause of "the signature never
+  matches".
+</Callout>
+
+Always compare with a constant-time function, and reject the request if the
+header is missing.
+
+## Retries
+
+A delivery counts as failed if your endpoint returns a non-2xx status, times
+out, or is unreachable. Knit then retries up to **3 times** with a fixed
+backoff:
+
+| Attempt | Sent |
+| ------- | ---- |
+| Initial | Immediately |
+| Retry 1 | 1 minute after the failure |
+| Retry 2 | 5 minutes after that |
+| Retry 3 | 30 minutes after that |
+
+After the third retry, delivery stops. The attempt history — status code,
+response body, and failure reason — is visible in the dashboard, where you can
+also trigger a manual resend.
+
+<Callout type="warning">
+  The full automatic retry window is roughly **36 minutes**, not hours. If your
+  endpoint is down longer than that, reconcile by reading the affected
+  resources back from the API rather than waiting for a redelivery.
+</Callout>
+
+Near-identical events for the same business within a five-minute window are
+collapsed into a single delivery, so a duplicated upstream signal does not
+become two webhooks. That is a safety net, not a guarantee — keep your handler
+idempotent.
+
+## Payload shape
+
+Every payload carries an `eventType`. Two things vary by event, so check the
+table before you write your parser:
+
+- **Envelope.** Most events are wrapped in a top-level `body` object. Two are
+  not.
+- **Key casing.** Some payloads use snake_case, others camelCase.
+
+| Event | Envelope | Key casing |
+| ----- | -------- | ---------- |
+| [`COLLECTION_CREATED`](/webhooks/collection-created) | `body` wrapper | snake_case |
+| [`COLLECTION_CONFIRMED`](/webhooks/collection-confirmed) | `body` wrapper | snake_case |
+| [`COLLECTION_SUCCESSFUL`](/webhooks/collection-successful) | `body` wrapper | snake_case |
+| [`COLLECTION_FAILED`](/webhooks/collection-failed) | `body` wrapper | snake_case |
+| [`PAYOUT_SUCCESSFUL`](/webhooks/payout-successful) | `body` wrapper | camelCase |
+| [`WALLET_FUNDING_SUCCESSFUL`](/webhooks/wallet-funding-successful) | top level | snake_case |
+| [`BLOCKCHAIN_TRANSACTION_DETECTED`](/webhooks/blockchain-transaction-detected) | top level | camelCase |
+
+<Callout type="warning">
+  Webhook payloads do **not** follow the camelCase convention that API
+  responses do — the transformation applied to API responses is not applied to
+  outbound webhooks. Read each event's page for its exact keys rather than
+  assuming they match the equivalent `GET` response.
+</Callout>
+
+A dispatcher that handles both shapes:
+
+```js filename="Handling both envelopes"
+app.post("/webhooks/knit", (req, res) => {
+  if (!verify(req.rawBody, req.get("X-Signature"), process.env.KNIT_WEBHOOK_SECRET)) {
+    return res.sendStatus(401);
+  }
+
+  // Acknowledge first — the delivery times out after 10 seconds.
+  res.sendStatus(200);
+
+  const payload = req.body.body ?? req.body;
+  enqueue(payload.eventType, payload);
+});
+```
+
+## Events
+
+<CardGrid>
+  <Card title="Collection created" href="/webhooks/collection-created">
+    `COLLECTION_CREATED` — a collection was created and its address issued.
+  </Card>
+  <Card title="Collection confirmed" href="/webhooks/collection-confirmed">
+    `COLLECTION_CONFIRMED` — the deposit reached your confirmation threshold.
+  </Card>
+  <Card title="Collection successful" href="/webhooks/collection-successful">
+    `COLLECTION_SUCCESSFUL` — funds were credited to your API account.
+  </Card>
+  <Card title="Collection failed" href="/webhooks/collection-failed">
+    `COLLECTION_FAILED` — the collection could not be completed.
+  </Card>
+  <Card title="Payout successful" href="/webhooks/payout-successful">
+    `PAYOUT_SUCCESSFUL` — a payout settled on-chain.
+  </Card>
+  <Card title="Wallet funding successful" href="/webhooks/wallet-funding-successful">
+    `WALLET_FUNDING_SUCCESSFUL` — an API wallet received a deposit.
+  </Card>
+  <Card title="Transaction detected" href="/webhooks/blockchain-transaction-detected">
+    `BLOCKCHAIN_TRANSACTION_DETECTED` — a watched address sent or received
+    stablecoin.
+  </Card>
+</CardGrid>

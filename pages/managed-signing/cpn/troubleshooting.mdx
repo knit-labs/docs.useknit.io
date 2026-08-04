@@ -1,12 +1,15 @@
-### Knit API Documentation
+---
+title: CPN Troubleshooting
+description: Common issues and solutions when integrating CPN with Knit's Managed Signing API.
+---
 
-#### CPN Troubleshooting
+# CPN Troubleshooting
 
 Common issues and solutions when integrating CPN with Knit's Managed Signing API.
 
 ---
 
-##### "Failed to sign transaction" from Managed Signing
+## "Failed to sign transaction" from Managed Signing
 
 **Cause**: Transaction is missing required fields (fees, gas, or nonce).
 
@@ -18,7 +21,7 @@ Common issues and solutions when integrating CPN with Knit's Managed Signing API
 
 ---
 
-##### "POLICY_DENIED" Error
+## "POLICY_DENIED" Error
 
 **Cause**: The signing request violates your policy rules.
 
@@ -34,7 +37,7 @@ Common issues and solutions when integrating CPN with Knit's Managed Signing API
 
 ---
 
-##### "Invalid typed data" Error
+## "Invalid typed data" Error
 
 **Cause**: The EIP-712 typed data format is incorrect.
 
@@ -45,7 +48,7 @@ Common issues and solutions when integrating CPN with Knit's Managed Signing API
 
 ---
 
-##### Permit2 Approval Transaction Fails
+## Permit2 Approval Transaction Fails
 
 **Cause**: Insufficient gas or incorrect parameters.
 
@@ -57,7 +60,7 @@ Common issues and solutions when integrating CPN with Knit's Managed Signing API
 
 ---
 
-##### Signature Rejected by Circle
+## Signature Rejected by Circle
 
 **Cause**: Signature doesn't match expected format or data.
 
@@ -69,7 +72,7 @@ Common issues and solutions when integrating CPN with Knit's Managed Signing API
 
 ---
 
-##### Request Body Validation Errors
+## Request Body Validation Errors
 
 **Cause**: Invalid JSON or missing required fields.
 
@@ -81,7 +84,7 @@ Common issues and solutions when integrating CPN with Knit's Managed Signing API
 
 ---
 
-##### Network Mismatch
+## Network Mismatch
 
 **Cause**: Using wrong network identifier.
 
@@ -98,7 +101,7 @@ Do **not** use `ETH_MAINNET` - use `ETHEREUM_MAINNET` instead.
 
 ---
 
-##### Auto-Fill Not Working
+## Auto-Fill Not Working
 
 **Cause**: RPC not configured for the target network.
 
@@ -109,7 +112,7 @@ Do **not** use `ETH_MAINNET` - use `ETHEREUM_MAINNET` instead.
 
 ---
 
-##### Common Contract Addresses
+## Common Contract Addresses
 
 Contact Circle for the official addresses for your integration. These are for reference only:
 
@@ -122,7 +125,7 @@ Contact Circle for the official addresses for your integration. These are for re
 
 ---
 
-##### Getting Help
+## Getting Help
 
 If you continue to experience issues:
 

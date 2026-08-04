@@ -1,42 +1,56 @@
-### Knit API Documentation
+---
+title: Delete a wallet
+description: Retire an API wallet so its address is no longer handed out.
+---
 
-#### Delete Single Wallet
+# Delete a wallet
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#f9f5f6",
-      color: "#fc697a",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    DELETE
-  </span>
-</div>
+Removes an API wallet from your business.
 
-```js copy
-{{baseUrl}}/api/v1/wallets/:id
+<Endpoint method="DELETE" path="/api/v1/wallets/{id}" />
+
+<Meta>
+  <Scope value="wallets:write" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+<Callout type="warning">
+  Deleting a wallet does not close anything on-chain, and it does not reverse
+  funds already credited. Stop handing the address out to customers before you
+  delete it — deposits sent to a deleted wallet's address may not be
+  attributable.
+</Callout>
+
+## Path parameters
+
+<Fields>
+  <Field name="id" type="string" required>
+    The wallet's `id`.
+  </Field>
+</Fields>
+
+## Request
+
+```bash filename="cURL"
+curl -X DELETE "https://api-prod.useknit.io/api/v1/wallets/d95143d2-c076-49da-b121-b3beed054bf3" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json"
 ```
 
-##### Headers
+## Response
 
-- X-API-KEY: Your API key, which authorizes the request.
-- Accept: Set to application/json to receive the response in JSON format.
-
-##### Path Variables
-
-- id: The unique identifier of the wallet you wish to retrieve information for. This should be replaced with the actual wallet ID in your request.
-
-##### Sample Request
-
-```sh copy filename="Sample Request"
-curl --location -g --request DELETE '{{baseUrl}}/api/v1/wallets/bf81f144-efca-422a-aed7-bf7bf52da26b' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json'
+```json filename="200 OK"
+{
+  "statusCode": 200,
+  "message": "Wallet deleted successfully",
+  "data": null,
+  "success": true
+}
 ```
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `wallets:write` |
+| `404` | No wallet with that ID belongs to your business |

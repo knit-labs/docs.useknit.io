@@ -1,77 +1,58 @@
-### Knit API Documentation
+---
+title: List wallets
+description: Fetch every API wallet belonging to your business.
+---
 
-#### Overview
+# List wallets
 
-Knit API provides a straightforward way for applications to interact with users' digital currency wallets. This section of the API focuses on retrieving a comprehensive list of all wallets associated with a user, making it easier to manage and access various cryptocurrency assets.
+Returns all API wallets your business has created, across every network.
 
-#### Get All Wallets
+<Endpoint method="GET" path="/api/v1/wallets" />
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#ebfbfa",
-      color: "#194d53",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    GET
-  </span>
-</div>
+<Meta>
+  <Scope value="wallets:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
 
-```js copy
-{{baseUrl}}/api/v1/wallets
+## Request
+
+```bash filename="cURL"
+curl "https://api-prod.useknit.io/api/v1/wallets" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json"
 ```
 
-This endpoint fetches a list of all wallets created by the user, across all supported blockchain networks. It's an essential tool for applications that need to display or manage users' cryptocurrency portfolios.
+## Response
 
-##### Headers
-
-- Authentication: Send `Authorization: Bearer <token>` (recommended) or the
-  legacy `X-API-KEY: {{apiKey}}` header.
-- Accept: Set to application/json to ensure the response is in JSON format.
-
-##### Sample Request
-
-To retrieve all wallets, use the following curl command:
-
-```sh copy
-curl --location -g '{{baseUrl}}/api/v1/wallets' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json'
-```
-
-##### Sample Response
-
-The response includes an array of wallet objects. Each object contains detailed information about the wallet, including its ID, associated user ID, network, address, and activation status:
-
-```json copy filename="Sample Response"
+```json filename="200 OK"
 {
-  "success": true,
+  "statusCode": 200,
   "message": "Wallets fetched successfully",
-  "status": 200,
   "data": [
     {
       "id": "d95143d2-c076-49da-b121-b3beed054bf3",
-      "userId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
-      "network": "ETHEREUM_MAINNET",
-      "networkId": "ETHEREUM_MAINNET",
+      "businessId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
+      "network": "MATIC_MAINNET",
+      "networkId": "MATIC_MAINNET",
+      "networks": ["MATIC_MAINNET"],
       "address": "0x1adb0a39bde00fa0957e519584cb5c51fefcb37f",
       "isActive": true,
       "createdAt": "2024-02-26T13:59:19.000000Z",
       "updatedAt": "2024-02-26T13:59:19.000000Z"
     }
-  ]
+  ],
+  "success": true
 }
 ```
 
-#### Description
+<Callout type="info">
+  This endpoint returns every wallet in one response. Cache the mapping between
+  your customers and wallet IDs on your side rather than calling this on each
+  request.
+</Callout>
 
-The "Get All Wallets" API endpoint is a critical component for applications requiring a holistic view of a user's digital currency portfolio. By calling this endpoint, developers can retrieve a list of all wallets a user has created, enabling comprehensive management and oversight of various cryptocurrency assets. This functionality is crucial for applications that provide financial insights, asset management, or transactional capabilities across multiple blockchain networks.
+## Errors
 
-The returned data includes essential wallet details such as the unique identifier, user association, network specifics, and the wallet's current status, ensuring applications have the necessary information to support user interactions effectively. Utilizing this API, developers can enhance their applications' user experience by providing detailed and up-to-date information on their cryptocurrency holdings.
+| Status | Cause |
+| ------ | ----- |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `wallets:read` |

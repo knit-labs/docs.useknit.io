@@ -1,53 +1,36 @@
-### Knit API Documentation
+---
+title: Get Policy
+description: This endpoint retrieves a specific policy by its local ID.
+---
 
-#### Get Policy
+# Get Policy
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#ebfbfa",
-      color: "#194d53",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    GET
-  </span>
-</div>
+<Endpoint method="GET" path="/api/v1/managed-signing/policies/{policyId}" />
 
-```js copy
-{{baseUrl}}/api/v1/managed-signing/policies/{policyId}
-```
+<Meta>
+  <Scope value="managed-signing:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
 
 This endpoint retrieves a specific policy by its local ID.
 
-##### Headers
-
-- `X-API-KEY`: Your API key for authentication.
-- `Accept`: Set to `application/json` to receive responses in JSON format.
-
-##### Path Parameters
+## Path Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `policyId` | string | Yes | The local policy ID |
 
-##### Sample Request
+## Request
 
-```sh copy
-curl --location -g '{{baseUrl}}/api/v1/managed-signing/policies/<local-policy-id>' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json'
+```bash
+curl "https://api-prod.useknit.io/api/v1/managed-signing/policies/<local-policy-id>" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json"
 ```
 
-##### Sample Response
+## Response
 
-```json copy filename="Sample Response"
+```json filename="Response"
 {
   "statusCode": 200,
   "message": "Policy retrieved",
@@ -67,7 +50,7 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/policies/<local-policy-id
 }
 ```
 
-##### Response Fields
+## Response Fields
 
 | Field | Type | Description |
 |-------|------|-------------|

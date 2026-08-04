@@ -1,0 +1,8 @@
+{
+  "index": "Overview",
+  "create-subscription": "Create a Subscription",
+  "list-subscriptions": "List Subscriptions",
+  "get-subscription": "Retrieve a Subscription",
+  "update-subscription": "Update a Subscription",
+  "delete-subscription": "Delete a Subscription"
+}

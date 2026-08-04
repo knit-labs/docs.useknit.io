@@ -1,37 +1,66 @@
-### Knit API Documentation
+---
+title: COLLECTION_CONFIRMED
+description: Delivered once a collection's deposit reaches the confirmation threshold you set.
+---
 
-#### Collection Confirmed
+# `COLLECTION_CONFIRMED`
 
-##### Sample Response
+Delivered when the deposit reaches the `confirmationThreshold` you set when
+[creating the collection](/collections/create-a-collection).
 
-This happens when the merchant-defined confirmationThreshold, established during the creation of the collection, is attained.
+<Meta>
+  <Chip label="Envelope" value="body wrapper" />
+  <Chip label="Keys" value="snake_case" />
+</Meta>
 
-```json copy filename="Sample Response"
+Delivered to the collection's `merchantCallbackUrl`, falling back to your
+business webhook URL.
+
+## Payload
+
+```json filename="COLLECTION_CONFIRMED"
 {
   "body": {
     "eventType": "COLLECTION_CONFIRMED",
     "collection": {
       "id": "4ebdfe45-a62b-47a9-ac31-7599305666b1",
-      "userId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
+      "business_id": "b7b93a40-4e18-4e97-9c5f-8a7a4fd0df92",
       "network": "MATIC_MAINNET",
       "token": "USDT",
       "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
-      "tokenAmount": "25.000000000000000000",
-      "tokenToUsd": null,
-      "fiatExchangeRateToUsd": null,
-      "fiatAmountInUsd": null,
-      "fiatAmount": null,
-      "fiatAmountCurrency": null,
+      "token_amount": "25.000000000000000000",
+      "token_amount_requested": "25.000000000000000000",
+      "token_amount_received": "25.000000000000000000",
+      "token_to_usd": "1.00000000",
       "status": "SUCCESSFUL",
-      "transactionHash": "b480ed44a275f042e482a78d9c5b54fcf612441c",
-      "transactionBlockNumber": null,
-      "numberOfConfirmations": null,
-      "merchantRedirectUrl": "https://example.com",
-      "merchantCallbackUrl": "https://example.com",
-      "expiresAt": "2024-02-22T17:29:33.000000Z",
-      "createdAt": "2024-02-22T16:59:33.000000Z",
-      "updatedAt": "2024-02-22T17:00:30.000000Z"
+      "transaction_hash": "0xb480ed44a275f042e482a78d9c5b54fcf612441c",
+      "transaction_block_number": 61234567,
+      "number_of_confirmations": 10,
+      "confirmation_threshold": 10,
+      "merchant_redirect_url": "https://example.com/thanks",
+      "merchant_callback_url": "https://example.com/webhooks/knit",
+      "expires_at": "2024-02-22T17:29:33.000000Z",
+      "created_at": "2024-02-22T16:59:33.000000Z",
+      "updated_at": "2024-02-22T17:00:30.000000Z"
     }
   }
 }
 ```
+
+<Callout type="info">
+  Confirmation and crediting are separate steps. This event says the chain has
+  confirmed the deposit to your satisfaction;
+  [`COLLECTION_SUCCESSFUL`](/webhooks/collection-successful) says the funds have
+  landed in your API account.
+</Callout>
+
+## Handling
+
+Compare `token_amount_received` against `token_amount_requested` before
+treating the payment as settled in full — an underpayment confirms just like a
+full payment does.
+
+## See also
+
+- [`COLLECTION_SUCCESSFUL`](/webhooks/collection-successful)
+- [Webhooks overview](/webhooks) — signature verification and retries

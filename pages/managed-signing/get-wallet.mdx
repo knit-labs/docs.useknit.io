@@ -1,53 +1,36 @@
-### Knit API Documentation
+---
+title: Get Managed Signing Wallet
+description: This endpoint retrieves a specific managed signing wallet by its local ID.
+---
 
-#### Get Managed Signing Wallet
+# Get Managed Signing Wallet
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#ebfbfa",
-      color: "#194d53",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    GET
-  </span>
-</div>
+<Endpoint method="GET" path="/api/v1/managed-signing/wallets/{walletId}" />
 
-```js copy
-{{baseUrl}}/api/v1/managed-signing/wallets/{walletId}
-```
+<Meta>
+  <Scope value="managed-signing:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
 
 This endpoint retrieves a specific managed signing wallet by its local ID.
 
-##### Headers
-
-- `X-API-KEY`: Your API key for authentication.
-- `Accept`: Set to `application/json` to receive responses in JSON format.
-
-##### Path Parameters
+## Path Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `walletId` | string | Yes | The local wallet ID returned by create/list endpoints |
 
-##### Sample Request
+## Request
 
-```sh copy
-curl --location -g '{{baseUrl}}/api/v1/managed-signing/wallets/<local-wallet-id>' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json'
+```bash
+curl "https://api-prod.useknit.io/api/v1/managed-signing/wallets/<local-wallet-id>" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json"
 ```
 
-##### Sample Response
+## Response
 
-```json copy filename="Sample Response"
+```json filename="Response"
 {
   "statusCode": 200,
   "message": "Wallet retrieved",
@@ -69,7 +52,7 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/wallets/<local-wallet-id>
 }
 ```
 
-##### Response Fields
+## Response Fields
 
 | Field | Type | Description |
 |-------|------|-------------|

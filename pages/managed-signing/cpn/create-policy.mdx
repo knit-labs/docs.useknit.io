@@ -1,40 +1,22 @@
-### Knit API Documentation
+---
+title: "Step 2: Create CPN Policy"
+description: Create a policy that allows CPN V2 signature flows while restricting signing to only approved tokens and contracts.
+---
 
-#### Step 2: Create CPN Policy
+# Step 2: Create CPN Policy
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#fff9eb",
-      color: "#d0a626",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    POST
-  </span>
-</div>
+<Endpoint method="POST" path="/api/v1/managed-signing/policies" />
 
-```js copy
-{{baseUrl}}/api/v1/managed-signing/policies
-```
+<Meta>
+  <Scope value="managed-signing:write" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
 
 Create a policy that allows CPN V2 signature flows while restricting signing to only approved tokens and contracts.
 
-##### Headers
+## Body
 
-- `X-API-KEY`: Your API key for authentication.
-- `Accept`: Set to `application/json` to receive responses in JSON format.
-- `Content-Type`: Set to `application/json`.
-
-##### Request Body
-
-```json copy
+```json
 {
   "name": "cpn-v2",
   "rules": {
@@ -48,7 +30,7 @@ Create a policy that allows CPN V2 signature flows while restricting signing to 
 }
 ```
 
-##### Policy Rules Explained
+## Policy Rules Explained
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -59,20 +41,20 @@ Create a policy that allows CPN V2 signature flows while restricting signing to 
 | `denyUnlimitedApprovals` | boolean | Set to `false` to allow standard Permit2 approvals |
 | `allowRawTx` | boolean | Set to `false` unless you need CPN V1 |
 
-##### Security Recommendations
+## Security Recommendations
 
 - **Restrict `tokens`**: Only include USDC addresses you intend to use
 - **Restrict `spenders`**: Only include the official Permit2 contract address
 - **Keep `allowRawTx: false`**: Only enable for CPN V1 legacy support
 
-##### Sample Request
+## Request
 
-```sh copy
-curl --location -g '{{baseUrl}}/api/v1/managed-signing/policies' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json' \
---header 'Content-Type: application/json' \
---data '{
+```bash
+curl "https://api-prod.useknit.io/api/v1/managed-signing/policies" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
     "name": "cpn-v2",
     "rules": {
         "chains": ["MATIC_MAINNET"],
@@ -85,9 +67,9 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/policies' \
 }'
 ```
 
-##### Sample Response
+## Response
 
-```json copy filename="Sample Response"
+```json filename="Response"
 {
   "statusCode": 201,
   "message": "Policy created",
@@ -110,6 +92,6 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/policies' \
 }
 ```
 
-##### Next Step
+## Next Step
 
 Proceed to [Permit2 Approval](/managed-signing/cpn/permit2-approval) to set up the one-time on-chain approval.

@@ -1,53 +1,36 @@
-### Knit API Documentation
+---
+title: Get Signing Request
+description: This endpoint retrieves a specific signing request by its local ID.
+---
 
-#### Get Signing Request
+# Get Signing Request
 
-<div style={{ display: "flex", alignItems: "center" }}>
-  ##### Endpoint
-  <span
-    style={{
-      display: "block",
-      backgroundColor: "#ebfbfa",
-      color: "#194d53",
-      marginLeft: "-17px",
-      padding: "0px 6px",
-      fontSize: ".8rem",
-      borderRadius: "5px",
-      marginTop: "30px",
-    }}
-  >
-    GET
-  </span>
-</div>
+<Endpoint method="GET" path="/api/v1/managed-signing/requests/{requestId}" />
 
-```js copy
-{{baseUrl}}/api/v1/managed-signing/requests/{requestId}
-```
+<Meta>
+  <Scope value="managed-signing:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
 
 This endpoint retrieves a specific signing request by its local ID.
 
-##### Headers
-
-- `X-API-KEY`: Your API key for authentication.
-- `Accept`: Set to `application/json` to receive responses in JSON format.
-
-##### Path Parameters
+## Path Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `requestId` | string | Yes | The local request ID |
 
-##### Sample Request
+## Request
 
-```sh copy
-curl --location -g '{{baseUrl}}/api/v1/managed-signing/requests/<local-request-id>' \
---header 'X-API-KEY: {{apiKey}}' \
---header 'Accept: application/json'
+```bash
+curl "https://api-prod.useknit.io/api/v1/managed-signing/requests/<local-request-id>" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json"
 ```
 
-##### Sample Response
+## Response
 
-```json copy filename="Sample Response"
+```json filename="Response"
 {
   "statusCode": 200,
   "message": "Signing request retrieved",
@@ -73,7 +56,7 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/requests/<local-request-i
 }
 ```
 
-##### Response Fields
+## Response Fields
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -90,7 +73,7 @@ curl --location -g '{{baseUrl}}/api/v1/managed-signing/requests/<local-request-i
 | `createdAt` | string | Creation timestamp |
 | `updatedAt` | string | Last update timestamp |
 
-##### Request Statuses
+## Request Statuses
 
 | Status | Description |
 |--------|-------------|

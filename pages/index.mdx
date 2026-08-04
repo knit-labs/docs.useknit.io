@@ -1,50 +1,142 @@
-### Knit API Overview
+---
+title: Introduction
+description: Knit is a stablecoin payments API for collecting, holding, and disbursing funds on-chain.
+---
 
-Knit provides a unified API for managing on-chain treasury tooling—collecting
-payments, provisioning reusable wallets, distributing payouts, and keeping web2
-systems in sync through reliable webhooks. Every endpoint lives under
-`{{baseUrl}}/api/v1` and is guarded by the same dual-authentication middleware,
-so you can start with legacy API keys and migrate to OAuth 2.0 client
-credentials when you are ready.
+<Hero
+  eyebrow="Knit API"
+  title="Stablecoin payments infrastructure"
+  subtitle="Collect payments to single-use addresses, hold balances in reusable wallets, disburse payouts on-chain, and keep your systems in sync with signed webhooks — through one JSON API."
+/>
 
-#### Platform Pillars
+<CardGrid>
+  <Card title="Quickstart" icon="🚀" href="/quickstart">
+    Go from credentials to your first collection and payout in a few requests.
+  </Card>
+  <Card title="Authentication" icon="🔐" href="/authentication">
+    OAuth 2.0 client credentials, scopes, and IP allow-listing.
+  </Card>
+  <Card title="How money moves" icon="🧭" href="/architecture">
+    Where balances live and which calls credit or debit them.
+  </Card>
+  <Card title="Webhooks" icon="📡" href="/webhooks">
+    Event payloads, signature verification, and retry behaviour.
+  </Card>
+</CardGrid>
 
-- **Collections:** one-time deposit addresses for invoice-like flows. Each
-  request creates a single-use address and forwards status events via webhooks.
-- **API Wallets:** reusable, labelled wallets (per chain) for recurring deposits
-  or customer-specific ledgers. Wallet transactions are queryable with filters
-  for status, token, range, and pagination.
-- **Business API Services Wallet (API Account):** holds funds that power payout
-  requests. Transfer crypto from the core business wallet into this account
-  before initiating disbursements.
-- **Payouts:** programmatic, on-chain withdrawals. Knit validates balances,
-  enforces IP whitelists, and pushes final statuses via `PAYOUT_SUCCESSFUL`
-  events.
-- **Webhooks & Dashboards:** every critical state change is persisted and can be
-  replayed; business stakeholders can also review activity via dashboard APIs.
+## What you can build
 
-#### Quick Start
+<Fields>
+  <Field name="Collections" type="single-use deposit addresses">
+    Create a one-time address and hosted payment link for an invoice or
+    checkout. Confirmed proceeds are credited to your API account
+    automatically. See [Collections](/collections/create-a-collection).
+  </Field>
+  <Field name="API wallets" type="reusable addresses">
+    Long-lived addresses per network — useful for per-customer ledgers or
+    recurring deposits. Deposits are recorded as wallet transactions. See
+    [Wallets](/wallets/create-a-wallet).
+  </Field>
+  <Field name="API account" type="spendable balance">
+    A per-token balance that funds programmatic payouts. Collections and wallet
+    deposits credit it; payouts debit it. See
+    [API Account](/API-account/create-an-API-account).
+  </Field>
+  <Field name="Payouts" type="on-chain disbursements">
+    Send USDT or USDC to an external address. Knit checks the balance, holds
+    it, and reports the final state over webhooks. See
+    [Payouts](/payouts/create-a-single-payout).
+  </Field>
+  <Field name="Blockchain notifications" type="address watching">
+    Subscribe to incoming or outgoing activity on any address you care about,
+    including addresses Knit does not hold. See
+    [Blockchain Notifications](/blockchain-notifications).
+  </Field>
+  <Field name="Managed signing" type="policy-governed signing">
+    Create signing wallets, define spending policies, and submit transactions,
+    typed data, or messages for signature. See
+    [Managed Signing](/managed-signing).
+  </Field>
+</Fields>
 
-1. **Create or onboard a business** in the Knit dashboard.
-2. **Configure authentication** — generate an API key or create an OAuth client
-   (see the [Authentication](/authentication) page).
-3. **Whitelist your server IPs** in the dashboard so authenticated requests are
-   allowed through to the API.
-4. **Set the webhook URL + secret** under Business → Developer → Webhooks to
-   receive collection/payout events.
-5. **Call the service endpoints** documented in the navigation (Collections,
-   Wallets, Payouts, Webhooks, Networks, etc.).
+## Conventions
 
-#### Request/Response Conventions
+Every endpoint in this reference lives under `/api/v1` and follows the same
+rules.
 
-- JSON only. The request/response examples in this documentation match exactly
-  what the API expects and returns.
-- Responses always include the shared envelope (`success`, `statusCode`,
-  `message`, `data`, and optional pagination metadata) so you can rely on a
-  consistent structure across endpoints.
-- Where relevant we show both `X-API-KEY` and `Authorization: Bearer` header
-  options so you can choose the auth strategy that fits your rollout plan.
+- **Base URLs.** `https://api-prod.useknit.io` for production and
+  `https://api-dev.useknit.io` for pre-production testing.
+- **Authentication.** OAuth 2.0 client credentials. Send
+  `Authorization: Bearer <access-token>` on every request. See
+  [Authentication](/authentication).
+- **JSON only.** Requests and responses are JSON. Send
+  `Content-Type: application/json` on requests with a body.
+- **camelCase.** Send camelCase field names; responses come back camelCase too.
+  See [Requests & responses](/conventions#field-casing) for the two places this
+  does not hold.
+- **Shared envelope.** Every response — success or failure — has the same
+  top-level shape. See [Requests & responses](/conventions).
 
-Need more detail on a particular workflow? Jump straight into the section that
-matches your use case or reach out via the support channel linked from the
-dashboard.
+```json filename="Response envelope"
+{
+  "statusCode": 200,
+  "message": "Collections fetched successfully",
+  "data": {},
+  "success": true
+}
+```
+
+<Callout type="info">
+  Access tokens are scoped. A request that reaches an endpoint without the
+  required scope is rejected with `401` — it is never silently downgraded. The
+  scope each endpoint needs is listed on its page.
+</Callout>
+
+## For AI agents
+
+These docs are published in plain text as well as HTML.
+
+| URL | Contents |
+| --- | -------- |
+| [`/llms.txt`](/llms.txt) | An index of every page, with descriptions |
+| [`/llms-full.txt`](/llms-full.txt) | Every page concatenated into one file |
+| `<any-page>.md` | That page's Markdown source |
+
+Append `.md` to any documentation URL to get the Markdown — for example
+[`/authentication.md`](/authentication.md) or
+[`/payouts/create-a-single-payout.md`](/payouts/create-a-single-payout.md).
+All three are served with permissive CORS, so a browser-based agent can fetch
+them directly.
+
+## Getting set up
+
+<Steps>
+
+### Onboard your business
+
+Create your business in the [Knit dashboard](https://dashboard.useknit.io) and
+complete KYB. Developer credentials become available once your business is
+approved.
+
+### Create an OAuth client
+
+Go to **Business → Developer → OAuth Clients** and create a client with only
+the scopes your integration needs. Copy the client ID and secret — the secret
+is shown once.
+
+### Allow-list your server IPs
+
+Add the outbound IP addresses of your servers in the dashboard. Requests from
+any other address are rejected before they reach the API.
+
+### Configure your webhook endpoint
+
+Set your webhook URL and secret under **Business → Developer → Webhooks**. The
+endpoint must be publicly reachable over HTTP or HTTPS.
+
+### Make your first call
+
+Request an access token and call an endpoint. The
+[Quickstart](/quickstart) walks through a complete collection and payout.
+
+</Steps>
