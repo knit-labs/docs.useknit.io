@@ -16,7 +16,7 @@ const resourceLinks = [
   { label: "Quickstart", href: "/quickstart" },
   { label: "Authentication", href: "/authentication" },
   { label: "Webhooks", href: "/webhooks" },
-  { label: "Errors", href: "/errors" },
+  { label: "Requests & responses", href: "/conventions" },
 ];
 
 const socialLinks = [

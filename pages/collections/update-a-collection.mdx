@@ -91,4 +91,4 @@ curl -X PUT "https://api-prod.useknit.io/api/v1/collections/9cddd3ad-c2a8-463c-a
 | ------ | ----- |
 | `401` | Missing or invalid token, IP not allow-listed, or missing `collections:write` |
 | `404` | No collection with that ID belongs to your business |
-| `422` | A supplied field failed validation |
+| `400` | A supplied field failed validation |

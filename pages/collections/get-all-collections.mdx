@@ -108,4 +108,4 @@ curl -G "https://api-prod.useknit.io/api/v1/collections" \
 | Status | Cause |
 | ------ | ----- |
 | `401` | Missing or invalid token, IP not allow-listed, or missing `collections:read` |
-| `422` | A filter value has the wrong type, for example a non-date `startDate` |
+| `422` | A filter value has the wrong type, for example a non-date `startDate`. Query-parameter failures on this endpoint return the full envelope with `errors` — see [Requests & responses](/conventions#validation-errors) |

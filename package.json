@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "description": "Knit Docs",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "dev": "node scripts/generate-llms.mjs && next dev",
+    "build": "node scripts/generate-llms.mjs && next build",
+    "start": "next start",
+    "llms": "node scripts/generate-llms.mjs"
   },
   "repository": {
     "type": "git",

@@ -1,0 +1,227 @@
+---
+title: Requests & responses
+description: Field casing, the shared response envelope, status codes, validation errors, and pagination.
+---
+
+# Requests & responses
+
+Every Knit endpoint follows the same rules for how you send data and what comes
+back. Read this once and the rest of the reference is mechanical.
+
+## Field casing
+
+**Send camelCase.** It matches what the API returns, so one convention covers
+both directions.
+
+```json filename="Send this"
+{
+  "tokenAmount": 2500,
+  "confirmationThreshold": 10,
+  "merchantCallbackUrl": "https://example.com/webhooks/knit"
+}
+```
+
+Top-level fields are mapped to their internal names before validation, so
+snake_case is also accepted — `token_amount` works exactly like `tokenAmount`.
+Both forms are supported, but pick one and stay consistent; camelCase is the
+form documented on every endpoint page.
+
+<Callout type="warning">
+  There is one exception, and it fails **silently**. The query parameters on
+  [List wallet transactions](/wallets/get-single-wallet-transactions) are
+  snake_case only: `per_page`, `date_from`, `date_to`. Sending `perPage` or
+  `dateFrom` there is not an error — the parameter is simply ignored and you
+  get unfiltered, default-paginated results.
+</Callout>
+
+### Nested objects
+
+The camelCase mapping applies to top-level fields. Nested objects are converted
+only where an endpoint says so:
+
+| Where | Behaviour |
+| ----- | --------- |
+| `rules` on [managed signing policies](/managed-signing/create-policy) | Converted recursively — send camelCase throughout (`maxTransferAmount`, `rateLimits.windowSec`) |
+| `payload` on [signing requests](/managed-signing/create-signing-request) | Converted recursively — send camelCase (`txOverrides`, `typedData`) |
+| `payload.typedData.types` and `payload.typedData.message` | **Passed through untouched.** EIP-712 requires exact key names, so send them exactly as your signing counterparty specified |
+| `metadata` on [notification subscriptions](/blockchain-notifications/create-subscription) | **Stored verbatim.** Your keys come back byte-for-byte on every event |
+
+## Response envelope
+
+Every response — success or failure — shares the same top-level shape.
+
+```json filename="Success"
+{
+  "statusCode": 200,
+  "message": "Collections fetched successfully",
+  "data": [],
+  "success": true
+}
+```
+
+<Fields>
+  <Field name="statusCode" type="integer">
+    Mirrors the HTTP status code.
+  </Field>
+  <Field name="message" type="string">
+    A human-readable summary. Useful in logs; do not branch on its exact text.
+  </Field>
+  <Field name="data" type="object | array | null">
+    The payload. `null` on errors and on endpoints that return nothing.
+  </Field>
+  <Field name="success" type="boolean">
+    `true` only for 2xx responses.
+  </Field>
+  <Field name="pagination" type="object">
+    Present only on paginated endpoints. See [Pagination](#pagination).
+  </Field>
+</Fields>
+
+<Callout type="warning">
+  The status field is named `statusCode`, not `status`. A `status` key appearing
+  inside `data` is a resource's own state — a payout's `PENDING`, say — which is
+  a different thing entirely.
+</Callout>
+
+Response keys are always camelCase, including nested ones. The one place this
+does **not** hold is webhook payloads, which are delivered by a different path —
+see [Webhooks](/webhooks) for the per-event casing.
+
+## Status codes
+
+| Status | When you'll see it |
+| ------ | ------------------ |
+| `200` | The request succeeded |
+| `201` | A resource was created |
+| `400` | **Validation failed**, or the request was well-formed but could not be fulfilled — insufficient balance, an unsupported network, a downstream failure |
+| `401` | Missing, invalid, or expired token; IP not allow-listed; token lacks the required scope |
+| `403` | Authenticated, but the resource belongs to another business |
+| `404` | The resource does not exist, or is not visible to your business |
+| `409` | The resource already exists — for example a second API account for the same token |
+| `422` | Query-parameter validation failed on a list endpoint |
+| `500` | An unexpected error on our side. Retry with backoff; if it persists, contact support |
+
+## Validation errors
+
+Validation failures come back in **two different shapes** depending on whether
+the endpoint validates a request body or query parameters. Branch on the HTTP
+status, and read `errors` — it is present on both.
+
+### Request bodies — `400`
+
+Almost every endpoint. The body is trimmed to `message` and `errors`; the usual
+`statusCode`, `data`, and `success` keys are **not** present.
+
+```json filename="400 — body validation failed"
+{
+  "message": "Callback URL must be a valid URL",
+  "errors": {
+    "merchantCallbackUrl": ["Callback URL must be a valid URL"],
+    "merchantReference": ["The merchant reference has already been taken."]
+  }
+}
+```
+
+<Fields>
+  <Field name="message" type="string">
+    The first error message, for logging.
+  </Field>
+  <Field name="errors" type="object">
+    Field name to array of messages. Keys are **camelCase**, matching what you
+    sent — so you can map them straight back onto your form fields.
+  </Field>
+</Fields>
+
+<Callout type="warning">
+  A duplicate `merchantReference` on
+  [Create a payout](/payouts/create-a-single-payout) surfaces here, as a `400`
+  with an `errors.merchantReference` entry — not as a `409`. That is the
+  response that tells you a retry was correctly rejected as a duplicate.
+</Callout>
+
+### Query parameters — `422`
+
+Only [List collections](/collections/get-all-collections) and
+[List wallet transactions](/wallets/get-single-wallet-transactions). These
+return the full envelope with `errors` alongside it.
+
+```json filename="422 — query validation failed"
+{
+  "statusCode": 422,
+  "message": "The given data was invalid.",
+  "data": null,
+  "errors": {
+    "perPage": ["The per page field must not be greater than 100."]
+  },
+  "success": false
+}
+```
+
+### Handling both
+
+```js filename="One handler for both shapes"
+async function call(path, init) {
+  const res = await fetch(`https://api-prod.useknit.io${path}`, init);
+  const body = await res.json();
+
+  if (res.status === 400 || res.status === 422) {
+    // `errors` is present on both shapes; the envelope is not.
+    throw new ValidationError(body.message, body.errors ?? {});
+  }
+  if (!res.ok) throw new ApiError(body.message, res.status);
+
+  return body.data;
+}
+```
+
+## Pagination
+
+Endpoints that paginate accept `page` and `per_page` and return a `pagination`
+object next to `data`.
+
+<Fields>
+  <Field name="page" type="integer" defaultValue="1">
+    The page to fetch. Minimum `1`.
+  </Field>
+  <Field name="per_page" type="integer" defaultValue="15">
+    Items per page. Minimum `1`, maximum `100`.
+  </Field>
+</Fields>
+
+```json filename="Paginated response"
+{
+  "statusCode": 200,
+  "message": "Wallet transactions fetched successfully",
+  "data": [],
+  "pagination": {
+    "totalItems": 128,
+    "page": 2,
+    "perPage": 25,
+    "currentPage": 2,
+    "lastPage": 6
+  },
+  "success": true
+}
+```
+
+<Callout type="info">
+  Note the asymmetry: you send `per_page`, and the response echoes it back as
+  `perPage`. Request parameters on this endpoint are snake_case; response keys
+  are always camelCase.
+</Callout>
+
+Not every list endpoint paginates. Where `pagination` is absent, the endpoint
+returned the full result set — each endpoint page states which applies.
+
+## Retrying safely
+
+- **Reads** (`GET`) are safe to retry unconditionally.
+- **Payouts** are protected by `merchantReference`, which must be unique.
+  Reuse the same reference when retrying a request whose outcome you are unsure
+  of — a duplicate is rejected with `400` instead of sending twice. Only
+  generate a new reference for a genuinely new payout.
+- **Managed signing requests** accept an `idempotencyKey` in the body; replaying
+  the same key returns the original request rather than creating another.
+- **`5xx` and network timeouts** should be retried with exponential backoff. A
+  timeout does not mean the request was rejected — re-read the resource before
+  assuming it was not created.

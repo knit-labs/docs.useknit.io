@@ -25,11 +25,18 @@ pagination.
 
 ## Query parameters
 
+<Callout type="warning">
+  These parameters are **snake_case**, unlike the camelCase used everywhere
+  else in the API. Sending `perPage`, `dateFrom`, or `dateTo` is not an error —
+  the parameter is silently ignored and you get unfiltered results with the
+  default page size. Spell them exactly as below.
+</Callout>
+
 <Fields>
   <Field name="page" type="integer" required={false} defaultValue="1">
     The page to fetch. Minimum `1`.
   </Field>
-  <Field name="perPage" type="integer" required={false} defaultValue="10">
+  <Field name="per_page" type="integer" required={false} defaultValue="15">
     Items per page. Minimum `1`, maximum `100`.
   </Field>
   <Field name="network" type="string" required={false}>
@@ -41,14 +48,17 @@ pagination.
   <Field name="status" type="string" required={false}>
     Filter to one transaction status, for example `SUCCESSFUL`.
   </Field>
-  <Field name="dateFrom" type="date" required={false}>
+  <Field name="date_from" type="date" required={false}>
     Only transactions on or after this date.
   </Field>
-  <Field name="dateTo" type="date" required={false}>
+  <Field name="date_to" type="date" required={false}>
     Only transactions on or before this date. Must not be earlier than
-    `dateFrom`.
+    `date_from`.
   </Field>
 </Fields>
+
+The response still uses camelCase, so you send `per_page` and read `perPage`
+back out of the `pagination` object.
 
 ## Request
 
@@ -57,7 +67,7 @@ curl -G "https://api-prod.useknit.io/api/v1/wallets/d95143d2-c076-49da-b121-b3be
   -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
   -H "Accept: application/json" \
   --data-urlencode "status=SUCCESSFUL" \
-  --data-urlencode "perPage=25" \
+  --data-urlencode "per_page=25" \
   --data-urlencode "page=1"
 ```
 
@@ -102,4 +112,5 @@ alongside `data`.
 | Status | Cause |
 | ------ | ----- |
 | `401` | Missing or invalid token, IP not allow-listed, or missing `wallets:read` |
-| `422` | `perPage` is above 100, or `dateTo` is earlier than `dateFrom` |
+| `404` | No wallet with that ID belongs to your business |
+| `422` | `per_page` is above 100, or `date_to` is earlier than `date_from`. Query-parameter failures on this endpoint return the full envelope with `errors` — see [Requests & responses](/conventions#validation-errors) |

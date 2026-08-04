@@ -24,7 +24,7 @@ balance, holds the amount, and submits the transfer.
 2. **Your server IP must be allow-listed.** Requests from other addresses are
    rejected before reaching this endpoint.
 3. **The destination address must be valid for the network.** Addresses are
-   checked per chain; a malformed or wrong-chain address fails with `422`.
+   checked per chain; a malformed or wrong-chain address fails with `400`.
 
 ## Supported networks
 
@@ -137,10 +137,24 @@ outage, say — use [Retrieve a payout](/payouts/get-single-payout) or
 
 | Status | Cause |
 | ------ | ----- |
+| `400` | A field failed validation: `amount` below `0.01`, an unsupported `network`, an invalid `toAddress`, or a `merchantReference` you have already used |
 | `400` | Insufficient balance in the API account for that token, or the payout could not be accepted |
 | `401` | Missing or invalid token, IP not allow-listed, or missing `payouts:write` |
 | `404` | `Wallet not found for the specified token` — no API account exists for that token yet |
-| `422` | A field failed validation: `amount` below `0.01`, an unsupported `network`, an invalid `toAddress`, or a `merchantReference` you have already used |
+
+Both cases are `400`, but the bodies differ. A validation failure carries an
+`errors` object naming the offending fields:
+
+```json filename="400 — validation failed"
+{
+  "message": "The merchant reference has already been taken.",
+  "errors": {
+    "merchantReference": ["The merchant reference has already been taken."]
+  }
+}
+```
+
+A rejected-but-valid request carries the standard envelope and no `errors`:
 
 ```json filename="400 — insufficient balance"
 {
@@ -150,3 +164,6 @@ outage, say — use [Retrieve a payout](/payouts/get-single-payout) or
   "success": false
 }
 ```
+
+Branch on the presence of `errors` to tell them apart — see
+[Requests & responses](/conventions#validation-errors).

@@ -60,7 +60,7 @@ Requests must also originate from an IP on your business allow list. See
   camelCase — except inside `payload.typedData`, where `types` and `message`
   must match the EIP-712 schema exactly and are passed through untouched.
 - **Shared envelope.** Responses use the standard `statusCode` / `message` /
-  `data` / `success` envelope. See [Errors](/errors).
+  `data` / `success` envelope. See [Requests & responses](/conventions).
 
 ## Supported networks
 
@@ -115,5 +115,5 @@ Requests must also originate from an IP on your business allow list. See
 | `400` | Invalid request body, unsupported network, or the wallet is not active on the requested network |
 | `401` | Missing or invalid token, IP not allow-listed, or the token lacks the required `managed-signing` scope |
 | `404` | The wallet, policy, or request does not exist under your business |
-| `422` | A field failed validation |
+| `400` | A field failed validation |
 | `500` | The signing request could not be processed. Retry with backoff |

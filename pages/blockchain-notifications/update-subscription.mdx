@@ -98,7 +98,7 @@ curl -X PATCH "https://api-prod.useknit.io/api/v1/blockchain-notifications/subsc
 
 | Status | Cause |
 | ------ | ----- |
+| `400` | A supplied field failed validation, or `networks` / `tokens` was sent empty — carries an `errors` object |
 | `400` | A network does not belong to the subscription's `type`, or `webhookUrl` is not a public HTTP(S) URL |
 | `401` | Missing or invalid token, IP not allow-listed, or missing `blockchain-notifications:write` |
 | `404` | No subscription with that ID belongs to your business |
-| `422` | A supplied field failed validation, or `networks` / `tokens` was sent empty |

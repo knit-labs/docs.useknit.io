@@ -71,9 +71,11 @@ rules.
   [Authentication](/authentication).
 - **JSON only.** Requests and responses are JSON. Send
   `Content-Type: application/json` on requests with a body.
-- **camelCase.** Request bodies and response payloads both use camelCase keys.
+- **camelCase.** Send camelCase field names; responses come back camelCase too.
+  See [Requests & responses](/conventions#field-casing) for the two places this
+  does not hold.
 - **Shared envelope.** Every response — success or failure — has the same
-  top-level shape. See [Errors & response format](/errors).
+  top-level shape. See [Requests & responses](/conventions).
 
 ```json filename="Response envelope"
 {
@@ -89,6 +91,22 @@ rules.
   required scope is rejected with `401` — it is never silently downgraded. The
   scope each endpoint needs is listed on its page.
 </Callout>
+
+## For AI agents
+
+These docs are published in plain text as well as HTML.
+
+| URL | Contents |
+| --- | -------- |
+| [`/llms.txt`](/llms.txt) | An index of every page, with descriptions |
+| [`/llms-full.txt`](/llms-full.txt) | Every page concatenated into one file |
+| `<any-page>.md` | That page's Markdown source |
+
+Append `.md` to any documentation URL to get the Markdown — for example
+[`/authentication.md`](/authentication.md) or
+[`/payouts/create-a-single-payout.md`](/payouts/create-a-single-payout.md).
+All three are served with permissive CORS, so a browser-based agent can fetch
+them directly.
 
 ## Getting set up
 

@@ -66,7 +66,7 @@ Returns `201` with the new account.
 | ------ | ----- |
 | `401` | Missing or invalid token, IP not allow-listed, or missing `payout-wallets:write` |
 | `409` | An API account already exists for that token — fetch it with [List API accounts](/API-account/get-all-API-accounts) instead |
-| `422` | `token` is missing or is not `USDT` or `USDC` |
+| `400` | `token` is missing or is not `USDT` or `USDC` |
 
 <Callout type="info">
   Creating accounts is idempotent in practice: a `409` means the account you

@@ -26,6 +26,37 @@ failures, and webhook side effects.
 Collections, API wallets, and payouts do not carry their own spendable
 balances. Every movement they represent settles against the API account.
 
+```mermaid
+flowchart TD
+    payer(["Customer"])
+    coll["Collection<br/>single-use address"]
+    wal["API wallet<br/>reusable address"]
+    api["API account<br/>per token"]
+    biz["Business wallet<br/>treasury"]
+    out(["External address"])
+
+    payer -->|pays| coll
+    payer -->|deposits| wal
+    coll -->|credits| api
+    wal -->|credits| api
+    biz <-->|dashboard transfer| api
+    api -->|POST /payouts| out
+
+    classDef balance fill:#4c38cb,stroke:#4c38cb,color:#ffffff;
+    classDef route fill:transparent,stroke:#4c38cb,stroke-width:1.5px;
+    classDef outside fill:transparent,stroke:#9aa0aa,stroke-dasharray:4 3;
+    class biz,api balance;
+    class coll,wal route;
+    class payer,out outside;
+```
+
+The two filled boxes are the balances. Everything else is a route value passes
+through.
+
+Everything with an arrow into the API account increases what you can pay out.
+Only the dashboard transfer moves value between the two balances — no API call
+does.
+
 <Callout type="info">
   Where a response includes `balanceBefore` and `balanceAfter`, those values
   describe the API account ledger for that token. Watching them is the most
@@ -72,10 +103,76 @@ dashboard.
 
 </Steps>
 
+## A collection, end to end
+
+Where the webhooks land relative to the money moving:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant You
+    participant Knit
+    participant Chain
+
+    You->>Knit: POST /collections
+    Knit-->>You: 200 · address + link
+    Knit->>You: COLLECTION_CREATED
+    Note over You: show link to customer
+    Chain-->>Knit: deposit seen
+    Note over Knit,Chain: waits for confirmationThreshold
+    Knit->>You: COLLECTION_CONFIRMED
+    Knit->>Knit: credit API account
+    Knit->>You: COLLECTION_SUCCESSFUL
+    Note over You: fulfil the order here
+```
+
+## A payout, end to end
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant You
+    participant Knit
+    participant Chain
+
+    You->>Knit: POST /payouts
+    alt balance is short
+        Knit-->>You: 400 · Insufficient balance
+        Note over Knit: nothing is held
+    else balance is sufficient
+        Knit-->>You: 201 · PENDING
+        Knit->>Knit: hold amount
+        Knit->>Chain: submit transfer
+        Note over Knit: PROCESSING
+        Chain-->>Knit: confirmed
+        Note over Knit: COMPLETED
+        Knit->>You: PAYOUT_SUCCESSFUL
+    end
+```
+
+Only `COMPLETED` produces a webhook. A payout that ends `FAILED` is discovered
+by reading it back — see [Get payout status](/payouts/get-payout-status).
+
 ## Request lifecycle
 
 Every authenticated request goes through the same three checks before it
 reaches an endpoint:
+
+```mermaid
+flowchart LR
+    req["Request"] --> tok{"Valid<br/>bearer token?"}
+    tok -->|no| e1["401"]
+    tok -->|yes| ip{"IP on the<br/>allow list?"}
+    ip -->|no| e2["401"]
+    ip -->|yes| sc{"Token has the<br/>required scope?"}
+    sc -->|no| e3["401"]
+    sc -->|yes| ok["Endpoint runs"]
+
+    classDef bad fill:transparent,stroke:#b3261e,color:#b3261e;
+    classDef good fill:#4c38cb,stroke:#4c38cb,color:#fff;
+    class e1,e2,e3 bad;
+    class ok good;
+```
 
 1. **Token.** The bearer token is validated and resolved to an OAuth client and
    the business it belongs to.
@@ -83,8 +180,8 @@ reaches an endpoint:
 3. **Scope.** The token must satisfy the scope the route requires, for example
    `payouts:write` for `POST /api/v1/payouts`.
 
-A failure at any step returns `401` with a message describing which check
-failed. See [Authentication](/authentication) for the full list.
+All three failures are `401`, with a message naming the check that failed. See
+[Authentication](/authentication) for the exact strings.
 
 ## Observability
 
@@ -100,7 +197,7 @@ failed. See [Authentication](/authentication) for the full list.
 ## Response format
 
 All endpoints return the same envelope, so you can parse success and failure
-identically. See [Errors & response format](/errors) for status codes and
+identically. See [Requests & responses](/conventions) for status codes and
 validation details.
 
 ```json filename="Envelope"

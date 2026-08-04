@@ -74,4 +74,4 @@ curl -X PUT "https://api-prod.useknit.io/api/v1/wallets/d95143d2-c076-49da-b121-
 | ------ | ----- |
 | `401` | Missing or invalid token, IP not allow-listed, or missing `wallets:write` |
 | `404` | No wallet with that ID belongs to your business |
-| `422` | A supplied field failed validation |
+| `400` | A supplied field failed validation |

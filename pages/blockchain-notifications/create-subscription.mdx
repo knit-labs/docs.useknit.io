@@ -98,6 +98,6 @@ curl -X POST "https://api-prod.useknit.io/api/v1/blockchain-notifications/subscr
 
 | Status | Cause |
 | ------ | ----- |
+| `400` | `address` or `type` is missing, `type` is not one of the three values, or a network or token is unsupported — carries an `errors` object |
 | `400` | The address format does not match `type`, a network does not belong to `type`, or no webhook URL is available and none is configured on your business |
 | `401` | Missing or invalid token, IP not allow-listed, or missing `blockchain-notifications:write` |
-| `422` | `address` or `type` is missing, `type` is not one of the three values, or a network or token is unsupported |

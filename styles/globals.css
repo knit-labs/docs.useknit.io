@@ -507,6 +507,41 @@ main h3 :not(pre) > code {
 }
 
 /* ==========================================================================
+   Mermaid diagrams
+   ========================================================================== */
+
+/* Nextra renders each diagram into a bare <div>; frame it as a figure and let
+   it scroll rather than shrink when the diagram is wider than the column. */
+main div:has(> svg[aria-roledescription]) {
+  margin: 1.75rem 0;
+  padding: 1.25rem 1rem;
+  border: 1px solid var(--knit-border);
+  border-radius: var(--knit-radius-lg);
+  background: var(--knit-bg-subtle);
+  overflow-x: auto;
+}
+
+main svg[aria-roledescription] {
+  display: block;
+  margin: 0 auto;
+  min-width: 22rem;
+}
+
+/* Mermaid inherits the page font; nudge the label size up so diagrams stay
+   legible once the SVG is scaled down to the content column. */
+main svg[aria-roledescription] .nodeLabel,
+main svg[aria-roledescription] .edgeLabel,
+main svg[aria-roledescription] .messageText,
+main svg[aria-roledescription] .actor > tspan,
+main svg[aria-roledescription] .noteText > tspan {
+  font-size: 0.8125rem !important;
+}
+
+main svg[aria-roledescription] .edgeLabel {
+  color: var(--knit-fg-subtle);
+}
+
+/* ==========================================================================
    Tables
    ========================================================================== */
 

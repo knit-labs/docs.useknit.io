@@ -147,5 +147,5 @@ See [Webhooks](/webhooks) for payloads and signature verification.
 | Status | Cause |
 | ------ | ----- |
 | `401` | Missing or invalid token, IP not allow-listed, or missing `collections:write` |
-| `422` | A required field is missing, `tokenAmount` or `confirmationThreshold` is not greater than zero, or a URL is invalid or not publicly reachable |
+| `400` | A required field is missing, `tokenAmount` or `confirmationThreshold` is not greater than zero, or a URL is invalid or not publicly reachable |
 | `500` | The collection could not be created. Retry; if it persists, contact support |
