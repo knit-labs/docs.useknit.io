@@ -17,8 +17,8 @@ your API account.
 </Meta>
 
 <Callout type="warning">
-  A collection address expires **30 minutes** after creation and accepts one
-  payment. Create it when your customer is ready to pay, not when the invoice is
+  A collection address accepts one payment and expires after **30 minutes by
+  default**. Set `expiry` at creation to choose **5–60 minutes**, in seconds. Create it when your customer is ready to pay, not when the invoice is
   drafted — and create a fresh one if the window lapses.
 </Callout>
 
@@ -36,6 +36,12 @@ your API account.
   </Field>
   <Field name="tokenAmount" type="number" required>
     The amount to collect, in token units. Must be greater than zero.
+  </Field>
+  <Field name="expiry" type="integer" required={false} defaultValue="1800">
+    Payment window in whole seconds. Minimum `300` (5 minutes), maximum `3600`
+    (60 minutes), inclusive. Omit this field to keep the 30-minute default;
+    `900` gives the customer 15 minutes. Do not send minutes or a timestamp.
+    Explicit `null`, fractional values, and values outside the range are invalid.
   </Field>
   <Field name="confirmationThreshold" type="integer" required>
     How many on-chain confirmations to wait for before the collection is
@@ -70,6 +76,7 @@ curl -X POST "https://api-prod.useknit.io/api/v1/collections" \
     "network": "MATIC_MAINNET",
     "token": "USDT",
     "tokenAmount": 2500,
+    "expiry": 900,
     "confirmationThreshold": 10,
     "merchantCallbackUrl": "https://example.com/webhooks/knit",
     "merchantRedirectUrl": "https://example.com/thanks"
@@ -99,7 +106,7 @@ Returns `200` with the created collection.
     "merchantCallbackUrl": "https://example.com/webhooks/knit",
     "merchantRedirectUrl": "https://example.com/thanks",
     "paymentLinkUrl": "https://checkout.collection.useknit.io/9cddd3ad-c2a8-463c-a703-158b900beea8",
-    "expiresAt": "2024-08-27T14:02:10.000000Z",
+    "expiresAt": "2024-08-27T13:47:10.000000Z",
     "createdAt": "2024-08-27T13:32:10.000000Z",
     "updatedAt": "2024-08-27T13:32:10.000000Z"
   },
@@ -117,7 +124,9 @@ Returns `200` with the created collection.
     redirect the customer here.
   </Field>
   <Field name="expiresAt" type="string">
-    ISO-8601 timestamp, 30 minutes after creation.
+    The payment deadline as an ISO-8601 timestamp. Knit uses the same deadline
+    for the deposit address and this response. Base your countdown on this
+    value rather than starting a new timer when the response arrives.
   </Field>
   <Field name="status" type="string">
     Starts at `PENDING`. See the lifecycle below.
@@ -147,5 +156,5 @@ See [Webhooks](/webhooks) for payloads and signature verification.
 | Status | Cause |
 | ------ | ----- |
 | `401` | Missing or invalid token, IP not allow-listed, or missing `collections:write` |
-| `400` | A required field is missing, `tokenAmount` or `confirmationThreshold` is not greater than zero, or a URL is invalid or not publicly reachable |
+| `400` | A required field is missing, `expiry` is not an integer from `300` to `3600`, `tokenAmount` or `confirmationThreshold` is not greater than zero, or a URL is invalid or not publicly reachable |
 | `500` | The collection could not be created. Retry; if it persists, contact support |

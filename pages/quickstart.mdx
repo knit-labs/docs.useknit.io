@@ -68,7 +68,8 @@ step.
 ### Collect a payment
 
 A collection issues a single-use address and a hosted payment link. It expires
-30 minutes after creation.
+after 30 minutes by default. Pass `expiry` in whole seconds to choose a window
+from `300` to `3600` seconds (5–60 minutes); the example uses `900` (15 minutes).
 
 ```bash filename="4. Create a collection"
 curl -X POST "$KNIT_BASE_URL/api/v1/collections" \
@@ -78,6 +79,7 @@ curl -X POST "$KNIT_BASE_URL/api/v1/collections" \
     "network": "MATIC_MAINNET",
     "token": "USDT",
     "tokenAmount": 25,
+    "expiry": 900,
     "confirmationThreshold": 10,
     "merchantCallbackUrl": "https://example.com/webhooks/knit",
     "merchantRedirectUrl": "https://example.com/thanks"
@@ -85,7 +87,7 @@ curl -X POST "$KNIT_BASE_URL/api/v1/collections" \
 ```
 
 Send your customer to `data.paymentLinkUrl`, or show them `data.address`
-directly. When the deposit confirms, the proceeds credit your API account and a
+directly. Use `data.expiresAt` as the countdown deadline. When the deposit confirms, the proceeds credit your API account and a
 `COLLECTION_SUCCESSFUL` webhook is delivered.
 
 ### Send a payout
