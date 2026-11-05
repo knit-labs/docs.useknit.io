@@ -17,8 +17,10 @@ to change.
 
 <Callout type="warning">
   Updating does not change the original expiry deadline and does not issue a
-  new address. The `expiry` parameter is only supported when creating a collection. Once a payment has been detected, create a new collection instead of
-  amending this one.
+  new address. The `expiry` parameter is only supported when creating a collection.
+  The network and token are fixed when the collection is created; to collect on a
+  different network or token, create a new collection. Once a collection is no
+  longer `PENDING`, it cannot be updated.
 </Callout>
 
 ## Path parameters
@@ -34,12 +36,6 @@ to change.
 Every field is optional; omitted fields are left unchanged.
 
 <Fields>
-  <Field name="network" type="string" required={false}>
-    A network that is active for collections.
-  </Field>
-  <Field name="token" type="string" required={false}>
-    A token that is active for collections on that network.
-  </Field>
   <Field name="tokenAmount" type="number" required={false}>
     Must be greater than zero.
   </Field>
@@ -91,4 +87,5 @@ curl -X PUT "https://api-prod.useknit.io/api/v1/collections/9cddd3ad-c2a8-463c-a
 | ------ | ----- |
 | `401` | Missing or invalid token, IP not allow-listed, or missing `collections:write` |
 | `404` | No collection with that ID belongs to your business |
-| `400` | A supplied field failed validation |
+| `400` | A supplied field failed validation, or the body includes `network` or `token` |
+| `409` | The collection is no longer `PENDING` |
