@@ -8,11 +8,14 @@ description: This endpoint approves a pending signing request.
 <Endpoint method="POST" path="/api/v1/managed-signing/requests/{requestId}/approve" />
 
 <Meta>
-  <Scope value="managed-signing:write" />
+  <Scope value="managed-signing:approve" />
   <Chip label="Auth" value="Bearer token" />
 </Meta>
 
 This endpoint approves a pending signing request.
+
+- Needs the `managed-signing:approve` scope, which full access (`*`) does not include.
+- A request is signed once. Approving it again returns the request as it is and does not sign again.
 
 ## Path Parameters
 

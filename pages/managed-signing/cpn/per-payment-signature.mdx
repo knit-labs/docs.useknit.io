@@ -27,6 +27,7 @@ For each CPN V2 payment, Circle provides a `messageToBeSigned` (EIP-712 typed da
 ```json
 {
   "walletId": "<local-wallet-id>",
+  "idempotencyKey": "<unique-key-per-signature>",
   "network": "MATIC_MAINNET",
   "type": "eip712",
   "payload": {
@@ -85,6 +86,7 @@ curl "https://api-prod.useknit.io/api/v1/managed-signing/requests" \
   -H "Content-Type: application/json" \
   -d '{
     "walletId": "<local-wallet-id>",
+    "idempotencyKey": "<unique-key-per-signature>",
     "network": "MATIC_MAINNET",
     "type": "eip712",
     "payload": {

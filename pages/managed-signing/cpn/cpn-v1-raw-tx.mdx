@@ -40,6 +40,7 @@ For new integrations, **CPN V2 is recommended** as it's gasless and more efficie
 ```json
 {
   "walletId": "<local-wallet-id>",
+  "idempotencyKey": "<unique-key-per-signature>",
   "network": "MATIC_MAINNET",
   "type": "evm_tx",
   "kind": "raw",
@@ -65,6 +66,7 @@ For new integrations, **CPN V2 is recommended** as it's gasless and more efficie
 | `type` | string | Must be `evm_tx` |
 | `kind` | string | Must be `raw` for raw transaction signing |
 | `payload.tx` | object | Raw transaction object |
+| `idempotencyKey` | string | One key per intended signature; resending it returns the first request |
 | `broadcast` | boolean | Whether to broadcast (usually `false` for CPN V1) |
 
 ## Transaction Fields
@@ -88,6 +90,7 @@ curl "https://api-prod.useknit.io/api/v1/managed-signing/requests" \
   -H "Content-Type: application/json" \
   -d '{
     "walletId": "<local-wallet-id>",
+    "idempotencyKey": "<unique-key-per-signature>",
     "network": "MATIC_MAINNET",
     "type": "evm_tx",
     "kind": "raw",
@@ -145,4 +148,7 @@ Enabling `allowRawTx: true` in your policy allows signing arbitrary transactions
 
 - Only enable if you specifically need CPN V1
 - Restrict `chains` to only the networks you need
+- Set `maxNativeValue` (wei) to cap the native coin a raw transaction can send, and `allowedContracts` to the contracts you call
+- `payload.tx.chainId` must match `network`; it is set from `network` when left out
+- A raw transaction that approves or transfers tokens is held to the same `tokens`, `spenders` and amount rules as the dedicated kinds. `payload.tx.data` must be `0x`-prefixed hex bytes
 - Monitor audit logs for unexpected raw transaction requests

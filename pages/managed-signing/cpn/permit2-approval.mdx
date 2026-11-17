@@ -25,6 +25,7 @@ This is a **one-time on-chain transaction** that approves the Permit2 contract t
 ```json
 {
   "walletId": "<local-wallet-id>",
+  "idempotencyKey": "<unique-key-per-signature>",
   "network": "MATIC_MAINNET",
   "type": "evm_tx",
   "kind": "erc20_approve",
@@ -62,6 +63,7 @@ curl "https://api-prod.useknit.io/api/v1/managed-signing/requests" \
   -H "Content-Type: application/json" \
   -d '{
     "walletId": "<local-wallet-id>",
+    "idempotencyKey": "<unique-key-per-signature>",
     "network": "MATIC_MAINNET",
     "type": "evm_tx",
     "kind": "erc20_approve",

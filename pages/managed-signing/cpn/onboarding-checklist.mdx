@@ -87,6 +87,7 @@ Approve the Permit2 contract to spend USDC on behalf of your wallet.
 ```json
 {
   "walletId": "<wallet-id>",
+  "idempotencyKey": "<unique-key-per-signature>",
   "network": "MATIC_MAINNET",
   "type": "evm_tx",
   "kind": "erc20_approve",
@@ -112,6 +113,7 @@ For each payment, Circle provides `messageToBeSigned` (EIP-712 typed data). Sign
 ```json
 {
   "walletId": "<wallet-id>",
+  "idempotencyKey": "<unique-key-per-signature>",
   "network": "MATIC_MAINNET",
   "type": "eip712",
   "payload": {
