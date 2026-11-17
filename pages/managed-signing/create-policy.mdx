@@ -103,7 +103,7 @@ The token, spender and amount rules apply to every way of moving or approving to
 - EIP-712 permits: EIP-2612 and DAI `Permit`, and Permit2 permits (including Circle CPN payment signatures). The permit's `spender` must be in `spenders`;
 - EIP-712 `TransferWithAuthorization` and `ReceiveWithAuthorization` (EIP-3009).
 
-EIP-712 requests must have a `domain.chainId` that matches `network`. Set `allowedContracts` when `allowRawTx` is on: calls to contracts that are not tokens are only limited by it.
+EIP-712 requests must have a `domain.chainId` that matches `network`. Only these domain fields are kept, in this order: `name`, `version`, `chainId`, `verifyingContract`, `salt`. An empty `name` or `version`, or a domain value of the wrong type, is refused. If you send an `EIP712Domain` type, it must list exactly the kept fields with the standard types. Otherwise the request is refused with a 400 and nothing is stored. Set `allowedContracts` when `allowRawTx` is on: calls to contracts that are not tokens are only limited by it.
 
 **Rate Limiting**
 
