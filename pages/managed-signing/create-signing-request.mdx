@@ -100,7 +100,7 @@ This endpoint creates a new signing request. Supports EVM transactions, EIP-712 
 | `token` | string | ERC20 token contract address |
 | `to` | string | Recipient address |
 | `amount` | string | Transfer amount in base units (e.g., `1000000` for 1.0 USDC) |
-| `txOverrides` | object | (Optional) Gas overrides (e.g., `gasLimit`). A `value` override is ignored: token calls send no native coin. When `broadcast` is `true`, Knit tops up gas for at most 150,000 gas at its own fee estimate; the wallet must hold any gas above that |
+| `txOverrides` | object | (Optional) Gas overrides (e.g., `gasLimit`). A `value` override is ignored: token calls send no native coin. When `broadcast` is `true`, Knit tops up gas for at most 150,000 gas at up to twice its own fee estimate; the wallet must hold any gas above that |
 
 **Note:** The `broadcast` field is commonly set to `true` for transfers so the signed transaction is submitted on-chain. When `broadcast: true`, the response includes a `txHash`. When `broadcast: false`, the response includes `rawSignedTx` for manual submission.
 
