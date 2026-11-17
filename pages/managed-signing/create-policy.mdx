@@ -8,7 +8,7 @@ description: This endpoint creates a new policy for managing signing request rul
 <Endpoint method="POST" path="/api/v1/managed-signing/policies" />
 
 <Meta>
-  <Scope value="managed-signing:write" />
+  <Scope value="managed-signing-policies:write" />
   <Chip label="Auth" value="Bearer token" />
 </Meta>
 
@@ -94,6 +94,16 @@ This endpoint creates a new policy for managing signing request rules.
 | `denyUnlimitedApprovals` | boolean | Block unlimited (max uint256) approvals |
 | `maxTransferAmount` | string | Maximum transfer amount per transaction (in base units) |
 | `requireApprovalAbove` | string | Require manual approval above this amount |
+| `maxNativeValue` | string | Maximum native coin value (wei) a raw transaction may send. Leave it out for no limit |
+
+The token, spender and amount rules apply to every way of moving or approving tokens:
+
+- `erc20_approve` and `erc20_transfer` requests;
+- raw transactions that approve or transfer tokens (ERC-20 calls and Permit2's on-chain `approve`). A raw transaction to a token in `tokens` with any other call is denied;
+- EIP-712 permits: EIP-2612 and DAI `Permit`, and Permit2 permits (including Circle CPN payment signatures). The permit's `spender` must be in `spenders`;
+- EIP-712 `TransferWithAuthorization` and `ReceiveWithAuthorization` (EIP-3009).
+
+EIP-712 requests must have a `domain.chainId` that matches `network`. Set `allowedContracts` when `allowRawTx` is on: calls to contracts that are not tokens are only limited by it.
 
 **Rate Limiting**
 
@@ -102,6 +112,8 @@ This endpoint creates a new policy for managing signing request rules.
 | `rateLimits.windowSec` | number | Time window for rate limiting (seconds) |
 | `rateLimits.maxCount` | number | Max requests allowed in time window |
 | `rateLimits.maxValue` | string | Max total value in time window (wei) |
+
+`rateLimits.maxCount` counts every request type. While `rateLimits.maxValue` is set, a request with more than one token amount (for example a Permit2 batch) is denied.
 
 **EIP-712 Typed Data Controls**
 

@@ -111,19 +111,24 @@ Scopes follow a `resource:action` pattern.
 | `payout-wallets:read` | View API account balances |
 | `payout-wallets:write` | Create API accounts |
 | `managed-signing:read` | View managed signing wallets, policies, requests, and audit events |
-| `managed-signing:write` | Create and approve managed signing wallets, policies, and requests |
+| `managed-signing:write` | Create managed signing wallets and signing requests |
+| `managed-signing-policies:write` | Create and update managed signing policies. Not included in `*` |
+| `managed-signing:approve` | Approve managed signing requests that are awaiting approval. Not included in `*` |
 | `blockchain-notifications:read` | View address notification subscriptions |
 | `blockchain-notifications:write` | Create, update, and delete address notification subscriptions |
 | `custody:read` | View custody owners, wallets, policies, signing requests, and operations |
 | `custody:write` | Create custody resources and confirm or execute operations |
-| `*` | Full access to every resource |
+| `*` | Full access to every resource, except the scopes marked "Not included in `*`" |
 
 Two rules apply when a scope is checked:
 
 - **Write implies read.** A client holding `payouts:write` can also call
   `GET /api/v1/payouts`. The reverse is not true.
-- **`*` satisfies everything.** Grant it only when a client genuinely needs the
-  whole surface.
+- **`*` satisfies everything except `managed-signing-policies:write` and
+  `managed-signing:approve`.** Grant those two by name, ideally to a different
+  client from the one that creates signing requests, so a leaked signing
+  credential cannot raise its own limits or approve its own held requests.
+  Grant `*` only when a client genuinely needs the whole surface.
 
 A request that reaches an endpoint without a satisfying scope is rejected:
 

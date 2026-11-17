@@ -41,7 +41,14 @@ API — send `Authorization: Bearer <access-token>`.
 | Operation | Required scope |
 | --------- | -------------- |
 | `GET` — wallets, policies, requests, audit | `managed-signing:read` |
-| `POST` / `PATCH` — create, update, approve | `managed-signing:write` |
+| `POST` — create wallets and signing requests | `managed-signing:write` |
+| `POST` / `PATCH` — create and update policies | `managed-signing-policies:write` |
+| `POST` — approve signing requests | `managed-signing:approve` |
+
+Full access (`*`) does not include `managed-signing-policies:write` or
+`managed-signing:approve`. Grant them by name, ideally to a separate client
+from the one that creates signing requests. Neither includes
+`managed-signing:read`; add it if that client needs to view requests or policies.
 
 Requests must also originate from an IP on your business allow list. See
 [Authentication](/authentication) for tokens, scopes, and allow-listing.

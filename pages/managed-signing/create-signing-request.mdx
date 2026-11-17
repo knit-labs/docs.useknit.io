@@ -40,10 +40,10 @@ This endpoint creates a new signing request. Supports EVM transactions, EIP-712 
 | `walletId` | string | Yes | Local wallet ID |
 | `network` | string | Yes | Target network |
 | `type` | string | Yes | Request type (`evm_tx`, `eip712`, or `eip191`) |
-| `kind` | string | Conditional | Transaction kind (required for `evm_tx`: `erc20_approve`, `erc20_transfer`, or `raw`) |
+| `kind` | string | Conditional | Transaction kind (required for `evm_tx`: `erc20_approve`, `erc20_transfer`, or `raw`). For `raw`, `payload.tx.chainId` must match `network` and is set from `network` when left out |
 | `payload` | object | Yes | Request payload |
 | `broadcast` | boolean | No | Whether to broadcast the transaction |
-| `idempotencyKey` | string | No | Idempotency key for request deduplication |
+| `idempotencyKey` | string | Yes | One key per intended signature, up to 255 characters. Sending the same key again returns the first request instead of signing again, so retry with the same key after a timeout |
 
 ---
 
@@ -52,6 +52,7 @@ This endpoint creates a new signing request. Supports EVM transactions, EIP-712 
 ```json
 {
   "walletId": "<local-wallet-id>",
+  "idempotencyKey": "<unique-key-per-signature>",
   "network": "MATIC_MAINNET",
   "type": "evm_tx",
   "kind": "erc20_approve",
@@ -60,8 +61,7 @@ This endpoint creates a new signing request. Supports EVM transactions, EIP-712 
     "spender": "0xSpender",
     "amount": "10"
   },
-  "broadcast": false,
-  "idempotencyKey": "optional-idem-key"
+  "broadcast": false
 }
 ```
 
@@ -80,6 +80,7 @@ This endpoint creates a new signing request. Supports EVM transactions, EIP-712 
 ```json
 {
   "walletId": "<local-wallet-id>",
+  "idempotencyKey": "<unique-key-per-signature>",
   "network": "ETH_MAINNET",
   "type": "evm_tx",
   "kind": "erc20_transfer",
@@ -99,7 +100,7 @@ This endpoint creates a new signing request. Supports EVM transactions, EIP-712 
 | `token` | string | ERC20 token contract address |
 | `to` | string | Recipient address |
 | `amount` | string | Transfer amount in base units (e.g., `1000000` for 1.0 USDC) |
-| `txOverrides` | object | (Optional) Gas overrides (e.g., `gasLimit`) |
+| `txOverrides` | object | (Optional) Gas overrides (e.g., `gasLimit`). A `value` override is ignored: token calls send no native coin. When `broadcast` is `true`, Knit tops up gas for at most 150,000 gas at its own fee estimate; the wallet must hold any gas above that |
 
 **Note:** The `broadcast` field is commonly set to `true` for transfers so the signed transaction is submitted on-chain. When `broadcast: true`, the response includes a `txHash`. When `broadcast: false`, the response includes `rawSignedTx` for manual submission.
 
@@ -112,6 +113,7 @@ Transfer requests are subject to policy rules including `tokens`, `rateLimits`, 
 ```json
 {
   "walletId": "<local-wallet-id>",
+  "idempotencyKey": "<unique-key-per-signature>",
   "network": "ETHEREUM_MAINNET",
   "type": "eip712",
   "payload": {
@@ -156,6 +158,7 @@ Transfer requests are subject to policy rules including `tokens`, `rateLimits`, 
 ```json
 {
   "walletId": "<local-wallet-id>",
+  "idempotencyKey": "<unique-key-per-signature>",
   "network": "ETHEREUM_MAINNET",
   "type": "eip191",
   "payload": {
@@ -186,6 +189,7 @@ curl "https://api-prod.useknit.io/api/v1/managed-signing/requests" \
   -H "Content-Type: application/json" \
   -d '{
     "walletId": "<local-wallet-id>",
+    "idempotencyKey": "<unique-key-per-signature>",
     "network": "MATIC_MAINNET",
     "type": "evm_tx",
     "kind": "erc20_approve",

@@ -8,7 +8,7 @@ description: This endpoint updates an existing policy by its local ID.
 <Endpoint method="PATCH" path="/api/v1/managed-signing/policies/{policyId}" />
 
 <Meta>
-  <Scope value="managed-signing:write" />
+  <Scope value="managed-signing-policies:write" />
   <Chip label="Auth" value="Bearer token" />
 </Meta>
 
@@ -29,6 +29,7 @@ This endpoint updates an existing policy by its local ID.
 | `rules.chains` | array | No | Allowed blockchain networks |
 | `rules.maxApprovalAmount` | string | No | Maximum approval amount |
 | `rules.maxTransferAmount` | string | No | Maximum transfer amount per transaction (in base units) |
+| `rules.maxNativeValue` | string | No | Maximum native coin value (wei) a raw transaction may send |
 | `rules.denyUnlimitedApprovals` | boolean | No | Whether to deny unlimited approvals |
 
 ```json

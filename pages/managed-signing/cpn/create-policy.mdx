@@ -8,7 +8,7 @@ description: Create a policy that allows CPN V2 signature flows while restrictin
 <Endpoint method="POST" path="/api/v1/managed-signing/policies" />
 
 <Meta>
-  <Scope value="managed-signing:write" />
+  <Scope value="managed-signing-policies:write" />
   <Chip label="Auth" value="Bearer token" />
 </Meta>
 
@@ -22,7 +22,7 @@ Create a policy that allows CPN V2 signature flows while restricting signing to 
   "rules": {
     "chains": ["MATIC_MAINNET"],
     "tokens": ["<USDC token address>"],
-    "spenders": ["<Permit2 contract address>"],
+    "spenders": ["<Permit2 contract address>", "<CPN contract named as spender in Circle's messageToBeSigned>"],
     "typedData": { "allow": true },
     "denyUnlimitedApprovals": false,
     "allowRawTx": false
@@ -36,7 +36,7 @@ Create a policy that allows CPN V2 signature flows while restricting signing to 
 |-------|------|-------------|
 | `chains` | array | Allowed blockchain networks |
 | `tokens` | array | Token contract addresses that can be approved |
-| `spenders` | array | Contract addresses allowed as spenders (Permit2) |
+| `spenders` | array | Contracts allowed as spenders: Permit2 (for the one-time approval) and the contract Circle names as `spender` in `messageToBeSigned` (for each payment signature) |
 | `typedData.allow` | boolean | **Must be `true`** for CPN V2 EIP-712 signatures |
 | `denyUnlimitedApprovals` | boolean | Set to `false` to allow standard Permit2 approvals |
 | `allowRawTx` | boolean | Set to `false` unless you need CPN V1 |
@@ -44,7 +44,7 @@ Create a policy that allows CPN V2 signature flows while restricting signing to 
 ## Security Recommendations
 
 - **Restrict `tokens`**: Only include USDC addresses you intend to use
-- **Restrict `spenders`**: Only include the official Permit2 contract address
+- **Restrict `spenders`**: Only include the official Permit2 contract address and Circle's CPN contract. A payment signature whose `spender` is not in this list is denied.
 - **Keep `allowRawTx: false`**: Only enable for CPN V1 legacy support
 
 ## Request
@@ -59,7 +59,7 @@ curl "https://api-prod.useknit.io/api/v1/managed-signing/policies" \
     "rules": {
         "chains": ["MATIC_MAINNET"],
         "tokens": ["0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"],
-        "spenders": ["0x000000000022D473030F116dDEE9F6B43aC78BA3"],
+        "spenders": ["0x000000000022D473030F116dDEE9F6B43aC78BA3", "<Circle CPN contract address>"],
         "typedData": { "allow": true },
         "denyUnlimitedApprovals": false,
         "allowRawTx": false
@@ -80,7 +80,7 @@ curl "https://api-prod.useknit.io/api/v1/managed-signing/policies" \
     "rules": {
       "chains": ["MATIC_MAINNET"],
       "tokens": ["0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"],
-      "spenders": ["0x000000000022D473030F116dDEE9F6B43aC78BA3"],
+      "spenders": ["0x000000000022D473030F116dDEE9F6B43aC78BA3", "<Circle CPN contract address>"],
       "typedData": { "allow": true },
       "denyUnlimitedApprovals": false,
       "allowRawTx": false
