@@ -218,8 +218,12 @@ returned the full result set — each endpoint page states which applies.
 - **Reads** (`GET`) are safe to retry unconditionally.
 - **Payouts** are protected by `merchantReference`, which must be unique.
   Reuse the same reference when retrying a request whose outcome you are unsure
-  of — a duplicate is rejected with `400` instead of sending twice. Only
-  generate a new reference for a genuinely new payout.
+  of — a duplicate is rejected with `400` instead of sending twice, even when
+  the first request is still being processed. To check whether a payout exists,
+  call [List payouts](/payouts/get-all-payouts) with `?merchantReference=`.
+  Only generate a new reference for a genuinely new payout. Knit retries a
+  `FAILED` payout automatically: do not send it again under a new reference
+  (see [Create a payout](/payouts/create-a-single-payout#status-lifecycle)).
 - **Managed signing requests** accept an `idempotencyKey` in the body; replaying
   the same key returns the original request rather than creating another.
 - **`5xx` and network timeouts** should be retried with exponential backoff. A
