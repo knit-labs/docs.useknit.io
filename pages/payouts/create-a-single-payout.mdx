@@ -76,6 +76,7 @@ These Knit addresses are refused with `400`, and nothing is held:
 | ------- | ----- |
 | `This address is a one-time Knit payment address and cannot receive payouts.` | The address belongs to a collection, a payment link or a deposit link |
 | `This Knit address does not receive deposits on this network. Ask the recipient for their address on this network.` | The address is a Knit wallet address, but not on the `network` you pay out on |
+| `This Knit address does not receive USDC on this network. Ask the recipient for an address that receives USDC.` | The address is a Knit business wallet address, but that business cannot receive the token you pay out (`USDT` or `USDC`) on this network. The message names that token |
 | `Coins cannot be paid out to a Knit address. Pay out USDT or USDC, or use an address outside Knit.` | The payout is a coin (`ETH`, `BNB`, `POL`, `TRX` or `SOL`) and the address belongs to Knit |
 
 ## Body
