@@ -62,13 +62,20 @@ Delivered to your business webhook URL.
     customer or ledger you associated with it.
   </Field>
   <Field name="transaction" type="object">
-    The deposit itself. `value` is the amount received, as a decimal string.
+    The deposit itself. `value` is the amount received, as a decimal string
+    with up to 18 decimal places. `token` is `USDT`, `USDC`, or the network's
+    own coin (`ETH`, `BNB`, `POL`, `TRX` or `SOL`).
   </Field>
 </Fields>
 
 ## Handling
 
-Credit against `transaction.value`, and use `transaction.transaction_hash` for
+Check `transaction.token` before you credit. A coin amount is in that coin,
+not in dollars: `1` ETH is not `1` USDT. If you do not accept coins, do not
+credit coin deposits.
+
+Credit against `transaction.value`, parsed as a decimal rather than a float
+(a coin amount can have 18 decimals), and use `transaction.transaction_hash` for
 deduplication — a chain reorganisation or a redelivery can produce the same
 transaction twice.
 
