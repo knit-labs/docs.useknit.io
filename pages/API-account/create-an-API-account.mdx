@@ -27,7 +27,8 @@ account per token you plan to pay out in.
 
 <Fields>
   <Field name="token" type="string" required>
-    The token this account holds. One of `USDT` or `USDC`.
+    The token this account holds. One of `USDT`, `USDC`, `ETH`, `BNB`, `POL`,
+    `TRX` or `SOL`.
   </Field>
 </Fields>
 
@@ -66,7 +67,7 @@ Returns `201` with the new account.
 | ------ | ----- |
 | `401` | Missing or invalid token, IP not allow-listed, or missing `payout-wallets:write` |
 | `409` | An API account already exists for that token — fetch it with [List API accounts](/API-account/get-all-API-accounts) instead |
-| `400` | `token` is missing or is not `USDT` or `USDC` |
+| `400` | `token` is missing or is not one of the tokens above |
 
 <Callout type="info">
   Creating accounts is idempotent in practice: a `409` means the account you

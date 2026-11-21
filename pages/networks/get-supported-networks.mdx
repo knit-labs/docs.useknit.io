@@ -62,6 +62,16 @@ curl "https://api-prod.useknit.io/api/v1/networks" \
           "address": "0x3c499c542cef5e3811e1192ce70d8cc03d5c3359",
           "collectionStatus": "ACTIVE",
           "payoutStatus": "ACTIVE"
+        },
+        {
+          "id": 5,
+          "name": "POL",
+          "symbol": "POL",
+          "logo": "https://demo.useknit.io/coins/polygon.svg",
+          "address": null,
+          "native": true,
+          "collectionStatus": "INACTIVE",
+          "payoutStatus": "ACTIVE"
         }
       ]
     },
@@ -113,8 +123,14 @@ curl "https://api-prod.useknit.io/api/v1/networks" \
     `payoutStatus`. A token can be inactive on an otherwise active network — so
     check both levels.
   </Field>
-  <Field name="tokens[].address" type="string">
-    The token's contract address on that chain.
+  <Field name="tokens[].address" type="string | null">
+    The token's contract address on that chain. `null` for the network's own
+    coin, which has no contract.
+  </Field>
+  <Field name="tokens[].native" type="boolean">
+    Present and `true` on the network's own coin (`ETH`, `BNB`, `POL`, `TRX` or
+    `SOL`). A coin can be paid out on its own network; its `collectionStatus` is
+    always `INACTIVE`, because collections are in USDT or USDC only.
   </Field>
 </Fields>
 
