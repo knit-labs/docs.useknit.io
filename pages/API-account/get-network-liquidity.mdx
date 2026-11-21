@@ -1,0 +1,87 @@
+---
+title: Network liquidity
+description: Read how much of each token your business holds on each network.
+---
+
+# Network liquidity
+
+Returns how much of each token your business holds on each network. This is
+your network liquidity. A payout draws on two balances: the
+[API account](/API-account/get-all-API-accounts) for its token, and the
+liquidity for its token on the network you pay out on. Both must cover the
+amount plus fee.
+
+<Endpoint method="GET" path="/api/v1/network-liquidity" />
+
+<Meta>
+  <Scope value="payout-wallets:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+## Request
+
+```bash filename="cURL"
+curl "https://api-prod.useknit.io/api/v1/network-liquidity" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json"
+```
+
+## Response
+
+```json filename="200 OK"
+{
+  "statusCode": 200,
+  "message": "Network liquidity fetched successfully",
+  "data": [
+    {
+      "network": "MATIC_MAINNET",
+      "networkName": "Polygon",
+      "token": "USDC",
+      "balance": "40"
+    },
+    {
+      "network": "TRON_MAINNET",
+      "networkName": "Tron",
+      "token": "USDT",
+      "balance": "1250.5"
+    }
+  ],
+  "success": true
+}
+```
+
+<Fields>
+  <Field name="network" type="string">
+    The network identifier. It is the same value that the `network` field of
+    [Create a payout](/payouts/create-a-single-payout) takes.
+  </Field>
+  <Field name="networkName" type="string">
+    The display name of the network.
+  </Field>
+  <Field name="token" type="string">
+    `USDT` or `USDC`.
+  </Field>
+  <Field name="balance" type="string">
+    The amount of the token on that network, as a decimal string. Parse it with
+    a decimal library. A float loses precision.
+  </Field>
+</Fields>
+
+<Callout type="info">
+  Only networks and tokens with a balance above zero are listed. A network or
+  token that is not in the list has a balance of `0`, and a payout on it fails
+  with `400` `Insufficient network liquidity`.
+</Callout>
+
+<Callout type="info">
+  This figure is for your whole business: deposits and withdrawals in your
+  business wallet on the dashboard change it too. The API account balance is per
+  token only, so read both before a batch of payouts.
+</Callout>
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `payout-wallets:read` |
+| `403` | API Services are not enabled for your business |

@@ -1,11 +1,12 @@
 ---
 title: List payouts
-description: Fetch every payout your business has created.
+description: Fetch every payout your business has created, or find one by your own reference.
 ---
 
 # List payouts
 
-Returns the payouts belonging to your business.
+Returns the payouts belonging to your business, newest first. Pass
+`merchantReference` to find the payout you created with that reference.
 
 <Endpoint method="GET" path="/api/v1/payouts" />
 
@@ -14,12 +15,36 @@ Returns the payouts belonging to your business.
   <Chip label="Auth" value="Bearer token" />
 </Meta>
 
+## Query parameters
+
+<Fields>
+  <Field name="merchantReference" type="string" required={false}>
+    Only the payout you created with this `merchantReference`. The list has one
+    item if that payout exists, and is empty if it does not. Maximum 255
+    characters. If you send the parameter, it must not be empty.
+  </Field>
+</Fields>
+
+<Callout type="info">
+  This endpoint returns the full result set. There is no `pagination` object
+  in the response.
+</Callout>
+
 ## Request
 
 ```bash filename="cURL"
 curl "https://api-prod.useknit.io/api/v1/payouts" \
   -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
   -H "Accept: application/json"
+```
+
+Find one payout by your reference:
+
+```bash filename="cURL"
+curl -G "https://api-prod.useknit.io/api/v1/payouts" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json" \
+  --data-urlencode "merchantReference=INV-2045"
 ```
 
 ## Response
@@ -50,11 +75,25 @@ curl "https://api-prod.useknit.io/api/v1/payouts" \
 
 <Callout type="info">
   Reconcile on `merchantReference` — it is the value you control and the one
-  that stays stable across your own retries.
+  that stays stable across your own retries. When you are not sure whether a
+  payout request reached us (a timeout, a `5xx`), look it up with
+  `?merchantReference=` before you send it again. One item means the payout
+  exists. An empty list means it was not created, or the first request is
+  still being processed: send it again with the **same** reference, never a new
+  one.
+</Callout>
+
+<Callout type="warning">
+  References are unique across all Knit businesses, not only yours. If a
+  create request gets the duplicate `400` but this lookup returns an empty
+  list, another business uses that reference. Your payout was not created. Use
+  references that only you generate, for example your company name plus an
+  invoice ID.
 </Callout>
 
 ## Errors
 
 | Status | Cause |
 | ------ | ----- |
+| `400` | `merchantReference` is empty or longer than 255 characters. The body carries an `errors.merchantReference` entry |
 | `401` | Missing or invalid token, IP not allow-listed, or missing `payouts:read` |
