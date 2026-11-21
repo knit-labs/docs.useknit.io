@@ -25,6 +25,11 @@ address. Knit checks the balance, holds the amount, and submits the transfer.
    rejected before reaching this endpoint.
 3. **The destination address must be valid for the network.** Addresses are
    checked per chain; a malformed or wrong-chain address fails with `400`.
+4. **The network must hold enough of the token.** Network liquidity is the
+   amount of a token your business holds on one network. It is separate from
+   your API account balance. A payout needs its amount plus fee in both, or it
+   fails with `400` `Insufficient network liquidity`. Check
+   [Network liquidity](/API-account/get-network-liquidity) first.
 
 ## Supported networks
 
@@ -91,8 +96,10 @@ Two kinds of Knit address are refused with `400`, and nothing is held:
     the chosen network.
   </Field>
   <Field name="merchantReference" type="string" required>
-    Your own reference for this payout. Must be unique across your payouts —
-    this is what makes retries safe.
+    Your own reference for this payout. It must be unique across all Knit
+    businesses, not only yours. This is what makes retries safe. Use
+    references that only you generate, for example your company name plus an
+    invoice ID.
   </Field>
 </Fields>
 
@@ -102,6 +109,21 @@ Two kinds of Knit address are refused with `400`, and nothing is held:
   request whose outcome you are unsure of is rejected as a duplicate rather
   than sending the money twice.
 </Callout>
+
+## Reusing a reference
+
+Knit checks `merchantReference` before the balance and network checks. A
+request with a reference that is already in use always gets the duplicate
+`400` shown under [Errors](#errors), and nothing is held or sent. This is also
+true for a retry with the same body that arrives while the first request is
+still being processed. Read `errors.merchantReference` to detect it.
+
+Always retry with the same reference and the same body. If you are not sure of
+the outcome, send it again and wait for a definite answer: `201` or the
+duplicate `400`.
+
+To find the payout that holds a reference, call
+[List payouts](/payouts/get-all-payouts) with `?merchantReference=`.
 
 ## Request
 
@@ -152,12 +174,18 @@ yet.
 | `PENDING` | Accepted and queued. The balance has been held |
 | `PROCESSING` | Submitted for settlement; awaiting on-chain confirmation |
 | `COMPLETED` | Confirmed on-chain. `transactionHash` is populated and a `PAYOUT_SUCCESSFUL` webhook is delivered |
-| `FAILED` | Could not be settled. Check `info` for the reason |
+| `FAILED` | Could not be submitted for settlement. Check `info` for the reason. Knit retries it automatically, and `nextRetryAt` shows the next attempt |
+| `CANCELLED` | Cancelled by Knit support. Knit does not retry it automatically, but support can still send it until it is refunded. When support refunds it, the held amount returns to your API account and you receive a `PAYOUT_REFUNDED` webhook |
 
-<Callout type="info">
-  A failed payout is not retried automatically at the same `merchantReference`.
-  To try again, submit a new payout with a **new** `merchantReference` once you
-  have resolved the cause.
+<Callout type="warning">
+  Do not send a `FAILED` or `CANCELLED` payout again under a new
+  `merchantReference`. Knit retries a `FAILED` payout automatically with the
+  same payout, up to 4 times within 48 hours, and its amount stays held. A
+  second payout for the same recipient can then be paid as well.
+
+  If a payout stays `FAILED` or is `CANCELLED`, contact Knit support. Send a
+  new payout with a new `merchantReference` only after support has refunded the
+  old one. A refunded payout can never be sent.
 </Callout>
 
 Track completion with the [`PAYOUT_SUCCESSFUL` webhook](/webhooks/payout-successful)
@@ -170,12 +198,15 @@ outage, say — use [Retrieve a payout](/payouts/get-single-payout) or
 | Status | Cause |
 | ------ | ----- |
 | `400` | A field failed validation: `amount` below `0.01`, an unsupported `network`, an invalid `toAddress`, or a `merchantReference` you have already used |
-| `400` | Insufficient balance in the API account for that token, or the payout could not be accepted |
+| `400` | `Insufficient balance` in the API account for that token |
+| `400` | `Insufficient network liquidity`: the API account has enough of the token, but the network you pay out on does not. See [Network liquidity](/API-account/get-network-liquidity) |
+| `400` | The payout could not be accepted, for example a recipient that is a Knit account |
 | `401` | Missing or invalid token, IP not allow-listed, or missing `payouts:write` |
 | `404` | `Wallet not found for the specified token` — no API account exists for that token yet |
 
-Both cases are `400`, but the bodies differ. A validation failure carries an
-`errors` object naming the offending fields:
+All of these are `400`, but the bodies differ. A validation failure carries an
+`errors` object naming the offending fields. A reused `merchantReference` is
+always named in `message`, even when another field also fails:
 
 ```json filename="400 — validation failed"
 {
