@@ -233,7 +233,9 @@ endpoint page states which applies.
 
 List wallets, List deposits, List payouts and the API account statement take
 `from` and `to`. Both are ISO 8601 dates or dates and times, for example
-`2026-11-01T00:00:00Z`. A time without an offset is read as UTC.
+`2026-11-01T00:00:00Z`. A time without an offset is read as UTC. Knit records
+times to the second, so it reads `from` and `to` to the second too:
+`10:00:00.500Z` is read as `10:00:00Z`.
 
 - `from` is inclusive: a record made exactly at `from` is included.
 - `to` is exclusive: a record made exactly at `to` is not included.

@@ -125,8 +125,9 @@ curl -G "https://api-prod.useknit.io/api/v1/business-api-services-wallets/c7ddb2
     The start of the window that the statement used.
   </Field>
   <Field name="to" type="string">
-    The end of the window that the statement used. It is one minute before
-    `asOf` when you sent no `to`, or a `to` later than that. Knit waits one
+    The end of the window that the statement used, to the second. It is one
+    minute before `asOf` when you sent no `to`, or a `to` later than that,
+    without the fraction of a second. Knit waits one
     minute because an entry can take a few seconds to be recorded after its
     `createdAt`. Start your next statement at this `to`.
   </Field>
