@@ -123,6 +123,7 @@ table before you write your parser:
 | [`COLLECTION_SUCCESSFUL`](/webhooks/collection-successful) | `body` wrapper | snake_case |
 | [`COLLECTION_FAILED`](/webhooks/collection-failed) | `body` wrapper | snake_case |
 | [`PAYOUT_SUCCESSFUL`](/webhooks/payout-successful) | `body` wrapper | camelCase |
+| [`PAYOUT_FAILED`](/webhooks/payout-failed) | `body` wrapper | camelCase |
 | [`WALLET_FUNDING_SUCCESSFUL`](/webhooks/wallet-funding-successful) | top level | snake_case |
 | [`BLOCKCHAIN_TRANSACTION_DETECTED`](/webhooks/blockchain-transaction-detected) | top level | camelCase |
 
@@ -166,6 +167,9 @@ app.post("/webhooks/knit", (req, res) => {
   </Card>
   <Card title="Payout successful" href="/webhooks/payout-successful">
     `PAYOUT_SUCCESSFUL` — a payout settled on-chain.
+  </Card>
+  <Card title="Payout failed" href="/webhooks/payout-failed">
+    `PAYOUT_FAILED` — Knit stopped trying to send a payout, and nothing was sent.
   </Card>
   <Card title="Wallet funding successful" href="/webhooks/wallet-funding-successful">
     `WALLET_FUNDING_SUCCESSFUL` — an API wallet received a deposit.

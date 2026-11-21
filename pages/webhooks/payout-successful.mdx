@@ -18,9 +18,10 @@ Delivered to your business webhook URL.
 
 <Callout type="info">
   This event fires **only** for completed payouts. There is no webhook for
-  `PENDING`, `PROCESSING`, or `FAILED` — to detect a failure, read the payout
-  back with
-  [Retrieve a payout](/payouts/get-single-payout) or
+  `PENDING` or `PROCESSING`, or for a `FAILED` payout that Knit still retries.
+  When Knit stops trying and nothing was sent, you get
+  [`PAYOUT_FAILED`](/webhooks/payout-failed). To check a payout at any time,
+  read it back with [Retrieve a payout](/payouts/get-single-payout) or
   [Get payout status](/payouts/get-payout-status).
 </Callout>
 

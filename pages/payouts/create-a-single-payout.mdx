@@ -42,6 +42,19 @@ balance, holds the amount, and submits the transfer.
   against a chain.
 </Callout>
 
+## Paying a Knit address
+
+You can pay out to an address that another Knit business owns, for example a
+deposit address of that business's wallet. Knit credits that business once,
+after the network confirms the payment. Very small amounts are credited too.
+
+Two kinds of Knit address are refused with `400`, and nothing is held:
+
+| Message | Cause |
+| ------- | ----- |
+| `This address is a one-time Knit payment address and cannot receive payouts.` | The address belongs to a collection, a payment link or a deposit link |
+| `This Knit address does not receive deposits on this network. Ask the recipient for their address on this network.` | The address is a Knit wallet address, but not on the `network` you pay out on |
+
 ## Body
 
 <Fields>

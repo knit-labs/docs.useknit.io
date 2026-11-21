@@ -1,0 +1,111 @@
+---
+title: PAYOUT_FAILED
+description: Delivered when Knit stops trying to send a payout and nothing was sent.
+---
+
+# `PAYOUT_FAILED`
+
+Delivered when Knit stops trying to send a payout, and no transfer for it was
+made on chain. The payout status is `FAILED` and Knit does not retry it
+automatically.
+
+<Meta>
+  <Chip label="Envelope" value="body wrapper" />
+  <Chip label="Keys" value="camelCase" />
+</Meta>
+
+Delivered to your business webhook URL.
+
+<Callout type="warning">
+  `PAYOUT_FAILED` is **not** the end of the payout. The amount stays held in
+  your API account. Knit support can still send the payout (you then get
+  `PAYOUT_SUCCESSFUL`) or refund it (you then get `PAYOUT_CANCELLED` and
+  `PAYOUT_REFUNDED`). Do not send the same payment again under a new
+  `merchantReference` until the old payout is refunded.
+</Callout>
+
+## When it is sent
+
+Knit sends this event only when it knows that nothing for the payout can be on
+chain:
+
+- the payout could not be submitted, or
+- every automatic retry failed and Knit holds no transfer for it, or
+- Knit stopped retrying the payout, and none of its attempts got as far as
+  sending it.
+
+A `FAILED` payout that still has automatic retries left produces no event. If
+Knit cannot confirm that nothing was sent, it sends no event and its support
+team checks the payout.
+
+## Payload
+
+```json filename="PAYOUT_FAILED"
+{
+  "body": {
+    "eventType": "PAYOUT_FAILED",
+    "payout": {
+      "id": "8e5697e3-8265-455b-984a-0eb40e10b0f9",
+      "businessId": "b7b93a40-4e18-4e97-9c5f-8a7a4fd0df92",
+      "network": "MATIC_MAINNET",
+      "token": "USDT",
+      "amount": "100.250000000000000000",
+      "feeByToken": "0.500000000000000000",
+      "toAddress": "0x56adfcc254ab3b8142a275c1837bcffaff5aa38b",
+      "merchantReference": "INV-2045",
+      "transactionHash": null,
+      "status": "FAILED",
+      "info": "Knit could not send this payout after several attempts.",
+      "retryCount": 0,
+      "nextRetryAt": null,
+      "completedAt": null,
+      "createdAt": "2024-10-02T11:21:33.000000Z",
+      "updatedAt": "2024-10-02T13:02:41.000000Z"
+    }
+  }
+}
+```
+
+<Fields>
+  <Field name="payout.status" type="string">
+    Always `FAILED`.
+  </Field>
+  <Field name="payout.transactionHash" type="string | null">
+    Always `null`: nothing was sent.
+  </Field>
+  <Field name="payout.info" type="string">
+    A short reason for the failure, for your support team. The wording
+    differs between failures and can change, so do not parse it.
+  </Field>
+  <Field name="payout.nextRetryAt" type="string | null">
+    Always `null`: Knit does not retry the payout automatically.
+  </Field>
+</Fields>
+
+## Handling
+
+<Steps>
+
+### Verify and acknowledge
+
+Check `X-Signature` against the raw body, then return `2xx` straight away. See
+[Webhooks](/webhooks) for the verification snippet.
+
+### Deduplicate on `merchantReference`
+
+This event can arrive more than once. Later events for the same
+`merchantReference` replace it: `PAYOUT_SUCCESSFUL` if the payout is sent, or
+`PAYOUT_CANCELLED` and then `PAYOUT_REFUNDED` if it is refunded.
+
+### Hold the payment
+
+Mark the payout as failed in your ledger, but keep the payment open. Contact
+Knit support to have it sent or refunded.
+
+</Steps>
+
+## See also
+
+- [Create a payout](/payouts/create-a-single-payout)
+- [`PAYOUT_SUCCESSFUL`](/webhooks/payout-successful)
+- [Webhooks overview](/webhooks) — signature verification and retries
