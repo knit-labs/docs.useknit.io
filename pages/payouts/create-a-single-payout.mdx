@@ -174,7 +174,7 @@ yet.
 | `PENDING` | Accepted and queued. The balance has been held |
 | `PROCESSING` | Submitted for settlement; awaiting on-chain confirmation |
 | `COMPLETED` | Confirmed on-chain. `transactionHash` is populated and a `PAYOUT_SUCCESSFUL` webhook is delivered |
-| `FAILED` | Could not be submitted for settlement. Check `info` for the reason. Knit retries it automatically, and `nextRetryAt` shows the next attempt |
+| `FAILED` | Could not be submitted for settlement. Check `info` for the reason. Knit retries it automatically, and `nextRetryAt` shows the next attempt. When Knit stops retrying it and knows nothing was sent on chain, you receive a [`PAYOUT_FAILED` webhook](/webhooks/payout-failed) |
 | `CANCELLED` | Cancelled by Knit support. Knit does not retry it automatically, but support can still send it until it is refunded. When support refunds it, the held amount returns to your API account and you receive a `PAYOUT_REFUNDED` webhook |
 
 <Callout type="warning">
