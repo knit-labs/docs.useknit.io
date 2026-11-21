@@ -87,7 +87,9 @@ account for that token. No transfer step is needed.
 
 Deposits into a reusable [API wallet](/wallets/create-a-wallet) are recorded as
 wallet transactions and credited to the API account, so the funds are
-immediately available for payouts.
+immediately available for payouts. Knit credits a deposit only after it has
+enough confirmations on its network (see
+[Deposit confirmations](/webhooks/wallet-funding-successful#deposit-confirmations)).
 
 ### Payouts debit it
 
@@ -150,8 +152,10 @@ sequenceDiagram
     end
 ```
 
-Only `COMPLETED` produces a webhook. A payout that ends `FAILED` is discovered
-by reading it back — see [Get payout status](/payouts/get-payout-status).
+`COMPLETED` produces `PAYOUT_SUCCESSFUL`. A `FAILED` payout that Knit still
+retries produces no webhook. When Knit stops trying and nothing was sent, you
+get [`PAYOUT_FAILED`](/webhooks/payout-failed). To check a payout at any time,
+see [Get payout status](/payouts/get-payout-status).
 
 ## Request lifecycle
 

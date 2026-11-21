@@ -5,6 +5,7 @@
   "collection-successful": "Collection Successful",
   "collection-failed": "Collection Failed",
   "payout-successful": "Payout Successful",
+  "payout-failed": "Payout Failed",
   "wallet-funding-successful": "Wallet Funding Successful",
   "blockchain-transaction-detected": "Transaction Detected"
 }

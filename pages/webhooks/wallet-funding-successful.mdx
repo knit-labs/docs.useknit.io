@@ -68,6 +68,25 @@ Delivered to your business webhook URL.
   </Field>
 </Fields>
 
+## Deposit confirmations
+
+A network sometimes drops a payment it has just accepted. To avoid crediting
+such a payment, Knit records a deposit, and sends this event, only after the
+network has added enough blocks after it (confirmations). A payment that is
+dropped before then is never credited.
+
+| Network | Knit waits for | Usual wait |
+| ------- | -------------- | ---------- |
+| Ethereum (`ETH_MAINNET`) | 15 blocks | About 3 minutes |
+| Base (`BASE_MAINNET`) | 60 blocks | About 2 minutes |
+| Polygon (`MATIC_MAINNET`) | The block the network marks as final | Usually under a minute |
+| BNB Smart Chain (`BSC_MAINNET`) | The block the network marks as final | Usually under a minute |
+| Tron (`TRON_MAINNET`) | 19 blocks | About 1 minute |
+| Solana (`SOL_MAINNET`) | The block the network marks as final | Usually under a minute |
+
+These waits are typical, not guaranteed. Knit also checks each network on a
+schedule, so a deposit can take a few more minutes to appear.
+
 ## Handling
 
 Check `transaction.token` before you credit. A coin amount is in that coin,
@@ -75,9 +94,11 @@ not in dollars: `1` ETH is not `1` USDT. If you do not accept coins, do not
 credit coin deposits.
 
 Credit against `transaction.value`, parsed as a decimal rather than a float
-(a coin amount can have 18 decimals), and use `transaction.transaction_hash` for
-deduplication — a chain reorganisation or a redelivery can produce the same
-transaction twice.
+(a coin amount can have 18 decimals), and use `transaction.id` for
+deduplication: a redelivery sends the same deposit again. Do not deduplicate
+on `transaction.transaction_hash`. One on-chain transaction can pay several
+addresses, for example a batch payment, or carry a coin and a token, and then
+sends one event per deposit, all with the same hash.
 
 ## See also
 
