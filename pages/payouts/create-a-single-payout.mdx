@@ -1,12 +1,12 @@
 ---
 title: Create a payout
-description: Send USDT or USDC from your API account to an external address.
+description: Send USDT, USDC or a network's own coin from your API account to an external address.
 ---
 
 # Create a payout
 
-Sends stablecoin from your API account to an external address. Knit checks the
-balance, holds the amount, and submits the transfer.
+Sends USDT, USDC or a network's own coin from your API account to an external
+address. Knit checks the balance, holds the amount, and submits the transfer.
 
 <Endpoint method="POST" path="/api/v1/payouts" />
 
@@ -30,6 +30,7 @@ balance, holds the amount, and submits the transfer.
 
 | Network | Identifier |
 | ------- | ---------- |
+| Ethereum | `ETHEREUM_MAINNET` |
 | Polygon | `MATIC_MAINNET` |
 | Tron | `TRON_MAINNET` |
 | BNB Smart Chain | `BSC_MAINNET` |
@@ -41,6 +42,21 @@ balance, holds the amount, and submits the transfer.
   [`GET /api/v1/networks`](/networks/get-supported-networks) before you build
   against a chain.
 </Callout>
+
+## Coins
+
+Each network's own coin can be paid out on that network only.
+
+| Coin | Network | Decimals | Smallest payout |
+| ---- | ------- | -------- | --------------- |
+| `ETH` | `ETHEREUM_MAINNET` | 18 | 0.0005 |
+| `BNB` | `BSC_MAINNET` | 18 | 0.001 |
+| `POL` | `MATIC_MAINNET` | 18 | 0.5 |
+| `TRX` | `TRON_MAINNET` | 6 | 1 |
+| `SOL` | `SOL_MAINNET` | 9 | 0.005 |
+
+A coin payout needs an [API account](/API-account/create-an-API-account) for
+that coin. Send the amount as a string to keep all of its decimals.
 
 ## Paying a Knit address
 
@@ -62,10 +78,13 @@ Two kinds of Knit address are refused with `400`, and nothing is held:
     One of the payout networks above.
   </Field>
   <Field name="token" type="string" required>
-    `USDT` or `USDC`.
+    `USDT`, `USDC`, or the network's own coin from the table above. Any other
+    coin and network pair is rejected with `400`.
   </Field>
-  <Field name="amount" type="number" required>
-    The amount to send, in token units — not fiat. Minimum `0.01`.
+  <Field name="amount" type="number | string" required>
+    The amount to send, in token units — not fiat. Minimum `0.01` for USDT and
+    USDC. For a coin, at least its smallest payout, with no more decimals than
+    the coin has.
   </Field>
   <Field name="toAddress" type="string" required>
     The destination address. Validated against the format and checksum rules of
