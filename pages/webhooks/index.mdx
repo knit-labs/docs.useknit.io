@@ -82,24 +82,33 @@ header is missing.
 ## Retries
 
 A delivery counts as failed if your endpoint returns a non-2xx status, times
-out, or is unreachable. Knit then retries up to **3 times** with a fixed
-backoff:
+out after 10 seconds, or is unreachable. Knit then retries up to **11 times**:
 
 | Attempt | Sent |
 | ------- | ---- |
 | Initial | Immediately |
 | Retry 1 | 1 minute after the failure |
 | Retry 2 | 5 minutes after that |
-| Retry 3 | 30 minutes after that |
+| Retry 3 | 15 minutes after that |
+| Retry 4 | 30 minutes after that |
+| Retry 5 | 1 hour after that |
+| Retry 6 | 2 hours after that |
+| Retries 7 to 11 | 4 hours after the previous one |
 
-After the third retry, delivery stops. The attempt history — status code,
-response body, and failure reason — is visible in the dashboard, where you can
-also trigger a manual resend.
+Knit sends retries on a five-minute schedule, so a retry usually arrives up to
+five minutes later than the table shows. It can arrive later when many
+deliveries to your endpoint are waiting. When your endpoint comes back, the
+next retry reaches it within about 4 hours. After the eleventh retry, delivery
+stops.
+The attempt history (status code, response body and failure reason) is visible
+in the dashboard, where you can also send the webhook again by hand.
 
 <Callout type="warning">
-  The full automatic retry window is roughly **36 minutes**, not hours. If your
-  endpoint is down longer than that, reconcile by reading the affected
-  resources back from the API rather than waiting for a redelivery.
+  The full automatic retry window is about **24 hours**. If your endpoint is
+  down longer than that, read the affected resources back from the API. Use
+  [List deposits](/wallets/list-deposits), [List payouts](/payouts/get-all-payouts)
+  and the [API account statement](/API-account/get-statement) with a `from` and
+  `to` that cover the time your endpoint was down.
 </Callout>
 
 Near-identical events for the same business within a five-minute window are

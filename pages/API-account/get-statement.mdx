@@ -1,0 +1,222 @@
+---
+title: Get an API account statement
+description: Read the credits and debits of one API account in a time window, with opening and closing balances.
+---
+
+# Get an API account statement
+
+Returns the entries of one API account between two times, oldest first. Each
+entry is one credit or one debit of the account balance. The statement also
+gives the balance at the start and at the end of the window.
+
+<Endpoint method="GET" path="/api/v1/business-api-services-wallets/{id}/statement" />
+
+<Meta>
+  <Scope value="payout-wallets:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+## Path parameters
+
+<Fields>
+  <Field name="id" type="string" required>
+    The API account's `id`, from [List API accounts](/API-account/get-all-API-accounts).
+  </Field>
+</Fields>
+
+## Query parameters
+
+<Fields>
+  <Field name="from" type="string" required>
+    The start of the window. Entries at or after this time are included. An ISO
+    8601 date or date and time, for example `2026-11-01T00:00:00Z`. A time
+    without an offset is read as UTC. Must be at least one minute in the past.
+  </Field>
+  <Field name="to" type="string" required={false} defaultValue="one minute ago">
+    The end of the window. An entry made exactly at `to` is not included. A
+    time later than one minute before your request is changed to one minute
+    before your request. The window can be 31 days or shorter.
+  </Field>
+  <Field name="page" type="integer" required={false} defaultValue="1">
+    The page of entries to fetch. Minimum `1`, maximum `10000`.
+  </Field>
+  <Field name="perPage" type="integer" required={false} defaultValue="15">
+    Entries per page. Minimum `1`, maximum `100`.
+  </Field>
+</Fields>
+
+## Request
+
+```bash filename="cURL"
+curl -G "https://api-prod.useknit.io/api/v1/business-api-services-wallets/c7ddb254-5da1-4136-b19e-733a00a31c70/statement" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json" \
+  --data-urlencode "from=2026-11-01T00:00:00Z" \
+  --data-urlencode "to=2026-12-01T00:00:00Z" \
+  --data-urlencode "perPage=100"
+```
+
+## Response
+
+```json filename="200 OK"
+{
+  "statusCode": 200,
+  "message": "Statement retrieved successfully",
+  "data": {
+    "accountId": "c7ddb254-5da1-4136-b19e-733a00a31c70",
+    "token": "USDT",
+    "from": "2026-11-01T00:00:00.000000Z",
+    "to": "2026-11-21T11:59:00.000000Z",
+    "asOf": "2026-11-21T12:00:00.000000Z",
+    "openingBalance": "100",
+    "closingBalance": "134.5",
+    "totalCredits": "70",
+    "totalDebits": "35.5",
+    "netChange": "34.5",
+    "entryCount": 2,
+    "entries": [
+      {
+        "id": "01a1fb82-b93a-7086-9a68-5d7a33965161",
+        "type": "CREDIT",
+        "category": "WALLETS COLLECTION",
+        "amount": "70",
+        "amountNet": "71",
+        "fee": "1",
+        "balanceAfter": "170",
+        "network": "TRON_MAINNET",
+        "sourceType": "WALLET_TRANSACTION",
+        "sourceId": "01a1fb82-b8f2-73a0-8b51-0f1e5a8a9c11",
+        "reversalOfId": null,
+        "description": null,
+        "createdAt": "2026-11-10T08:00:00.000000Z"
+      },
+      {
+        "id": "01a1fe1c-64ef-7326-9537-6ef0bf202770",
+        "type": "DEBIT",
+        "category": "PAYOUT",
+        "amount": "35.5",
+        "amountNet": "35",
+        "fee": "0.5",
+        "balanceAfter": "134.5",
+        "network": "TRON_MAINNET",
+        "sourceType": "PAYOUT",
+        "sourceId": "01a1fe1c-64e3-71f3-8a9a-37985087d7a1",
+        "reversalOfId": null,
+        "description": null,
+        "createdAt": "2026-11-12T09:00:00.000000Z"
+      }
+    ]
+  },
+  "pagination": {
+    "totalItems": 2,
+    "page": 1,
+    "perPage": 100,
+    "currentPage": 1,
+    "lastPage": 1
+  },
+  "success": true
+}
+```
+
+### Statement fields
+
+<Fields>
+  <Field name="from" type="string">
+    The start of the window that the statement used.
+  </Field>
+  <Field name="to" type="string">
+    The end of the window that the statement used. It is one minute before
+    `asOf` when you sent no `to`, or a `to` later than that. Knit waits one
+    minute because an entry can take a few seconds to be recorded after its
+    `createdAt`. Start your next statement at this `to`.
+  </Field>
+  <Field name="asOf" type="string">
+    The time Knit made the statement.
+  </Field>
+  <Field name="openingBalance" type="string">
+    The account balance at `from`.
+  </Field>
+  <Field name="closingBalance" type="string">
+    The account balance at `to`. It is always `openingBalance` plus
+    `totalCredits` minus `totalDebits`.
+  </Field>
+  <Field name="totalCredits" type="string">
+    The sum of `amount` of all `CREDIT` entries in the window, on all pages.
+  </Field>
+  <Field name="totalDebits" type="string">
+    The sum of `amount` of all `DEBIT` entries in the window, on all pages.
+  </Field>
+  <Field name="entryCount" type="integer">
+    The number of entries in the window, on all pages.
+  </Field>
+  <Field name="entries" type="array">
+    One page of entries, oldest first.
+  </Field>
+</Fields>
+
+The balance and total fields are the same on every page. Only `entries`
+changes from page to page.
+
+### Entry fields
+
+<Fields>
+  <Field name="id" type="string">
+    The ID of the entry. A deposit in [List deposits](/wallets/list-deposits)
+    shows this ID as `ledgerEntryId`.
+  </Field>
+  <Field name="type" type="string">
+    `CREDIT` adds `amount` to the balance. `DEBIT` takes `amount` from the
+    balance.
+  </Field>
+  <Field name="category" type="string">
+    What the entry is for, for example `PAYOUT`, `WALLETS COLLECTION` (a deposit
+    to an API wallet) or `COLLECTION`.
+  </Field>
+  <Field name="amount" type="string">
+    The change to the balance. For a payout it includes the fee.
+  </Field>
+  <Field name="amountNet" type="string">
+    For a payout, the amount the recipient got. For a deposit or a collection,
+    the amount that arrived before the fee.
+  </Field>
+  <Field name="fee" type="string">
+    The fee in this entry.
+  </Field>
+  <Field name="balanceAfter" type="string">
+    The account balance after this entry.
+  </Field>
+  <Field name="sourceType" type="string | null">
+    What made the entry: `PAYOUT`, `WALLET_TRANSACTION` (a deposit),
+    `COLLECTION`, `SUBSCRIPTION` or `TRANSACTION` (a transfer from or to your
+    business wallet). `null` when Knit did not record a source.
+  </Field>
+  <Field name="sourceId" type="string | null">
+    The ID of that payout, deposit, collection or transfer.
+  </Field>
+  <Field name="reversalOfId" type="string | null">
+    For a refund, the `id` of the entry it gives back. A refunded payout has a
+    `DEBIT` entry and a `CREDIT` entry with this field set to the debit's `id`.
+  </Field>
+</Fields>
+
+<Callout type="info">
+  Knit records entry times to the second. When several entries have the same
+  `createdAt`, the order between them can differ from the order in which they
+  happened. `openingBalance`, `closingBalance` and the totals do not change
+  because of this.
+</Callout>
+
+## Monthly statements
+
+The window can be 31 days or shorter, so one call can cover one calendar month.
+To read more than one month, request one month at a time. The `closingBalance`
+of one month is the `openingBalance` of the next month when the next `from` is
+the same time as the last `to`.
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `400` | A query parameter is not valid: `from` is missing or less than one minute in the past, `to` is before `from`, the window is longer than 31 days, or `perPage` is above `100`. The body carries an `errors` entry for the parameter |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `payout-wallets:read` |
+| `404` | No API account with that ID belongs to your business |

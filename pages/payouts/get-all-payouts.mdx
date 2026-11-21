@@ -1,12 +1,13 @@
 ---
 title: List payouts
-description: Fetch every payout your business has created, or find one by your own reference.
+description: Page through the payouts of your business, or find one by your own reference.
 ---
 
 # List payouts
 
-Returns the payouts belonging to your business, newest first. Pass
-`merchantReference` to find the payout you created with that reference.
+Returns the payouts belonging to your business, newest first. The list is
+paginated. Pass `merchantReference` to find the payout you created with that
+reference.
 
 <Endpoint method="GET" path="/api/v1/payouts" />
 
@@ -14,6 +15,12 @@ Returns the payouts belonging to your business, newest first. Pass
   <Scope value="payouts:read" />
   <Chip label="Auth" value="Bearer token" />
 </Meta>
+
+<Callout type="warning">
+  This endpoint used to return every payout in one response. It now returns
+  one page of 15 payouts by default. Read `pagination.lastPage` and fetch each
+  page, or set `perPage` up to `100`.
+</Callout>
 
 ## Query parameters
 
@@ -23,12 +30,32 @@ Returns the payouts belonging to your business, newest first. Pass
     item if that payout exists, and is empty if it does not. Maximum 255
     characters. If you send the parameter, it must not be empty.
   </Field>
+  <Field name="status" type="string" required={false}>
+    Only payouts with this status, for example `FAILED`. See the
+    [status lifecycle](/payouts/create-a-single-payout#status-lifecycle).
+  </Field>
+  <Field name="network" type="string" required={false}>
+    Only payouts on this network, for example `TRON_MAINNET`.
+  </Field>
+  <Field name="token" type="string" required={false}>
+    Only payouts of this token, for example `USDT`.
+  </Field>
+  <Field name="from" type="string" required={false}>
+    Only payouts created at or after this time. An ISO 8601 date or date and
+    time, for example `2026-11-01T00:00:00Z`. A time without an offset is read
+    as UTC.
+  </Field>
+  <Field name="to" type="string" required={false}>
+    Only payouts created before this time. A payout created exactly at `to` is
+    not included. Must be later than `from`.
+  </Field>
+  <Field name="page" type="integer" required={false} defaultValue="1">
+    The page to fetch. Minimum `1`, maximum `10000`.
+  </Field>
+  <Field name="perPage" type="integer" required={false} defaultValue="15">
+    Payouts per page. Minimum `1`, maximum `100`.
+  </Field>
 </Fields>
-
-<Callout type="info">
-  This endpoint returns the full result set. There is no `pagination` object
-  in the response.
-</Callout>
 
 ## Request
 
@@ -69,6 +96,13 @@ curl -G "https://api-prod.useknit.io/api/v1/payouts" \
       "updatedAt": "2024-08-27T13:47:03.000000Z"
     }
   ],
+  "pagination": {
+    "totalItems": 1,
+    "page": 1,
+    "perPage": 15,
+    "currentPage": 1,
+    "lastPage": 1
+  },
   "success": true
 }
 ```
@@ -95,5 +129,5 @@ curl -G "https://api-prod.useknit.io/api/v1/payouts" \
 
 | Status | Cause |
 | ------ | ----- |
-| `400` | `merchantReference` is empty or longer than 255 characters. The body carries an `errors.merchantReference` entry |
+| `400` | A query parameter is not valid, for example an empty `merchantReference`, `perPage` above `100` or `to` before `from`. The body carries an `errors` entry for the parameter |
 | `401` | Missing or invalid token, IP not allow-listed, or missing `payouts:read` |
