@@ -3,6 +3,7 @@
   "get-all-wallets": "List Wallets",
   "get-single-wallet": "Retrieve a Wallet",
   "get-single-wallet-transactions": "List Wallet Transactions",
+  "list-deposits": "List Deposits",
   "update-single-wallet": "Update a Wallet",
   "delete-single-wallet": "Delete a Wallet"
 }

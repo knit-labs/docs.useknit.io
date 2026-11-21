@@ -1,0 +1,164 @@
+---
+title: List deposits
+description: Page through every deposit to any of your API wallets.
+---
+
+# List deposits
+
+Returns the deposits to all of your API wallets, in one list.
+Use it to reconcile what your customers sent without one call per wallet.
+
+<Endpoint method="GET" path="/api/v1/deposits" />
+
+<Meta>
+  <Scope value="wallets:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+Knit records a deposit and credits it to your API account in one step. A
+deposit is in this list from that moment, which is also when Knit sends the
+[`WALLET_FUNDING_SUCCESSFUL` webhook](/webhooks/wallet-funding-successful).
+
+## Query parameters
+
+<Fields>
+  <Field name="page" type="integer" required={false} defaultValue="1">
+    The page to fetch. Minimum `1`, maximum `10000`.
+  </Field>
+  <Field name="perPage" type="integer" required={false} defaultValue="15">
+    Deposits per page. Minimum `1`, maximum `100`.
+  </Field>
+  <Field name="from" type="string" required={false}>
+    Only deposits recorded at or after this time. An ISO 8601 date or date and
+    time, for example `2026-11-01T00:00:00Z`. A time without an offset is read
+    as UTC.
+  </Field>
+  <Field name="to" type="string" required={false}>
+    Only deposits recorded before this time. A deposit recorded exactly at `to`
+    is not included, so one window can start where the last one ended. Must be
+    later than `from`.
+  </Field>
+  <Field name="order" type="string" required={false} defaultValue="desc">
+    `desc` returns the newest deposits first. `asc` returns the oldest first.
+  </Field>
+  <Field name="walletId" type="string" required={false}>
+    Only deposits to this API wallet.
+  </Field>
+  <Field name="network" type="string" required={false}>
+    Only deposits on this network, for example `TRON_MAINNET`.
+  </Field>
+  <Field name="token" type="string" required={false}>
+    Only deposits of this token, for example `USDT`.
+  </Field>
+  <Field name="transactionHash" type="string" required={false}>
+    Only deposits from this on-chain transaction. One transaction can pay
+    several of your wallets, so the list can have more than one item.
+  </Field>
+</Fields>
+
+## Request
+
+```bash filename="cURL"
+curl -G "https://api-prod.useknit.io/api/v1/deposits" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json" \
+  --data-urlencode "from=2026-11-20T00:00:00Z" \
+  --data-urlencode "to=2026-11-21T00:00:00Z" \
+  --data-urlencode "order=asc" \
+  --data-urlencode "perPage=100"
+```
+
+## Response
+
+```json filename="200 OK"
+{
+  "statusCode": 200,
+  "message": "Deposits fetched successfully",
+  "data": [
+    {
+      "id": "01a1fb82-b8f2-73a0-8b51-0f1e5a8a9c11",
+      "walletId": "01a1eef2-73e8-703f-a922-f1aa501123e1",
+      "network": "TRON_MAINNET",
+      "token": "USDT",
+      "value": "4500.000000000000000000",
+      "fromAddress": "TXk8rQSAvPvBBNtqSoY6nCfsXWCSSpTVQF",
+      "toAddress": "TTRK2ZZrvCHjZhZb8Qy3fJ9V2cKXmdaucN6",
+      "transactionHash": "5a1c0b8e4d7f2a9b3c6e1d0f8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b",
+      "status": "SUCCESSFUL",
+      "feeByToken": "5.000000000000000000",
+      "ledgerEntryId": "01a1fb82-b93a-7086-9a68-5d7a33965161",
+      "creditedAmount": "4495.000000000000000000",
+      "creditFee": "5.000000000000000000",
+      "createdAt": "2026-11-21T00:30:10.000000Z"
+    }
+  ],
+  "pagination": {
+    "totalItems": 1,
+    "page": 1,
+    "perPage": 100,
+    "currentPage": 1,
+    "lastPage": 1
+  },
+  "success": true
+}
+```
+
+<Fields>
+  <Field name="id" type="string">
+    Knit's ID for this deposit. It is unique for each credit, also when one
+    transaction pays several wallets. Use it to remove duplicates.
+  </Field>
+  <Field name="value" type="string">
+    The amount that arrived on chain.
+  </Field>
+  <Field name="creditedAmount" type="string | null">
+    The amount added to your API account: `value` minus `creditFee`, and never
+    less than `0`.
+  </Field>
+  <Field name="creditFee" type="string | null">
+    The fee Knit took from this deposit.
+  </Field>
+  <Field name="ledgerEntryId" type="string | null">
+    The ID of the matching credit on your
+    [API account statement](/API-account/get-statement).
+  </Field>
+  <Field name="feeByToken" type="string">
+    The fee estimate stored with the deposit. Reconcile on `creditFee`, which is
+    the fee Knit took.
+  </Field>
+</Fields>
+
+`ledgerEntryId`, `creditedAmount` and `creditFee` are `null` for deposits that
+Knit recorded before October 2026. Knit did not link a credit to its deposit
+then. The credit for such a deposit is still on your
+[API account statement](/API-account/get-statement).
+
+## Reconcile without gaps
+
+New deposits arrive while you page, and a deposit can take a few seconds to
+appear after its `createdAt`. To read every deposit:
+
+1. Pick a window that ends at least one minute in the past, for example the
+   last full hour.
+2. Send `order=asc` with that `from` and `to`.
+3. Read each page until `page` equals `lastPage`.
+4. Remove duplicates by `id`.
+5. Start the next window one minute before the `to` of this window.
+
+<Callout type="info">
+  The one-minute overlap in step 5 reads deposits near a window edge twice.
+  Step 4 removes the second copy.
+</Callout>
+
+<Callout type="info">
+  Amounts here have 18 decimal places, and the
+  [API account statement](/API-account/get-statement) trims trailing zeros.
+  Compare amounts as decimals, not as strings.
+</Callout>
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `400` | A query parameter is not valid, for example `order` other than `asc` or `desc`. The body carries an `errors` entry for the parameter |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `wallets:read` |

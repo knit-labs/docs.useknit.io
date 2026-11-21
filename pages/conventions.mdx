@@ -145,6 +145,11 @@ Only [List collections](/collections/get-all-collections) and
 [List wallet transactions](/wallets/get-single-wallet-transactions). These
 return the full envelope with `errors` alongside it.
 
+The other list endpoints ([List wallets](/wallets/get-all-wallets),
+[List deposits](/wallets/list-deposits), [List payouts](/payouts/get-all-payouts)
+and [Get a statement](/API-account/get-statement)) return the `400` shape above
+for bad query parameters.
+
 ```json filename="422 — query validation failed"
 {
   "statusCode": 422,
@@ -176,14 +181,14 @@ async function call(path, init) {
 
 ## Pagination
 
-Endpoints that paginate accept `page` and `per_page` and return a `pagination`
-object next to `data`.
+Endpoints that paginate accept `page` and a page size, and return a
+`pagination` object next to `data`.
 
 <Fields>
   <Field name="page" type="integer" defaultValue="1">
     The page to fetch. Minimum `1`.
   </Field>
-  <Field name="per_page" type="integer" defaultValue="15">
+  <Field name="perPage" type="integer" defaultValue="15">
     Items per page. Minimum `1`, maximum `100`.
   </Field>
 </Fields>
@@ -191,7 +196,7 @@ object next to `data`.
 ```json filename="Paginated response"
 {
   "statusCode": 200,
-  "message": "Wallet transactions fetched successfully",
+  "message": "Deposits fetched successfully",
   "data": [],
   "pagination": {
     "totalItems": 128,
@@ -204,14 +209,39 @@ object next to `data`.
 }
 ```
 
+These endpoints paginate:
+
+| Endpoint | Page size parameter |
+| -------- | ------------------- |
+| [List wallets](/wallets/get-all-wallets) | `perPage` |
+| [List deposits](/wallets/list-deposits) | `perPage` |
+| [List payouts](/payouts/get-all-payouts) | `perPage` |
+| [API account statement](/API-account/get-statement) | `perPage` |
+| [List collections](/collections/get-all-collections) | `perPage` |
+| [List wallet transactions](/wallets/get-single-wallet-transactions) | `per_page` only |
+
 <Callout type="info">
-  Note the asymmetry: you send `per_page`, and the response echoes it back as
-  `perPage`. Request parameters on this endpoint are snake_case; response keys
-  are always camelCase.
+  List wallet transactions is the one exception: send `per_page` there, and
+  read `perPage` back in the response. On the other endpoints, `perPage` and
+  `per_page` both work.
 </Callout>
 
-Not every list endpoint paginates. Where `pagination` is absent, the endpoint
-returned the full result set — each endpoint page states which applies.
+Where `pagination` is absent, the endpoint returned the full result set. Each
+endpoint page states which applies.
+
+### Time windows
+
+List wallets, List deposits, List payouts and the API account statement take
+`from` and `to`. Both are ISO 8601 dates or dates and times, for example
+`2026-11-01T00:00:00Z`. A time without an offset is read as UTC. Knit records
+times to the second, so it reads `from` and `to` to the second too:
+`10:00:00.500Z` is read as `10:00:00Z`.
+
+- `from` is inclusive: a record made exactly at `from` is included.
+- `to` is exclusive: a record made exactly at `to` is not included.
+
+So one window can start at the `to` of the last window, and no record is in
+both.
 
 ## Retrying safely
 

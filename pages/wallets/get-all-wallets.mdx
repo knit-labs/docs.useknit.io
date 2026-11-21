@@ -1,11 +1,12 @@
 ---
 title: List wallets
-description: Fetch every API wallet belonging to your business.
+description: Page through the API wallets of your business.
 ---
 
 # List wallets
 
-Returns all API wallets your business has created, across every network.
+Returns the API wallets your business has created, across every network,
+newest first. The list is paginated.
 
 <Endpoint method="GET" path="/api/v1/wallets" />
 
@@ -14,12 +15,40 @@ Returns all API wallets your business has created, across every network.
   <Chip label="Auth" value="Bearer token" />
 </Meta>
 
+<Callout type="warning">
+  This endpoint used to return every wallet in one response. It now returns
+  one page of 15 wallets by default. Read `pagination.lastPage` and fetch each
+  page, or set `perPage` up to `100`.
+</Callout>
+
+## Query parameters
+
+<Fields>
+  <Field name="page" type="integer" required={false} defaultValue="1">
+    The page to fetch. Minimum `1`, maximum `10000`.
+  </Field>
+  <Field name="perPage" type="integer" required={false} defaultValue="15">
+    Wallets per page. Minimum `1`, maximum `100`.
+  </Field>
+  <Field name="from" type="string" required={false}>
+    Only wallets created at or after this time. An ISO 8601 date or date and
+    time, for example `2026-11-01T00:00:00Z`. A time without an offset is read
+    as UTC.
+  </Field>
+  <Field name="to" type="string" required={false}>
+    Only wallets created before this time. The wallet created exactly at `to`
+    is not included. Must be later than `from`.
+  </Field>
+</Fields>
+
 ## Request
 
 ```bash filename="cURL"
-curl "https://api-prod.useknit.io/api/v1/wallets" \
+curl -G "https://api-prod.useknit.io/api/v1/wallets" \
   -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
-  -H "Accept: application/json"
+  -H "Accept: application/json" \
+  --data-urlencode "perPage=100" \
+  --data-urlencode "page=1"
 ```
 
 ## Response
@@ -41,18 +70,26 @@ curl "https://api-prod.useknit.io/api/v1/wallets" \
       "updatedAt": "2024-02-26T13:59:19.000000Z"
     }
   ],
+  "pagination": {
+    "totalItems": 353,
+    "page": 1,
+    "perPage": 100,
+    "currentPage": 1,
+    "lastPage": 4
+  },
   "success": true
 }
 ```
 
 <Callout type="info">
-  This endpoint returns every wallet in one response. Cache the mapping between
-  your customers and wallet IDs on your side rather than calling this on each
-  request.
+  Keep the mapping between your customers and wallet IDs on your side. Use this
+  list to load that mapping once, not on each request. To see what your
+  wallets received, use [List deposits](/wallets/list-deposits).
 </Callout>
 
 ## Errors
 
 | Status | Cause |
 | ------ | ----- |
+| `400` | A query parameter is not valid, for example `perPage` above `100` or `to` before `from`. The body carries an `errors` entry for the parameter |
 | `401` | Missing or invalid token, IP not allow-listed, or missing `wallets:read` |
