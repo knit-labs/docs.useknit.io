@@ -85,7 +85,9 @@ const key = `${payload.transactionHash}:${payload.eventIndex}`;
   Knit does not hold the funds these events describe. The webhook tells you
   money moved; acting on it — crediting a customer, releasing goods — is
   entirely your decision, and you should apply your own confirmation policy
-  before treating a transfer as final.
+  before treating a transfer as final. Knit sends the event only after the
+  transfer has the confirmations listed under
+  [Deposit confirmations](/webhooks/wallet-funding-successful#deposit-confirmations).
 </Callout>
 
 ## See also

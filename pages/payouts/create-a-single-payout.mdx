@@ -63,6 +63,22 @@ Each network's own coin can be paid out on that network only.
 A coin payout needs an [API account](/API-account/create-an-API-account) for
 that coin. Send the amount as a string to keep all of its decimals.
 
+## Paying a Knit address
+
+You can pay out USDT or USDC to an address that another Knit business owns,
+for example a deposit address of that business's wallet. Knit credits that
+business once, after the network confirms the payment. Very small amounts are
+credited too.
+
+These Knit addresses are refused with `400`, and nothing is held:
+
+| Message | Cause |
+| ------- | ----- |
+| `This address is a one-time Knit payment address and cannot receive payouts.` | The address belongs to a collection, a payment link or a deposit link |
+| `This Knit address does not receive deposits on this network. Ask the recipient for their address on this network.` | The address is a Knit wallet address, but not on the `network` you pay out on |
+| `This Knit address does not receive USDC on this network. Ask the recipient for an address that receives USDC.` | The address is a Knit business wallet address, but that business cannot receive the token you pay out (`USDT` or `USDC`) on this network. The message names that token |
+| `Coins cannot be paid out to a Knit address. Pay out USDT or USDC, or use an address outside Knit.` | The payout is a coin (`ETH`, `BNB`, `POL`, `TRX` or `SOL`) and the address belongs to Knit |
+
 ## Body
 
 <Fields>
@@ -161,7 +177,7 @@ yet.
 | `PENDING` | Accepted and queued. The balance has been held |
 | `PROCESSING` | Submitted for settlement; awaiting on-chain confirmation |
 | `COMPLETED` | Confirmed on-chain. `transactionHash` is populated and a `PAYOUT_SUCCESSFUL` webhook is delivered |
-| `FAILED` | Could not be submitted for settlement. Check `info` for the reason. Knit retries it automatically, and `nextRetryAt` shows the next attempt |
+| `FAILED` | Could not be submitted for settlement. Check `info` for the reason. Knit retries it automatically, and `nextRetryAt` shows the next attempt. When Knit stops retrying it and knows nothing was sent on chain, you receive a [`PAYOUT_FAILED` webhook](/webhooks/payout-failed) |
 | `CANCELLED` | Cancelled by Knit support. Knit does not retry it automatically, but support can still send it until it is refunded. When support refunds it, the held amount returns to your API account and you receive a `PAYOUT_REFUNDED` webhook |
 
 <Callout type="warning">
