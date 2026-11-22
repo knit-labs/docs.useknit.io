@@ -1,0 +1,193 @@
+---
+title: Create a bridge
+description: Move your network liquidity of USDT or USDC from one network to another.
+---
+
+# Create a bridge
+
+Moves your network liquidity of a token from one network to another, so that
+payouts on the destination network have enough to draw on. The move is
+instant. Your [API account](/API-account/get-all-API-accounts) balance for the
+token goes down by the fee only.
+
+<Endpoint method="POST" path="/api/v1/bridges" />
+
+<Meta>
+  <Scope value="payout-wallets:write" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+## How it works
+
+A payout draws on two balances: the API account for its token, and your
+[network liquidity](/API-account/get-network-liquidity) for that token on the
+network you pay out on. A bridge changes the second one:
+
+| Balance | Change |
+| ------- | ------ |
+| Network liquidity on `fromNetwork` | Goes down by `amount` plus `fee` |
+| Network liquidity on `toNetwork` | Goes up by `amount` |
+| API account balance for `token` | Goes down by `fee` |
+
+Knit refuses the bridge, and changes nothing, if the API account balance or
+the liquidity on `fromNetwork` is less than `amount` plus `fee`. Call
+[Quote a bridge](/API-account/quote-a-bridge) first to see the fee.
+
+If your business keeps deposits on Tron in its own Tron wallet, that part of
+your Tron liquidity pays your Tron payouts and cannot be moved. Only the rest
+of your Tron liquidity can be bridged.
+
+## Body
+
+<Fields>
+  <Field name="merchantReference" type="string" required>
+    Your own reference for this bridge. It must be unique among the bridges of
+    your business. Maximum 255 characters. This is what makes retries safe.
+  </Field>
+  <Field name="token" type="string" required>
+    `USDT` or `USDC`. Coins cannot be moved between networks.
+  </Field>
+  <Field name="fromNetwork" type="string" required>
+    The network to move the liquidity from, for example `TRON_MAINNET`. It must
+    be a network that [`GET /api/v1/networks`](/networks/get-supported-networks)
+    shows the token on.
+  </Field>
+  <Field name="toNetwork" type="string" required>
+    The network to move the liquidity to, for example `ETHEREUM_MAINNET`. Payouts
+    of the token must be active on it in `GET /api/v1/networks`. It must not be
+    the same as `fromNetwork`.
+  </Field>
+  <Field name="amount" type="number | string" required>
+    The amount that arrives on `toNetwork`, in token units. Minimum `0.01`. The
+    fee is added on top.
+  </Field>
+</Fields>
+
+## Reusing a reference
+
+Knit checks `merchantReference` first. A request with a reference that your
+business has already used gets the duplicate `400` shown under
+[Errors](#errors), and nothing moves. This is also true for a retry that
+arrives while the first request is still being processed.
+
+If you are not sure of the outcome, send the request again with the same
+reference and the same body, or look the reference up with
+[List bridges](/API-account/get-all-bridges) and `?merchantReference=`.
+
+## Request
+
+```bash filename="cURL"
+curl -X POST "https://api-prod.useknit.io/api/v1/bridges" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "merchantReference": "rebalance-001",
+    "token": "USDT",
+    "fromNetwork": "TRON_MAINNET",
+    "toNetwork": "ETHEREUM_MAINNET",
+    "amount": "200"
+  }'
+```
+
+## Response
+
+Returns `201`. The bridge is complete when you get the response: its status is
+`SUCCESSFUL`.
+
+```json filename="201 Created"
+{
+  "statusCode": 201,
+  "message": "Bridge created successfully",
+  "data": {
+    "id": "9f3c2a71-5d0e-4b8a-9a43-6c2f1e7b8d10",
+    "merchantReference": "rebalance-001",
+    "token": "USDT",
+    "fromNetwork": "TRON_MAINNET",
+    "toNetwork": "ETHEREUM_MAINNET",
+    "amount": "200",
+    "fee": "2",
+    "totalDebit": "202",
+    "accountBalanceBefore": "500",
+    "accountBalanceAfter": "498",
+    "status": "SUCCESSFUL",
+    "createdAt": "2026-11-21T23:10:04.000000Z"
+  },
+  "success": true
+}
+```
+
+<Fields>
+  <Field name="amount" type="string">
+    The amount added to your liquidity on `toNetwork`.
+  </Field>
+  <Field name="fee" type="string">
+    The bridge fee. `0` when no fee applies.
+  </Field>
+  <Field name="totalDebit" type="string">
+    `amount` plus `fee`: the amount taken from your liquidity on `fromNetwork`.
+  </Field>
+  <Field name="accountBalanceBefore" type="string">
+    The API account balance for `token` before the bridge.
+  </Field>
+  <Field name="accountBalanceAfter" type="string">
+    The API account balance for `token` after the bridge. It is lower than
+    `accountBalanceBefore` by `fee` only.
+  </Field>
+  <Field name="status" type="string">
+    Always `SUCCESSFUL`. A bridge that Knit refuses is not created.
+  </Field>
+</Fields>
+
+<Callout type="info">
+  When the fee is above `0`, the [statement](/API-account/get-statement) of the
+  API account shows one `DEBIT` entry for the fee, with `category` and
+  `sourceType` `BRIDGE` and `sourceId` the bridge `id`. A bridge with no fee
+  does not change the balance and has no entry.
+</Callout>
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `400` | A field failed validation, for example a `merchantReference` your business has already used, a coin as `token`, the same network twice, or a network the token cannot be moved from or to |
+| `400` | `Insufficient balance in wallet`: the API account balance is less than `amount` plus `fee` |
+| `400` | `Insufficient network liquidity`: the liquidity on `fromNetwork` is less than `amount` plus `fee` |
+| `400` | `Only 200 USDT, including the bridge fee, can be moved from TRON_MAINNET. …`: part of the liquidity is held in your business's own wallet on that network, and the rest is less than `amount` plus `fee` |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `payout-wallets:write` |
+| `403` | API Services are not enabled for your business |
+| `404` | `Wallet not found for the specified token`: no API account exists for that token yet |
+| `503` | `Bridges are temporarily unavailable. Please try again later.` Knit has paused bridges. Nothing moved, so try again later with the same reference |
+
+A validation failure names the field in `errors`. A reused `merchantReference`
+is always the `message`, even when another field also fails:
+
+```json filename="400 — validation failed"
+{
+  "message": "The merchant reference has already been taken.",
+  "errors": {
+    "merchantReference": ["The merchant reference has already been taken."]
+  }
+}
+```
+
+A network that a token cannot be moved from:
+
+```json filename="400 — validation failed"
+{
+  "message": "USDC can't be moved from TRON_MAINNET.",
+  "errors": {
+    "fromNetwork": ["USDC can't be moved from TRON_MAINNET."]
+  }
+}
+```
+
+A refused bridge carries the standard envelope and no `errors`:
+
+```json filename="400 — insufficient network liquidity"
+{
+  "statusCode": 400,
+  "message": "Insufficient network liquidity",
+  "data": null,
+  "success": false
+}
+```

@@ -1,0 +1,63 @@
+---
+title: Retrieve a bridge
+description: Read one bridge of your business by its ID.
+---
+
+# Retrieve a bridge
+
+Returns one bridge of your business.
+
+<Endpoint method="GET" path="/api/v1/bridges/{id}" />
+
+<Meta>
+  <Scope value="payout-wallets:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+## Path parameters
+
+<Fields>
+  <Field name="id" type="string" required>
+    The `id` from the [Create a bridge](/API-account/create-a-bridge) response.
+  </Field>
+</Fields>
+
+## Request
+
+```bash filename="cURL"
+curl "https://api-prod.useknit.io/api/v1/bridges/9f3c2a71-5d0e-4b8a-9a43-6c2f1e7b8d10" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json"
+```
+
+## Response
+
+```json filename="200 OK"
+{
+  "statusCode": 200,
+  "message": "Bridge retrieved successfully",
+  "data": {
+    "id": "9f3c2a71-5d0e-4b8a-9a43-6c2f1e7b8d10",
+    "merchantReference": "rebalance-001",
+    "token": "USDT",
+    "fromNetwork": "TRON_MAINNET",
+    "toNetwork": "ETHEREUM_MAINNET",
+    "amount": "200",
+    "fee": "2",
+    "totalDebit": "202",
+    "accountBalanceBefore": "500",
+    "accountBalanceAfter": "498",
+    "status": "SUCCESSFUL",
+    "createdAt": "2026-11-21T23:10:04.000000Z"
+  },
+  "success": true
+}
+```
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `payout-wallets:read` |
+| `403` | API Services are not enabled for your business |
+| `404` | `Bridge not found`: no bridge of your business has this `id` |

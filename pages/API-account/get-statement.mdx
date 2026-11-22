@@ -188,11 +188,13 @@ changes from page to page.
   </Field>
   <Field name="sourceType" type="string | null">
     What made the entry: `PAYOUT`, `WALLET_TRANSACTION` (a deposit),
-    `COLLECTION`, `SUBSCRIPTION` or `TRANSACTION` (a transfer from or to your
-    business wallet). `null` when Knit did not record a source.
+    `COLLECTION`, `SUBSCRIPTION`, `TRANSACTION` (a transfer from or to your
+    business wallet) or `BRIDGE` (the fee of a
+    [bridge](/API-account/create-a-bridge)). `null` when Knit did not record a
+    source.
   </Field>
   <Field name="sourceId" type="string | null">
-    The ID of that payout, deposit, collection or transfer.
+    The ID of that payout, deposit, collection, transfer or bridge.
   </Field>
   <Field name="reversalOfId" type="string | null">
     For a refund, the `id` of the entry it gives back. A refunded payout has a

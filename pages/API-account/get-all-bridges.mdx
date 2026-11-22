@@ -1,0 +1,96 @@
+---
+title: List bridges
+description: Page through the bridges of your business, or find one by your own reference.
+---
+
+# List bridges
+
+Returns the bridges of your business, newest first. The list is paginated.
+Pass `merchantReference` to find the bridge you created with that reference.
+
+<Endpoint method="GET" path="/api/v1/bridges" />
+
+<Meta>
+  <Scope value="payout-wallets:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+## Query parameters
+
+<Fields>
+  <Field name="merchantReference" type="string" required={false}>
+    Only the bridge you created with this `merchantReference`. The list has one
+    item if that bridge exists, and is empty if it does not. Maximum 255
+    characters. If you send the parameter, it must not be empty.
+  </Field>
+  <Field name="token" type="string" required={false}>
+    Only bridges of this token, for example `USDT`.
+  </Field>
+  <Field name="from" type="string" required={false}>
+    Only bridges created at or after this time. An ISO 8601 date or date and
+    time, for example `2026-11-01T00:00:00Z`. A time without an offset is read
+    as UTC.
+  </Field>
+  <Field name="to" type="string" required={false}>
+    Only bridges created before this time. Must be later than `from`.
+  </Field>
+  <Field name="page" type="integer" required={false} defaultValue="1">
+    The page to fetch. Minimum `1`, maximum `10000`.
+  </Field>
+  <Field name="perPage" type="integer" required={false} defaultValue="15">
+    Bridges per page. Minimum `1`, maximum `100`.
+  </Field>
+</Fields>
+
+## Request
+
+```bash filename="cURL"
+curl -G "https://api-prod.useknit.io/api/v1/bridges" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json" \
+  --data-urlencode "merchantReference=rebalance-001"
+```
+
+## Response
+
+```json filename="200 OK"
+{
+  "statusCode": 200,
+  "message": "Bridges retrieved successfully",
+  "data": [
+    {
+      "id": "9f3c2a71-5d0e-4b8a-9a43-6c2f1e7b8d10",
+      "merchantReference": "rebalance-001",
+      "token": "USDT",
+      "fromNetwork": "TRON_MAINNET",
+      "toNetwork": "ETHEREUM_MAINNET",
+      "amount": "200",
+      "fee": "2",
+      "totalDebit": "202",
+      "accountBalanceBefore": "500",
+      "accountBalanceAfter": "498",
+      "status": "SUCCESSFUL",
+      "createdAt": "2026-11-21T23:10:04.000000Z"
+    }
+  ],
+  "pagination": {
+    "totalItems": 1,
+    "page": 1,
+    "perPage": 15,
+    "currentPage": 1,
+    "lastPage": 1
+  },
+  "success": true
+}
+```
+
+Each item has the fields of the
+[Create a bridge](/API-account/create-a-bridge#response) response.
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `400` | A query parameter is not valid, for example an empty `merchantReference`, `perPage` above `100` or `to` before `from`. The body carries an `errors` entry for the parameter |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `payout-wallets:read` |
+| `403` | API Services are not enabled for your business |

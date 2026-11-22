@@ -1,0 +1,86 @@
+---
+title: Quote a bridge
+description: See the fee and the balances of a bridge before you create it.
+---
+
+# Quote a bridge
+
+Returns the fee of a bridge and what your API account balance would be after
+it. Nothing moves and nothing is held. Use it before
+[Create a bridge](/API-account/create-a-bridge).
+
+<Endpoint method="POST" path="/api/v1/bridges/quote" />
+
+<Meta>
+  <Scope value="payout-wallets:write" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+## Body
+
+The same fields as [Create a bridge](/API-account/create-a-bridge#body),
+without `merchantReference`.
+
+<Fields>
+  <Field name="token" type="string" required>
+    `USDT` or `USDC`.
+  </Field>
+  <Field name="fromNetwork" type="string" required>
+    The network to move the liquidity from.
+  </Field>
+  <Field name="toNetwork" type="string" required>
+    The network to move the liquidity to. Payouts of the token must be active
+    on it.
+  </Field>
+  <Field name="amount" type="number | string" required>
+    The amount that would arrive on `toNetwork`. Minimum `0.01`.
+  </Field>
+</Fields>
+
+## Request
+
+```bash filename="cURL"
+curl -X POST "https://api-prod.useknit.io/api/v1/bridges/quote" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "token": "USDT",
+    "fromNetwork": "TRON_MAINNET",
+    "toNetwork": "ETHEREUM_MAINNET",
+    "amount": "200"
+  }'
+```
+
+## Response
+
+```json filename="200 OK"
+{
+  "statusCode": 200,
+  "message": "Bridge quote retrieved successfully",
+  "data": {
+    "token": "USDT",
+    "fromNetwork": "TRON_MAINNET",
+    "toNetwork": "ETHEREUM_MAINNET",
+    "amount": "200",
+    "fee": "2",
+    "totalDebit": "202",
+    "accountBalanceBefore": "500",
+    "accountBalanceAfter": "498"
+  },
+  "success": true
+}
+```
+
+The fields have the same meaning as in the
+[Create a bridge](/API-account/create-a-bridge#response) response.
+
+<Callout type="info">
+  A quote is not held. The fee or your balances can change before you create
+  the bridge, and the create request uses the values at that time.
+</Callout>
+
+## Errors
+
+The same as [Create a bridge](/API-account/create-a-bridge#errors), except that
+there is no `merchantReference` check. A quote that your balance or liquidity
+cannot cover gets the same `400` that the create request would get.
