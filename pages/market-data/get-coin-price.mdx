@@ -1,0 +1,85 @@
+---
+title: Retrieve a coin price
+description: Read the current US dollar price of one coin, with its description, links and categories.
+---
+
+# Retrieve a coin price
+
+Returns the current US dollar price of one coin, with the change over the last
+24 hours. It also gives a short description of the coin, links to its official
+sites, and its categories, so you can show a coin details screen without a
+second data source.
+
+<Endpoint method="GET" path="/api/v1/market/coins/{id}" />
+
+<Meta>
+  <Scope value="market-data:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+## Path parameters
+
+<Fields>
+  <Field name="id" type="string" required>
+    The coin's `id`, from [List coin prices](/market-data/list-coin-prices), for
+    example `bitcoin`. Use lowercase.
+  </Field>
+</Fields>
+
+## Request
+
+```bash filename="cURL"
+curl "https://api-prod.useknit.io/api/v1/market/coins/bitcoin" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json"
+```
+
+## Response
+
+```json filename="200 OK"
+{
+  "statusCode": 200,
+  "message": "Market coin fetched successfully",
+  "data": {
+    "id": "bitcoin",
+    "symbol": "BTC",
+    "name": "Bitcoin",
+    "rank": 1,
+    "logoUrl": null,
+    "priceUsd": "60911.34164609",
+    "change24hPercent": "-1.24",
+    "priceUpdatedAt": "2026-11-22T21:40:47Z",
+    "isStale": false,
+    "description": "Bitcoin is the first decentralised digital currency. It was launched in 2009 by the pseudonymous Satoshi Nakamoto. Bitcoin runs on a public proof-of-work blockchain with a maximum supply of 21 million coins, and people send it directly to each other without a bank in between.",
+    "links": ["https://bitcoin.org", "https://bitcoin.org/bitcoin.pdf"],
+    "categories": ["Layer 1", "Proof of Work", "Store of Value"]
+  },
+  "success": true
+}
+```
+
+The price fields are the same as in [List coin prices](/market-data/list-coin-prices).
+This endpoint adds three fields:
+
+<Fields>
+  <Field name="description" type="string | null">
+    A short description of the coin in plain English, or `null` when Knit has
+    none.
+  </Field>
+  <Field name="links" type="string[]">
+    Links to the coin's official sites. The list can be empty.
+  </Field>
+  <Field name="categories" type="string[]">
+    Labels for the kind of coin, for example `Stablecoins`. The list can be
+    empty.
+  </Field>
+</Fields>
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `market-data:read` |
+| `403` | API Services are not enabled for your business |
+| `404` | `Market coin not found.` Knit does not track a coin with that `id` |
+| `503` | `Market data is temporarily unavailable.` Knit has had no prices for more than one hour. Show your last known price and try again later |

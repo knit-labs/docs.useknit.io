@@ -1,0 +1,141 @@
+---
+title: List coin prices
+description: Read the current US dollar price and 24-hour change of the coins Knit tracks.
+---
+
+# List coin prices
+
+Returns the current US dollar price of every coin Knit tracks, with the change
+over the last 24 hours. Coins come in rank order. Use these prices to show
+values to your users, for example on a market screen or next to a balance.
+
+<Endpoint method="GET" path="/api/v1/market/coins" />
+
+<Meta>
+  <Scope value="market-data:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+<Callout type="info">
+  These prices are for display. They are not an offer to buy or sell, and Knit
+  does not use them to price your collections or payouts.
+</Callout>
+
+## Coins
+
+| `id` | `symbol` | Name |
+| ---- | -------- | ---- |
+| `bitcoin` | `BTC` | Bitcoin |
+| `ethereum` | `ETH` | Ethereum |
+| `tether` | `USDT` | Tether |
+| `ripple` | `XRP` | XRP |
+| `binancecoin` | `BNB` | BNB |
+| `solana` | `SOL` | Solana |
+| `usd-coin` | `USDC` | USDC |
+| `dogecoin` | `DOGE` | Dogecoin |
+| `tron` | `TRX` | TRON |
+| `cardano` | `ADA` | Cardano |
+
+The `id` values are the same as the coin ids that CoinGecko uses. Knit can add
+coins to this list. Read the list from the response, and do not hard-code it.
+
+## Request
+
+```bash filename="cURL"
+curl "https://api-prod.useknit.io/api/v1/market/coins" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json"
+```
+
+## Response
+
+The example shows two of the coins.
+
+```json filename="200 OK"
+{
+  "statusCode": 200,
+  "message": "Market coins fetched successfully",
+  "data": [
+    {
+      "id": "bitcoin",
+      "symbol": "BTC",
+      "name": "Bitcoin",
+      "rank": 1,
+      "logoUrl": null,
+      "priceUsd": "60911.34164609",
+      "change24hPercent": "-1.24",
+      "priceUpdatedAt": "2026-11-22T21:40:47Z",
+      "isStale": false
+    },
+    {
+      "id": "ethereum",
+      "symbol": "ETH",
+      "name": "Ethereum",
+      "rank": 2,
+      "logoUrl": null,
+      "priceUsd": "1721.7028",
+      "change24hPercent": "-0.42",
+      "priceUpdatedAt": "2026-11-22T21:41:01Z",
+      "isStale": false
+    }
+  ],
+  "success": true
+}
+```
+
+<Fields>
+  <Field name="id" type="string">
+    The coin's identifier. Use it to [retrieve one coin](/market-data/get-coin-price)
+    or to [get its price history](/market-data/get-price-history).
+  </Field>
+  <Field name="symbol" type="string">
+    The coin's ticker, for example `BTC`.
+  </Field>
+  <Field name="name" type="string">
+    The coin's display name.
+  </Field>
+  <Field name="rank" type="integer">
+    The coin's position in the list, starting at `1`.
+  </Field>
+  <Field name="logoUrl" type="string | null">
+    A link to the coin's logo, or `null` when Knit has no logo for it. Show
+    your own icon when it is `null`.
+  </Field>
+  <Field name="priceUsd" type="string | null">
+    The price of one coin in US dollars, as a decimal string. It can have up
+    to 18 decimals, so round it for display. Parse it with a decimal library.
+    A float loses precision. It is `null` when Knit has no price for the coin
+    at the moment.
+  </Field>
+  <Field name="change24hPercent" type="string | null">
+    The change in price over the last 24 hours, in percent, with two decimals.
+    A fall has a minus sign, for example `-0.42`. It is `null` when Knit has
+    no price from 24 hours ago.
+  </Field>
+  <Field name="priceUpdatedAt" type="string | null">
+    When the source last updated the price, in ISO 8601 UTC. A price that does
+    not move much can keep the same time for some minutes. It is `null` when
+    `priceUsd` is `null`.
+  </Field>
+  <Field name="isStale" type="boolean">
+    `true` when the price has not been updated for longer than usual, or when
+    `priceUsd` is `null`. Show a stale price with a warning, or hide it.
+  </Field>
+</Fields>
+
+<Callout type="warning">
+  Check `isStale` before you show a price. Knit refreshes the prices at most
+  every 30 seconds, so calling more often gives the same answer. If Knit
+  cannot get new prices, it continues to send the last prices it got, for up
+  to one hour. `isStale` changes to `true` about 10 minutes after a coin's
+  usual update time has passed, and `priceUpdatedAt` tells you the age of the
+  price. After one hour without new prices, the endpoint answers `503`.
+</Callout>
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `market-data:read` |
+| `403` | API Services are not enabled for your business |
+| `503` | `Market data is temporarily unavailable.` Knit has had no prices for more than one hour. Show your last known prices and try again later |

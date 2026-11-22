@@ -1,0 +1,114 @@
+---
+title: Get price history
+description: Read the past US dollar prices of one coin, for a chart.
+---
+
+# Get price history
+
+Returns the past US dollar prices of one coin between two times, oldest
+first. Use it to draw a price chart. Knit records the price of every coin once
+every 5 minutes.
+
+<Endpoint method="GET" path="/api/v1/market/coins/{id}/history" />
+
+<Meta>
+  <Scope value="market-data:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+## Path parameters
+
+<Fields>
+  <Field name="id" type="string" required>
+    The coin's `id`, from [List coin prices](/market-data/list-coin-prices), for
+    example `bitcoin`.
+  </Field>
+</Fields>
+
+## Query parameters
+
+<Fields>
+  <Field name="from" type="integer" required={false} defaultValue="24 hours before to">
+    The start of the range, as a Unix timestamp in seconds. A point at `from`
+    is included.
+  </Field>
+  <Field name="to" type="integer" required={false} defaultValue="now">
+    The end of the range, as a Unix timestamp in seconds. A point at `to` is
+    included. Must not be before `from`.
+  </Field>
+  <Field name="interval" type="string" required={false} defaultValue="see below">
+    The time between two points: `5m`, `1h` or `1d`. Without it, Knit uses the
+    shortest interval that gives 1,000 points or fewer for the range. The
+    default range of 24 hours gets `5m`.
+  </Field>
+</Fields>
+
+A response holds 1,000 points at most. For a long range, use a longer
+interval or ask for the range in parts.
+
+## Request
+
+```bash filename="cURL"
+curl -G "https://api-prod.useknit.io/api/v1/market/coins/bitcoin/history" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json" \
+  --data-urlencode "from=1795383300" \
+  --data-urlencode "to=1795383600" \
+  --data-urlencode "interval=5m"
+```
+
+## Response
+
+```json filename="200 OK"
+{
+  "statusCode": 200,
+  "message": "Market coin history fetched successfully",
+  "data": {
+    "id": "bitcoin",
+    "interval": "5m",
+    "points": [
+      { "timestamp": 1795383300, "priceUsd": "60873.54" },
+      { "timestamp": 1795383600, "priceUsd": "60893.64012672" }
+    ]
+  },
+  "success": true
+}
+```
+
+<Fields>
+  <Field name="id" type="string">
+    The coin's `id`.
+  </Field>
+  <Field name="interval" type="string">
+    The interval that Knit used: `5m`, `1h` or `1d`. It is the one you asked
+    for, or the one Knit chose.
+  </Field>
+  <Field name="points" type="object[]">
+    The prices, oldest first. The list is empty when Knit has no price in the
+    range.
+  </Field>
+  <Field name="points[].timestamp" type="integer">
+    The time of the price, as a Unix timestamp in seconds. Points fall on
+    whole intervals in UTC: every 5 minutes for `5m`, on the hour for `1h`,
+    and at midnight UTC for `1d`.
+  </Field>
+  <Field name="points[].priceUsd" type="string">
+    The price of one coin in US dollars at that time, as a decimal string.
+  </Field>
+</Fields>
+
+<Callout type="info">
+  Knit does not fill gaps. When no price was recorded at a time, there is no
+  point for that time, so the time between two points can be longer than the
+  interval. There are no points for times before Knit started to record
+  prices.
+</Callout>
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `400` | A query parameter is not valid: `from` or `to` is not a whole number of `0` or more, `to` is before `from`, `interval` is not `5m`, `1h` or `1d`, or the range holds more than 1,000 points. The body carries an `errors` entry for the parameter |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `market-data:read` |
+| `403` | API Services are not enabled for your business |
+| `404` | `Market coin not found.` Knit does not track a coin with that `id` |
