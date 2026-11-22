@@ -70,7 +70,8 @@ curl "https://api-prod.useknit.io/api/v1/network-liquidity" \
 <Callout type="info">
   Only networks and tokens with a balance above zero are listed. A network or
   token that is not in the list has a balance of `0`, and a payout on it fails
-  with `400` `Insufficient network liquidity`.
+  with `400` `Insufficient network liquidity`. To move liquidity from one
+  network to another, [create a bridge](/API-account/create-a-bridge).
 </Callout>
 
 <Callout type="info">
