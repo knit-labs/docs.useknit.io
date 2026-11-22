@@ -19,14 +19,36 @@ and accepts any number of deposits.
 
 ## Supported networks
 
-| Network | Identifier |
-| ------- | ---------- |
-| Polygon | `MATIC_MAINNET` |
-| Polygon Amoy (testnet) | `MATIC_AMOY` |
-| BNB Smart Chain | `BSC_MAINNET` |
-| Ethereum | `ETHEREUM_MAINNET` |
-| Bitcoin | `BITCOIN_MAINNET` |
-| Tron | `TRON_MAINNET` |
+| Network | Identifier | Type |
+| ------- | ---------- | ---- |
+| Polygon | `MATIC_MAINNET` | EVM |
+| Polygon Amoy (testnet) | `MATIC_AMOY` | EVM |
+| BNB Smart Chain | `BSC_MAINNET` | EVM |
+| Ethereum | `ETHEREUM_MAINNET` | EVM |
+| Base | `BASE_MAINNET` | EVM |
+| Tron | `TRON_MAINNET` | Tron |
+
+USDT is not available on Base.
+
+## One address on several networks
+
+An EVM wallet can receive deposits on more than one EVM network. List the
+networks in `networks` when you create the wallet. Knit gives the wallet one
+address, and that address receives deposits on every network in the list.
+
+- **You can add EVM networks later.** Send them in `networks` to
+  [Update a wallet](/wallets/update-single-wallet). The address stays the
+  same. Knit never removes a network from a wallet.
+- **Knit watches only the listed networks.** Tell your customers which
+  networks they can use.
+- **Tron has its own wallet.** A wallet holds EVM networks or Tron, not both.
+  A Tron wallet uses `TRON_MAINNET` only.
+
+<Callout type="warning">
+  The address is the same on every EVM network. If a customer sends funds to it
+  on a network that is not in `networks`, Knit does not detect the deposit and
+  does not credit your API account. Add the network first.
+</Callout>
 
 ## Body
 
@@ -37,9 +59,9 @@ Provide either `network` or `networks` — not both.
     A single network identifier. Required unless `networks` is supplied.
   </Field>
   <Field name="networks" type="string[]" required={false}>
-    One or more network identifiers, for an address usable across compatible
-    chains. Required unless `network` is supplied; must contain at least one
-    entry.
+    One or more network identifiers of the same type. The wallet gets one
+    address that receives deposits on all of them. Required unless `network`
+    is supplied; must contain at least one entry.
   </Field>
 </Fields>
 
@@ -61,14 +83,14 @@ curl -X POST "https://api-prod.useknit.io/api/v1/wallets" \
 curl -X POST "https://api-prod.useknit.io/api/v1/wallets" \
   -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{ "networks": ["MATIC_MAINNET", "BSC_MAINNET", "ETHEREUM_MAINNET"] }'
+  -d '{ "networks": ["MATIC_MAINNET", "BSC_MAINNET", "BASE_MAINNET"] }'
 ```
 
 ## Response
 
 Returns `201` with the new wallet.
 
-```json filename="201 Created"
+```json filename="201 Created (single network)"
 {
   "statusCode": 201,
   "message": "Wallet created successfully",
@@ -87,6 +109,25 @@ Returns `201` with the new wallet.
 }
 ```
 
+```json filename="201 Created (multiple networks)"
+{
+  "statusCode": 201,
+  "message": "Wallet created successfully",
+  "data": {
+    "id": "5f0c8a7e-3b1d-4e62-9a43-7c2d1e8b9f10",
+    "businessId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
+    "network": "MATIC_MAINNET",
+    "networkId": "MATIC_MAINNET",
+    "networks": ["MATIC_MAINNET", "BSC_MAINNET", "BASE_MAINNET"],
+    "address": "0x7b3f2c9e41d05a8e6c1f4b2d9a3e5c7f8b0d1a2e",
+    "isActive": true,
+    "createdAt": "2024-02-26T14:02:07.000000Z",
+    "updatedAt": "2024-02-26T14:02:07.000000Z"
+  },
+  "success": true
+}
+```
+
 <Fields>
   <Field name="id" type="string">
     Use this in every subsequent wallet request.
@@ -99,7 +140,8 @@ Returns `201` with the new wallet.
     first entry.
   </Field>
   <Field name="networks" type="string[]">
-    Every network the address is usable on.
+    Every network where Knit watches `address` for deposits. To add EVM
+    networks later, use [Update a wallet](/wallets/update-single-wallet).
   </Field>
 </Fields>
 
@@ -111,9 +153,13 @@ your API account, so the funds are immediately available to
 [payouts](/payouts/create-a-single-payout). A
 `WALLET_FUNDING_SUCCESSFUL` webhook is delivered for each confirmed deposit.
 
+Each deposit records the network it arrived on. For a wallet on several
+networks, read `network` on the wallet transaction, or `transaction.network`
+in the webhook, to see which one the customer used.
+
 ## Errors
 
 | Status | Cause |
 | ------ | ----- |
 | `401` | Missing or invalid token, IP not allow-listed, or missing `wallets:write` |
-| `400` | Neither `network` nor `networks` was supplied, both were supplied, or a network identifier is not supported |
+| `400` | Neither `network` nor `networks` was supplied, both were supplied, a network identifier is not supported, or `networks` mixes EVM and Tron networks |

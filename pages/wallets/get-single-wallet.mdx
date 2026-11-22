@@ -41,7 +41,7 @@ curl "https://api-prod.useknit.io/api/v1/wallets/d95143d2-c076-49da-b121-b3beed0
     "businessId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
     "network": "MATIC_MAINNET",
     "networkId": "MATIC_MAINNET",
-    "networks": ["MATIC_MAINNET"],
+    "networks": ["MATIC_MAINNET", "BSC_MAINNET", "ETHEREUM_MAINNET"],
     "address": "0x1adb0a39bde00fa0957e519584cb5c51fefcb37f",
     "isActive": true,
     "createdAt": "2024-02-26T13:59:19.000000Z",
@@ -50,6 +50,13 @@ curl "https://api-prod.useknit.io/api/v1/wallets/d95143d2-c076-49da-b121-b3beed0
   "success": true
 }
 ```
+
+<Fields>
+  <Field name="networks" type="string[]">
+    Every network where Knit watches `address` for deposits. An EVM wallet
+    uses the same address on all of them.
+  </Field>
+</Fields>
 
 <Callout type="info">
   This returns the wallet record, not an on-chain balance. For the money that

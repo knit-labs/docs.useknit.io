@@ -1,11 +1,12 @@
 ---
 title: Update a wallet
-description: Amend an API wallet's stored attributes.
+description: Add EVM networks to an API wallet, or amend its stored attributes.
 ---
 
 # Update a wallet
 
-Amends an existing API wallet. Send only the fields you want to change.
+Amends an existing API wallet. Send only the fields you want to change. Use
+`networks` to let an EVM wallet receive deposits on more EVM networks.
 
 <Endpoint method="PUT" path="/api/v1/wallets/{id}" />
 
@@ -14,9 +15,21 @@ Amends an existing API wallet. Send only the fields you want to change.
   <Chip label="Auth" value="Bearer token" />
 </Meta>
 
+## Adding networks
+
+- **The address stays the same.** One EVM address works on every EVM network,
+  so your customers keep using the address they already have.
+- **Networks are only added.** Knit adds the networks you send to the ones the
+  wallet already has. A network that you leave out of the request stays on the
+  wallet. You cannot remove a network.
+- **EVM wallets only.** You can add `MATIC_MAINNET`, `MATIC_AMOY`,
+  `BSC_MAINNET`, `ETHEREUM_MAINNET` and `BASE_MAINNET`. A Tron wallet cannot
+  take EVM networks.
+
 <Callout type="warning">
-  Updating a wallet does not re-provision its on-chain address. The `address`
-  returned when the wallet was created stays the same.
+  Knit starts to watch an added network when the update succeeds. Knit may
+  not detect a deposit made on that network before the update. Add the
+  network before your customer sends funds on it.
 </Callout>
 
 ## Path parameters
@@ -30,8 +43,15 @@ Amends an existing API wallet. Send only the fields you want to change.
 ## Body
 
 <Fields>
+  <Field name="networks" type="string[]" required={false}>
+    EVM network identifiers to add to the wallet. Must contain at least one
+    entry. Networks the wallet already has are kept, so you can send only the
+    new ones or the full list.
+  </Field>
   <Field name="network" type="string" required={false}>
-    The wallet's primary network identifier.
+    The wallet's primary network identifier. Changing it does not add a
+    network. Use `networks` for that. When you send both, `network` must be one
+    of the wallet's networks after the update.
   </Field>
   <Field name="type" type="string" required={false}>
     The wallet's type classification.
@@ -40,14 +60,17 @@ Amends an existing API wallet. Send only the fields you want to change.
 
 ## Request
 
-```bash filename="cURL"
+```bash filename="Add Base and BNB Smart Chain"
 curl -X PUT "https://api-prod.useknit.io/api/v1/wallets/d95143d2-c076-49da-b121-b3beed054bf3" \
   -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{ "network": "MATIC_MAINNET" }'
+  -d '{ "networks": ["BASE_MAINNET", "BSC_MAINNET"] }'
 ```
 
 ## Response
+
+The wallet was on Polygon only. After the update, the same address receives
+deposits on Polygon, Base and BNB Smart Chain.
 
 ```json filename="200 OK"
 {
@@ -58,7 +81,7 @@ curl -X PUT "https://api-prod.useknit.io/api/v1/wallets/d95143d2-c076-49da-b121-
     "businessId": "a2667393-2c6c-43c9-a288-6167e2b2b591",
     "network": "MATIC_MAINNET",
     "networkId": "MATIC_MAINNET",
-    "networks": ["MATIC_MAINNET"],
+    "networks": ["MATIC_MAINNET", "BASE_MAINNET", "BSC_MAINNET"],
     "address": "0x1adb0a39bde00fa0957e519584cb5c51fefcb37f",
     "isActive": true,
     "createdAt": "2024-02-26T13:59:19.000000Z",
@@ -74,4 +97,5 @@ curl -X PUT "https://api-prod.useknit.io/api/v1/wallets/d95143d2-c076-49da-b121-
 | ------ | ----- |
 | `401` | Missing or invalid token, IP not allow-listed, or missing `wallets:write` |
 | `404` | No wallet with that ID belongs to your business |
-| `400` | A supplied field failed validation |
+| `400` | A supplied field failed validation, `networks` holds a network that is not EVM, or the wallet is a Tron wallet |
+| `409` | Another request is adding networks to this wallet. Try again |
