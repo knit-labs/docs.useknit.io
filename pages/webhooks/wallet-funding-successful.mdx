@@ -64,10 +64,13 @@ Delivered to your business webhook URL.
   <Field name="transaction" type="object">
     The deposit itself. `value` is the amount received, as a decimal string
     with up to 18 decimal places. `token` is `USDT`, `USDC`, or the network's
-    own coin (`ETH`, `BNB`, `POL`, `TRX` or `SOL`). `network` is the network
-    the deposit arrived on, one of `wallet.networks`.
+    own coin (`ETH`, `BNB`, `POL`, `TRX`, `SOL` or `BTC`). `network` is the
+    network the deposit arrived on, one of `wallet.networks`.
   </Field>
 </Fields>
+
+For a Bitcoin deposit, `from_address` is empty: a Bitcoin payment can have
+many senders. `number_of_confirmations` is the count Knit read, 2 or more.
 
 ## Deposit confirmations
 
@@ -84,6 +87,7 @@ dropped before then is never credited.
 | BNB Smart Chain (`BSC_MAINNET`) | The block the network marks as final | Usually under a minute |
 | Tron (`TRON_MAINNET`) | 19 blocks | About 1 minute |
 | Solana (`SOL_MAINNET`) | The block the network marks as final | Usually under a minute |
+| Bitcoin (`BITCOIN_MAINNET`) | 2 blocks | About 20 minutes |
 
 These waits are typical, not guaranteed. Knit also checks each network on a
 schedule, so a deposit can take a few more minutes to appear.
@@ -100,6 +104,9 @@ deduplication: a redelivery sends the same deposit again. Do not deduplicate
 on `transaction.transaction_hash`. One on-chain transaction can pay several
 addresses, for example a batch payment, or carry a coin and a token, and then
 sends one event per deposit, all with the same hash.
+
+A Bitcoin transaction that pays the same address more than once is one
+deposit, for the sum.
 
 ## See also
 

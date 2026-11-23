@@ -27,8 +27,11 @@ and accepts any number of deposits.
 | Ethereum | `ETHEREUM_MAINNET` | EVM |
 | Base | `BASE_MAINNET` | EVM |
 | Tron | `TRON_MAINNET` | Tron |
+| Bitcoin | `BITCOIN_MAINNET` | Bitcoin |
+| Bitcoin Testnet (testnet) | `BITCOIN_TESTNET` | Bitcoin |
 
-USDT is not available on Base.
+USDT is not available on Base. A Bitcoin wallet receives BTC only. See
+[Bitcoin wallets](#bitcoin-wallets).
 
 ## One address on several networks
 
@@ -43,12 +46,34 @@ address, and that address receives deposits on every network in the list.
   networks they can use.
 - **Tron has its own wallet.** A wallet holds EVM networks or Tron, not both.
   A Tron wallet uses `TRON_MAINNET` only.
+- **Bitcoin has its own wallet.** A Bitcoin wallet has one Bitcoin network and
+  no other network.
 
 <Callout type="warning">
   The address is the same on every EVM network. If a customer sends funds to it
   on a network that is not in `networks`, Knit does not detect the deposit and
   does not credit your API account. Add the network first.
 </Callout>
+
+## Bitcoin wallets
+
+Send `BITCOIN_MAINNET` as `network` to get a Bitcoin address. On
+`https://api-dev.useknit.io` you can also use `BITCOIN_TESTNET`, which gives
+an address on Bitcoin's test network.
+
+- **The address starts with `bc1q`** (`tb1q` on the test network). Every
+  current Bitcoin wallet and exchange can send to it.
+- **It receives BTC only.** Bitcoin has no USDT or USDC.
+- **Deposits are credited after 2 confirmations.** That usually takes about
+  20 minutes, and longer when the Bitcoin network is slow.
+- **The BTC goes to your BTC API account.** Knit opens that account on your
+  first deposit. Pay it out with a [payout](/payouts/create-a-single-payout).
+- **One wallet, one Bitcoin network.** You cannot add Bitcoin to an EVM or
+  Tron wallet, and you cannot change the network of a Bitcoin wallet.
+
+Check that Bitcoin is on for your account before you build against it:
+[List supported networks](/networks/get-supported-networks) shows
+`BITCOIN_MAINNET` when it is.
 
 ## Body
 
@@ -162,4 +187,4 @@ in the webhook, to see which one the customer used.
 | Status | Cause |
 | ------ | ----- |
 | `401` | Missing or invalid token, IP not allow-listed, or missing `wallets:write` |
-| `400` | Neither `network` nor `networks` was supplied, both were supplied, a network identifier is not supported, or `networks` mixes EVM and Tron networks |
+| `400` | Neither `network` nor `networks` was supplied, both were supplied, a network identifier is not supported, `networks` mixes EVM and Tron networks, or `networks` holds a Bitcoin network together with any other network |

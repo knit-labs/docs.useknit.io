@@ -42,6 +42,7 @@ address. Knit checks the balance, holds the amount, and submits the transfer.
 | Tron | `TRON_MAINNET` |
 | BNB Smart Chain | `BSC_MAINNET` |
 | Solana | `SOL_MAINNET` |
+| Bitcoin | `BITCOIN_MAINNET` |
 
 <Callout type="warning">
   Payout availability is narrower than collection availability — a network that
@@ -61,9 +62,28 @@ Each network's own coin can be paid out on that network only.
 | `POL` | `MATIC_MAINNET` | 18 | 0.5 |
 | `TRX` | `TRON_MAINNET` | 6 | 1 |
 | `SOL` | `SOL_MAINNET` | 9 | 0.005 |
+| `BTC` | `BITCOIN_MAINNET` | 8 | 0.0001 |
 
 A coin payout needs an [API account](/API-account/create-an-API-account) for
 that coin. Send the amount as a string to keep all of its decimals.
+
+## Bitcoin payouts
+
+A Bitcoin payout sends `BTC` on `BITCOIN_MAINNET` from your BTC API account.
+On `https://api-dev.useknit.io` you can also use `BITCOIN_TESTNET`.
+
+- **BTC only.** USDT and USDC cannot be paid out on Bitcoin.
+- **Any standard address.** Addresses that start with `1`, `3`, `bc1q` or
+  `bc1p` are accepted. Send `bc1` addresses in lower case.
+- **The recipient gets the full amount.** Knit pays the Bitcoin network fee.
+  Your payout fee, if you have one, is added to what leaves your balance.
+- **It takes longer than other networks.** A payout is `COMPLETED` after the
+  Bitcoin network has confirmed it twice. That usually takes about 30
+  minutes, and longer when the network is busy. Until then it is
+  `PROCESSING`.
+- **`transactionHash` is set when the payout is `COMPLETED`.** It is `null`
+  before that. Knit can send several payouts in one Bitcoin transaction, so
+  two payouts can have the same hash.
 
 ## Paying a Knit address
 
@@ -79,7 +99,7 @@ These Knit addresses are refused with `400`, and nothing is held:
 | `This address is a one-time Knit payment address and cannot receive payouts.` | The address belongs to a collection, a payment link or a deposit link |
 | `This Knit address does not receive deposits on this network. Ask the recipient for their address on this network.` | The address is a Knit wallet address, but not on the `network` you pay out on |
 | `This Knit address does not receive USDC on this network. Ask the recipient for an address that receives USDC.` | The address is a Knit business wallet address, but that business cannot receive the token you pay out (`USDT` or `USDC`) on this network. The message names that token |
-| `Coins cannot be paid out to a Knit address. Pay out USDT or USDC, or use an address outside Knit.` | The payout is a coin (`ETH`, `BNB`, `POL`, `TRX` or `SOL`) and the address belongs to Knit |
+| `Coins cannot be paid out to a Knit address. Pay out USDT or USDC, or use an address outside Knit.` | The payout is a coin (`ETH`, `BNB`, `POL`, `TRX`, `SOL` or `BTC`) and the address belongs to Knit |
 
 ## Body
 
