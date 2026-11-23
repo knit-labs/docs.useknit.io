@@ -9,6 +9,11 @@ Returns the current US dollar price of every coin Knit tracks, with the change
 over the last 24 hours. Coins come in rank order. Use these prices to show
 values to your users, for example on a market screen or next to a balance.
 
+Knit checks each price across several independent sources. A source whose
+price is far from the others is left out, and a price is published only when
+at least two sources agree on it, or when only one source has a price at the
+moment. `sourceCount` tells you how many sources agreed.
+
 <Endpoint method="GET" path="/api/v1/market/coins" />
 
 <Meta>
@@ -35,6 +40,7 @@ values to your users, for example on a market screen or next to a balance.
 | `dogecoin` | `DOGE` | Dogecoin |
 | `tron` | `TRX` | TRON |
 | `cardano` | `ADA` | Cardano |
+| `polygon-ecosystem-token` | `POL` | Polygon |
 
 The `id` values are the same as the coin ids that CoinGecko uses. Knit can add
 coins to this list. Read the list from the response, and do not hard-code it.
@@ -62,10 +68,11 @@ The example shows two of the coins.
       "name": "Bitcoin",
       "rank": 1,
       "logoUrl": null,
-      "priceUsd": "60911.34164609",
+      "priceUsd": "61019.99",
       "change24hPercent": "-1.24",
-      "priceUpdatedAt": "2026-11-22T21:40:47Z",
-      "isStale": false
+      "priceUpdatedAt": "2026-11-23T21:04:17Z",
+      "isStale": false,
+      "sourceCount": 3
     },
     {
       "id": "ethereum",
@@ -73,10 +80,11 @@ The example shows two of the coins.
       "name": "Ethereum",
       "rank": 2,
       "logoUrl": null,
-      "priceUsd": "1721.7028",
+      "priceUsd": "1722.88",
       "change24hPercent": "-0.42",
-      "priceUpdatedAt": "2026-11-22T21:41:01Z",
-      "isStale": false
+      "priceUpdatedAt": "2026-11-23T21:04:17Z",
+      "isStale": false,
+      "sourceCount": 3
     }
   ],
   "success": true
@@ -113,23 +121,29 @@ The example shows two of the coins.
     no price from 24 hours ago.
   </Field>
   <Field name="priceUpdatedAt" type="string | null">
-    When the source last updated the price, in ISO 8601 UTC. A price that does
-    not move much can keep the same time for some minutes. It is `null` when
-    `priceUsd` is `null`.
+    When the sources last confirmed the price, in ISO 8601 UTC. It is usually
+    a few seconds old. It is `null` when `priceUsd` is `null`.
   </Field>
   <Field name="isStale" type="boolean">
-    `true` when the price has not been updated for longer than usual, or when
-    `priceUsd` is `null`. Show a stale price with a warning, or hide it.
+    `true` when the sources have not agreed on a new price for about a minute,
+    or when `priceUsd` is `null`. Show a stale price with a warning, or hide
+    it.
+  </Field>
+  <Field name="sourceCount" type="integer">
+    How many independent sources agreed on the price. It is `1` when only one
+    source has a price for the coin at the moment, and `0` when `priceUsd` is
+    `null`.
   </Field>
 </Fields>
 
 <Callout type="warning">
   Check `isStale` before you show a price. Knit refreshes the prices at most
-  every 30 seconds, so calling more often gives the same answer. If Knit
-  cannot get new prices, it continues to send the last prices it got, for up
-  to one hour. `isStale` changes to `true` about 10 minutes after a coin's
-  usual update time has passed, and `priceUpdatedAt` tells you the age of the
-  price. After one hour without new prices, the endpoint answers `503`.
+  every 10 seconds, so calling more often gives the same answer. If the
+  sources disagree on a coin, or Knit cannot get new prices, it continues to
+  send the last agreed price, for up to one hour. `isStale` changes to `true`
+  about a minute after the sources last agreed, and `priceUpdatedAt` tells you
+  its age. After one hour without new prices, the endpoint answers
+  `503`.
 </Callout>
 
 ## Errors
