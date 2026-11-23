@@ -128,11 +128,25 @@ curl "https://api-prod.useknit.io/api/v1/networks" \
     coin, which has no contract.
   </Field>
   <Field name="tokens[].native" type="boolean">
-    Present and `true` on the network's own coin (`ETH`, `BNB`, `POL`, `TRX` or
-    `SOL`). A coin can be paid out on its own network; its `collectionStatus` is
-    always `INACTIVE`, because collections are in USDT or USDC only.
+    Present and `true` on the network's own coin (`ETH`, `BNB`, `POL`, `TRX`,
+    `SOL` or `BTC`). A coin can be paid out on its own network; its
+    `collectionStatus` is always `INACTIVE`, because collections are in USDT or
+    USDC only.
   </Field>
 </Fields>
+
+## Bitcoin
+
+Bitcoin (`BITCOIN_MAINNET`) is in the list when it is on. It has one asset,
+`BTC`, and no USDT or USDC. Its `collectionStatus` is `INACTIVE`: you receive
+BTC with an [API wallet](/wallets/create-a-wallet#bitcoin-wallets), not with a
+collection.
+
+<Callout type="warning">
+  An asset marked `native` is a coin, not a dollar token. Its amounts are in
+  that coin: `1` BTC is not `1` USDT. If your product treats every asset in
+  this list as a dollar token, skip the assets marked `native`.
+</Callout>
 
 <Callout type="info">
   Use this endpoint to drive the network and token pickers in your product. It
