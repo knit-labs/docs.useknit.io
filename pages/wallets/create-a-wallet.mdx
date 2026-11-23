@@ -71,9 +71,9 @@ an address on Bitcoin's test network.
 - **One wallet, one Bitcoin network.** You cannot add Bitcoin to an EVM or
   Tron wallet, and you cannot change the network of a Bitcoin wallet.
 
-Check that Bitcoin is on for your account before you build against it:
-[List supported networks](/networks/get-supported-networks) shows
-`BITCOIN_MAINNET` when it is.
+Bitcoin is in early access. Knit turns it on for one business at a time, so
+ask Knit support before you build against it. Until it is on for your
+business, this call answers `403` for a Bitcoin network.
 
 ## Body
 
@@ -187,4 +187,5 @@ in the webhook, to see which one the customer used.
 | Status | Cause |
 | ------ | ----- |
 | `401` | Missing or invalid token, IP not allow-listed, or missing `wallets:write` |
+| `403` | You asked for a Bitcoin network and Bitcoin is not on for your business yet. Contact Knit support to get access |
 | `400` | Neither `network` nor `networks` was supplied, both were supplied, a network identifier is not supported, `networks` mixes EVM and Tron networks, or `networks` holds a Bitcoin network together with any other network |

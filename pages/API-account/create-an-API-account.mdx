@@ -66,6 +66,7 @@ Returns `201` with the new account.
 | Status | Cause |
 | ------ | ----- |
 | `401` | Missing or invalid token, IP not allow-listed, or missing `payout-wallets:write` |
+| `403` | `token` is `BTC` and Bitcoin is not on for your business yet. Bitcoin is in early access: contact Knit support to get access |
 | `409` | An API account already exists for that token — fetch it with [List API accounts](/API-account/get-all-API-accounts) instead |
 | `400` | `token` is missing or is not one of the tokens above |
 
