@@ -28,8 +28,19 @@ Nothing moves and nothing is held when you ask for a quote.
   [Create one](/API-account/create-an-API-account) for any token you do not
   have an account for yet.
 - **Knit chooses the pairs it offers, and on which networks.** These include
-  USDT and USDC, and ETH with USDT or USDC on `ETHEREUM_MAINNET`, as Knit
-  switches each pair on. A pair that is not offered gets `PAIR_NOT_SUPPORTED`.
+  USDT and USDC, and these coin pairs as Knit switches each one on:
+
+  | Network | Coin pairs |
+  | :--- | :--- |
+  | `ETHEREUM_MAINNET` | ETH with USDT or USDC |
+  | `BSC_MAINNET` | BNB with USDT or USDC |
+  | `MATIC_MAINNET` | POL with USDT or USDC |
+  | `BASE_MAINNET` | ETH with USDC |
+
+  A pair that is not offered gets `PAIR_NOT_SUPPORTED`.
+- **ETH has one API account on both networks.** A swap on `BASE_MAINNET`
+  uses your ETH network liquidity on Base, and a swap on `ETHEREUM_MAINNET`
+  uses your ETH network liquidity on Ethereum.
 
 ## Body
 
