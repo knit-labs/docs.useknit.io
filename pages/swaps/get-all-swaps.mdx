@@ -1,0 +1,106 @@
+---
+title: List swaps
+description: Page through the swaps of your business, or find one by your own reference.
+---
+
+# List swaps
+
+Returns the swaps of your business, newest first. The list is paginated. Pass
+`merchantReference` to find the swap you created with that reference.
+
+<Endpoint method="GET" path="/api/v1/swaps" />
+
+<Meta>
+  <Scope value="swaps:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+## Query parameters
+
+<Fields>
+  <Field name="merchantReference" type="string" required={false}>
+    Only the swap you created with this `merchantReference`. The list has one
+    item if that swap exists, and is empty if it does not. Maximum 255
+    characters. If you send the parameter, it must not be empty.
+  </Field>
+  <Field name="fromToken" type="string" required={false}>
+    Only swaps that paid with this token, for example `USDT`.
+  </Field>
+  <Field name="toToken" type="string" required={false}>
+    Only swaps that got this token, for example `ETH`.
+  </Field>
+  <Field name="from" type="string" required={false}>
+    Only swaps created at or after this time. An ISO 8601 date or date and
+    time, for example `2026-11-01T00:00:00Z`. A time without an offset is read
+    as UTC.
+  </Field>
+  <Field name="to" type="string" required={false}>
+    Only swaps created before this time. Must be later than `from`.
+  </Field>
+  <Field name="page" type="integer" required={false} defaultValue="1">
+    The page to fetch. Minimum `1`, maximum `10000`.
+  </Field>
+  <Field name="perPage" type="integer" required={false} defaultValue="15">
+    Swaps per page. Minimum `1`, maximum `100`.
+  </Field>
+</Fields>
+
+## Request
+
+```bash filename="cURL"
+curl -G "https://api-prod.useknit.io/api/v1/swaps" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json" \
+  --data-urlencode "merchantReference=swap-001"
+```
+
+## Response
+
+```json filename="200 OK"
+{
+  "statusCode": 200,
+  "message": "Swaps retrieved successfully",
+  "data": [
+    {
+      "id": "e2a4f6b8-1c3d-4e5f-8a9b-0c1d2e3f4a5b",
+      "merchantReference": "swap-001",
+      "quoteId": "5b1e0c7a-8f43-4d2e-9b61-2f0d3c4a7e91",
+      "fromToken": "USDT",
+      "toToken": "ETH",
+      "network": "ETHEREUM_MAINNET",
+      "amount": "1000",
+      "toAmount": "0.33195",
+      "rate": "0.00033195",
+      "fee": "8.2",
+      "feesBreakdown": [
+        { "type": "NETWORK", "amount": "3.2" },
+        { "type": "KNIT", "amount": "5" }
+      ],
+      "totalDebit": "1008.2",
+      "fromBalanceAfter": "3991.8",
+      "toBalanceAfter": "1.33195",
+      "status": "SUCCESSFUL",
+      "createdAt": "2026-11-24T10:15:12.000000Z"
+    }
+  ],
+  "pagination": {
+    "totalItems": 1,
+    "page": 1,
+    "perPage": 15,
+    "currentPage": 1,
+    "lastPage": 1
+  },
+  "success": true
+}
+```
+
+Each item has the fields of the
+[Create a swap](/swaps/create-a-swap#response) response.
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `400` | A query parameter is not valid, for example an empty `merchantReference`, `perPage` above `100` or `to` before `from`. The body carries an `errors` entry for the parameter |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `swaps:read` |
+| `403` | API Services are not enabled for your business |

@@ -63,6 +63,11 @@ curl -X POST "https://api-prod.useknit.io/api/v1/bridges/quote" \
     "toNetwork": "ETHEREUM_MAINNET",
     "amount": "200",
     "fee": "2",
+    "feesBreakdown": [
+      { "type": "PROVIDER", "amount": "1.2" },
+      { "type": "NETWORK", "amount": "0.6" },
+      { "type": "KNIT", "amount": "0.2" }
+    ],
     "totalDebit": "202",
     "accountBalanceBefore": "500",
     "accountBalanceAfter": "498"
@@ -76,7 +81,9 @@ The fields have the same meaning as in the
 
 <Callout type="info">
   A quote is not held. The fee or your balances can change before you create
-  the bridge, and the create request uses the values at that time.
+  the bridge, and the create request uses the values at that time. To pay no
+  more than the quoted fee, send it as
+  [`maxFee`](/API-account/create-a-bridge#body) when you create the bridge.
 </Callout>
 
 ## Errors

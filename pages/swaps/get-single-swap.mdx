@@ -1,0 +1,73 @@
+---
+title: Retrieve a swap
+description: Read one swap of your business by its ID.
+---
+
+# Retrieve a swap
+
+Returns one swap of your business.
+
+<Endpoint method="GET" path="/api/v1/swaps/{id}" />
+
+<Meta>
+  <Scope value="swaps:read" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+## Path parameters
+
+<Fields>
+  <Field name="id" type="string" required>
+    The `id` from the [Create a swap](/swaps/create-a-swap) response.
+  </Field>
+</Fields>
+
+## Request
+
+```bash filename="cURL"
+curl "https://api-prod.useknit.io/api/v1/swaps/e2a4f6b8-1c3d-4e5f-8a9b-0c1d2e3f4a5b" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Accept: application/json"
+```
+
+## Response
+
+```json filename="200 OK"
+{
+  "statusCode": 200,
+  "message": "Swap retrieved successfully",
+  "data": {
+    "id": "e2a4f6b8-1c3d-4e5f-8a9b-0c1d2e3f4a5b",
+    "merchantReference": "swap-001",
+    "quoteId": "5b1e0c7a-8f43-4d2e-9b61-2f0d3c4a7e91",
+    "fromToken": "USDT",
+    "toToken": "ETH",
+    "network": "ETHEREUM_MAINNET",
+    "amount": "1000",
+    "toAmount": "0.33195",
+    "rate": "0.00033195",
+    "fee": "8.2",
+    "feesBreakdown": [
+      { "type": "NETWORK", "amount": "3.2" },
+      { "type": "KNIT", "amount": "5" }
+    ],
+    "totalDebit": "1008.2",
+    "fromBalanceAfter": "3991.8",
+    "toBalanceAfter": "1.33195",
+    "status": "SUCCESSFUL",
+    "createdAt": "2026-11-24T10:15:12.000000Z"
+  },
+  "success": true
+}
+```
+
+The fields are the same as in the
+[Create a swap](/swaps/create-a-swap#response) response.
+
+## Errors
+
+| Status | Cause |
+| ------ | ----- |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `swaps:read` |
+| `403` | API Services are not enabled for your business |
+| `404` | `Swap not found`: no swap of your business has this `id` |

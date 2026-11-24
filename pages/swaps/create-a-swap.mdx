@@ -1,0 +1,182 @@
+---
+title: Create a swap
+description: Swap one token in your API accounts for another at a quoted price.
+---
+
+# Create a swap
+
+Swaps one token in your API accounts for another, at the price of a quote from
+[Quote a swap](/swaps/quote-a-swap). The swap is instant: it is complete when
+you get the response.
+
+<Endpoint method="POST" path="/api/v1/swaps" />
+
+<Meta>
+  <Scope value="swaps:write" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+## How it works
+
+A swap changes two [API account](/API-account/get-all-API-accounts) balances,
+using the amounts from the quote:
+
+| Balance | Change |
+| ------- | ------ |
+| API account for `fromToken` | Goes down by `totalDebit`: `amount` plus `fee` |
+| API account for `toToken` | Goes up by `toAmount` |
+
+Your [network liquidity](/API-account/get-network-liquidity) on the swap's
+`network` changes the same way: less `fromToken`, more `toToken`.
+
+Before the swap runs, Knit checks:
+
+- the quote has not expired and has not been used,
+- the market price has not moved against the quote since it was made,
+- your `fromToken` API account and your network liquidity cover `totalDebit`.
+
+If any check fails, Knit refuses the swap and nothing moves. See
+[Errors](#errors).
+
+## Body
+
+<Fields>
+  <Field name="quoteId" type="string" required>
+    The `id` from [Quote a swap](/swaps/quote-a-swap). Each quote can make one
+    swap. A swap that Knit refuses does not use up the quote.
+  </Field>
+  <Field name="merchantReference" type="string" required>
+    Your own reference for this swap. It must be unique among the swaps of
+    your business. Maximum 255 characters. It lets you retry without swapping
+    twice.
+  </Field>
+</Fields>
+
+## Sending a request again
+
+If you are not sure whether a swap went through, for example after a timeout,
+send the same request again: the same `quoteId` and the same
+`merchantReference`. If Knit already made the swap, you get `200` with the same
+swap in `data` as the first time, and nothing moves twice. This works even after
+the quote's `expiresAt`. If Knit did not make the swap, the request is handled
+as new.
+
+You can also look the reference up with
+[List swaps](/swaps/get-all-swaps) and `?merchantReference=`.
+
+A `merchantReference` that your business used for a different swap gets
+`DUPLICATE_MERCHANT_REFERENCE`, and nothing moves. A `quoteId` that already made
+a swap under a different `merchantReference` gets `QUOTE_EXPIRED`. When a quote
+expired or the price moved, no swap was made, so you can use the same reference
+with the new quote.
+
+## Request
+
+```bash filename="cURL"
+curl -X POST "https://api-prod.useknit.io/api/v1/swaps" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "quoteId": "5b1e0c7a-8f43-4d2e-9b61-2f0d3c4a7e91",
+    "merchantReference": "swap-001"
+  }'
+```
+
+## Response
+
+Returns `201` for a new swap. When you send a swap you already made again, it
+returns `200`, the message `Swap retrieved successfully` and the same `data`.
+
+```json filename="201 Created"
+{
+  "statusCode": 201,
+  "message": "Swap created successfully",
+  "data": {
+    "id": "e2a4f6b8-1c3d-4e5f-8a9b-0c1d2e3f4a5b",
+    "merchantReference": "swap-001",
+    "quoteId": "5b1e0c7a-8f43-4d2e-9b61-2f0d3c4a7e91",
+    "fromToken": "USDT",
+    "toToken": "ETH",
+    "network": "ETHEREUM_MAINNET",
+    "amount": "1000",
+    "toAmount": "0.33195",
+    "rate": "0.00033195",
+    "fee": "8.2",
+    "feesBreakdown": [
+      { "type": "NETWORK", "amount": "3.2" },
+      { "type": "KNIT", "amount": "5" }
+    ],
+    "totalDebit": "1008.2",
+    "fromBalanceAfter": "3991.8",
+    "toBalanceAfter": "1.33195",
+    "status": "SUCCESSFUL",
+    "createdAt": "2026-11-24T10:15:12.000000Z"
+  },
+  "success": true
+}
+```
+
+`amount`, `toAmount`, `rate`, `fee`, `feesBreakdown` and `totalDebit` are the
+ones from the quote.
+
+<Fields>
+  <Field name="quoteId" type="string">
+    The quote this swap used.
+  </Field>
+  <Field name="fromBalanceAfter" type="string">
+    Your API account balance for `fromToken` after the swap.
+  </Field>
+  <Field name="toBalanceAfter" type="string">
+    Your API account balance for `toToken` after the swap.
+  </Field>
+  <Field name="status" type="string">
+    Always `SUCCESSFUL`. A swap that Knit refuses is not created.
+  </Field>
+</Fields>
+
+Knit also sends the [`SWAP_SUCCESSFUL`](/webhooks/swap-successful) webhook for
+each new swap.
+
+## Errors
+
+Refusals carry a `code`. The `message` is for people and can change, so branch
+on `code`. Nothing moves when a swap is refused.
+
+```json filename="400 — quote expired"
+{
+  "statusCode": 400,
+  "message": "The quote has expired. Request a new quote.",
+  "data": null,
+  "success": false,
+  "code": "QUOTE_EXPIRED"
+}
+```
+
+| Status | `code` | What it means | What to do |
+| ------ | ------ | ------------- | ---------- |
+| `400` | `QUOTE_EXPIRED` | The quote passed its `expiresAt` before Knit received the request, or it already made a swap under a different `merchantReference` | [Get a new quote](/swaps/quote-a-swap) and create the swap with it |
+| `400` | `QUOTE_NOT_FOUND` | No quote of your business has this `quoteId` | Check the `quoteId`, or get a new quote |
+| `400` | `DUPLICATE_MERCHANT_REFERENCE` | Your business already used this `merchantReference` for a different swap | Use a new reference for a new swap |
+| `400` | `INSUFFICIENT_BALANCE` | Your API account for `fromToken` has less than `totalDebit` | Fund the account, or swap less |
+| `400` | `INSUFFICIENT_NETWORK_LIQUIDITY` | Your network liquidity for `fromToken` on `network` does not cover the swap | Swap less, or [bridge](/API-account/create-a-bridge) liquidity to `network` |
+| `400` | `PAIR_NOT_SUPPORTED` | Knit no longer offers this pair on this network | Use a pair Knit offers |
+| `400` | `AMOUNT_BELOW_MINIMUM` | The amount is below the smallest swap for this pair | Get a quote for more |
+| `400` | `AMOUNT_ABOVE_MAXIMUM` | The amount is above the largest swap for this pair | Get a quote for less, or split the amount |
+| `409` | `PRICE_MOVED` | The market price moved against the quote after it was made | Get a new quote and decide again |
+| `503` | `PRICE_UNAVAILABLE` | Knit cannot get a reliable market price for this pair right now | Try again in a few minutes with a new quote |
+| `503` | `PRICE_CHECK_FAILED` | The price did not pass Knit's check against the market price | Try again in a few minutes with a new quote |
+| `503` | `CAPACITY_REACHED` | Knit has paused this kind of swap for now | Try again later with a new quote |
+
+Other responses:
+
+| Status | Cause |
+| ------ | ----- |
+| `400` | A field failed validation, for example a missing `merchantReference` or a `quoteId` that is not a UUID. The body has an `errors` entry for the field and no `code` |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `swaps:write` |
+| `403` | API Services are not enabled for your business |
+| `503` | `Swaps are temporarily unavailable. Please try again later.` Knit has paused swaps. The body has no `code`. Nothing moved, so try again later |
+
+<Callout type="info">
+  `QUOTE_EXPIRED` and `PRICE_MOVED` protect you from a price you did not agree
+  to. Get a new quote and check it before you create the swap again.
+</Callout>

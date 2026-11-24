@@ -1,0 +1,183 @@
+---
+title: Quote a swap
+description: Get a firm price for swapping one token in your API accounts for another.
+---
+
+# Quote a swap
+
+A swap exchanges one token in your [API accounts](/API-account/get-all-API-accounts)
+for another, for example USDT for ETH. It takes two requests:
+
+1. **Quote.** Ask for a price. Knit answers with exactly what you pay, what you
+   get and the fees, and holds that price until `expiresAt`.
+2. **Create.** [Create the swap](/swaps/create-a-swap) with the quote's `id`
+   before it expires. The swap happens at the quoted price, or not at all.
+
+Nothing moves and nothing is held when you ask for a quote.
+
+<Endpoint method="POST" path="/api/v1/swaps/quote" />
+
+<Meta>
+  <Scope value="swaps:write" />
+  <Chip label="Auth" value="Bearer token" />
+</Meta>
+
+## Before you call
+
+- **You need an API account for both tokens.**
+  [Create one](/API-account/create-an-API-account) for any token you do not
+  have an account for yet.
+- **Knit chooses the pairs it offers, and on which networks.** These include
+  USDT and USDC, and ETH with USDT or USDC on `ETHEREUM_MAINNET`, as Knit
+  switches each pair on. A pair that is not offered gets `PAIR_NOT_SUPPORTED`.
+
+## Body
+
+<Fields>
+  <Field name="fromToken" type="string" required>
+    The token you pay with, for example `USDT`.
+  </Field>
+  <Field name="toToken" type="string" required>
+    The token you get, for example `ETH`. It must not be the same as
+    `fromToken`.
+  </Field>
+  <Field name="network" type="string" required>
+    The network the swap happens on, for example `ETHEREUM_MAINNET`. Both
+    tokens are on this network.
+  </Field>
+  <Field name="amount" type="number | string" required>
+    How much `fromToken` to swap, in token units, with at most 18 decimal
+    places. The fees are added on top. Send it as a string to keep every
+    decimal.
+  </Field>
+</Fields>
+
+## Request
+
+```bash filename="cURL"
+curl -X POST "https://api-prod.useknit.io/api/v1/swaps/quote" \
+  -H "Authorization: Bearer $KNIT_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fromToken": "USDT",
+    "toToken": "ETH",
+    "network": "ETHEREUM_MAINNET",
+    "amount": "1000"
+  }'
+```
+
+## Response
+
+```json filename="201 Created"
+{
+  "statusCode": 201,
+  "message": "Swap quote created successfully",
+  "data": {
+    "id": "5b1e0c7a-8f43-4d2e-9b61-2f0d3c4a7e91",
+    "fromToken": "USDT",
+    "toToken": "ETH",
+    "network": "ETHEREUM_MAINNET",
+    "amount": "1000",
+    "toAmount": "0.33195",
+    "rate": "0.00033195",
+    "marketRate": "0.0003324",
+    "fee": "8.2",
+    "feesBreakdown": [
+      { "type": "NETWORK", "amount": "3.2" },
+      { "type": "KNIT", "amount": "5" }
+    ],
+    "totalDebit": "1008.2",
+    "expiresAt": "2026-11-24T10:15:30Z"
+  },
+  "success": true
+}
+```
+
+All amounts are strings in token units. Use them as they are: do not
+recalculate them.
+
+<Fields>
+  <Field name="id" type="string">
+    The quote. Send it as `quoteId` to [Create a swap](/swaps/create-a-swap).
+  </Field>
+  <Field name="amount" type="string">
+    How much `fromToken` is swapped, without fees.
+  </Field>
+  <Field name="toAmount" type="string">
+    How much `toToken` you get. This is what is added to your `toToken` API
+    account.
+  </Field>
+  <Field name="rate" type="string">
+    What you get for 1 `fromToken`, in `toToken`. It already includes the cost
+    of making the exchange. The fees are charged on top of `amount`, not taken
+    from `toAmount`.
+  </Field>
+  <Field name="marketRate" type="string">
+    The market price of 1 `fromToken` in `toToken` when Knit made the quote. It
+    is shown for comparison only: the swap uses `rate`.
+  </Field>
+  <Field name="fee" type="string">
+    The total fees, in `fromToken`. `0` when no fee applies.
+  </Field>
+  <Field name="feesBreakdown" type="array">
+    The parts of `fee`. Each item has a `type` and an `amount` in `fromToken`,
+    and the amounts add up to `fee`. `NETWORK` is the network cost of making
+    the swap. `KNIT` is Knit's fee.
+  </Field>
+  <Field name="totalDebit" type="string">
+    `amount` plus `fee`: what leaves your `fromToken` API account.
+  </Field>
+  <Field name="expiresAt" type="string">
+    When the price stops being valid. Create the swap before this time.
+  </Field>
+</Fields>
+
+## When a quote expires
+
+A quote is valid for a short time, usually less than a minute. Read
+`expiresAt` from each quote rather than assuming a fixed time, and create the
+swap straight after you decide to accept the price.
+
+If the quote has expired when Knit receives your create request, Knit refuses
+with `QUOTE_EXPIRED` and nothing moves. Ask for a new quote, check the new
+price, and create the swap with the new `id`. Prices move, so the new quote can
+be better or worse than the old one: do not accept it automatically unless
+your own rules allow that.
+
+<Callout type="info">
+  A quote does not reserve your balance. Knit checks your balances when you
+  create the swap.
+</Callout>
+
+## Errors
+
+Refusals carry a `code` that tells you what happened. The `message` is for
+people and can change, so branch on `code`.
+
+```json filename="503 — price unavailable"
+{
+  "statusCode": 503,
+  "message": "Swap prices are unavailable right now. Try again shortly.",
+  "data": null,
+  "success": false,
+  "code": "PRICE_UNAVAILABLE"
+}
+```
+
+| Status | `code` | What it means | What to do |
+| ------ | ------ | ------------- | ---------- |
+| `400` | `PAIR_NOT_SUPPORTED` | Knit does not offer this pair on this network | Use a pair Knit offers |
+| `400` | `AMOUNT_BELOW_MINIMUM` | `amount` is below the smallest swap for this pair | Swap more |
+| `400` | `AMOUNT_ABOVE_MAXIMUM` | `amount` is above the largest swap for this pair | Swap less, or split the amount |
+| `503` | `PRICE_UNAVAILABLE` | Knit cannot get a reliable market price for this pair right now | Try again in a few minutes |
+| `503` | `PRICE_CHECK_FAILED` | The price did not pass Knit's check against the market price | Try again in a few minutes |
+| `503` | `CAPACITY_REACHED` | Knit has paused this kind of swap for now | Try again later |
+
+Other responses:
+
+| Status | Cause |
+| ------ | ----- |
+| `400` | A field failed validation, for example a missing `amount`, more than 18 decimal places, or the same token twice. The body has an `errors` entry for the field and no `code` |
+| `401` | Missing or invalid token, IP not allow-listed, or missing `swaps:write` |
+| `403` | API Services are not enabled for your business |
+| `503` | `Swaps are temporarily unavailable. Please try again later.` Knit has paused swaps. The body has no `code` |

@@ -1,0 +1,95 @@
+---
+title: SWAP_SUCCESSFUL
+description: Delivered when a swap between two of your API accounts is complete.
+---
+
+# `SWAP_SUCCESSFUL`
+
+Delivered when a [swap](/swaps/create-a-swap) is complete: one API account
+balance went down and the other went up. Use it to update your ledger.
+
+<Meta>
+  <Chip label="Envelope" value="body wrapper" />
+  <Chip label="Keys" value="camelCase" />
+</Meta>
+
+Delivered to your business webhook URL.
+
+<Callout type="info">
+  A swap is complete when Knit answers your create request, so the response
+  already tells you the outcome. This event is the record for systems that
+  listen for webhooks instead. A swap that Knit refuses is not created and
+  produces no event.
+</Callout>
+
+## Payload
+
+`swap` has the same fields as the
+[Create a swap](/swaps/create-a-swap#response) response.
+
+```json filename="SWAP_SUCCESSFUL"
+{
+  "body": {
+    "eventType": "SWAP_SUCCESSFUL",
+    "swap": {
+      "id": "e2a4f6b8-1c3d-4e5f-8a9b-0c1d2e3f4a5b",
+      "merchantReference": "swap-001",
+      "quoteId": "5b1e0c7a-8f43-4d2e-9b61-2f0d3c4a7e91",
+      "fromToken": "USDT",
+      "toToken": "ETH",
+      "network": "ETHEREUM_MAINNET",
+      "amount": "1000",
+      "toAmount": "0.33195",
+      "rate": "0.00033195",
+      "fee": "8.2",
+      "feesBreakdown": [
+        { "type": "NETWORK", "amount": "3.2" },
+        { "type": "KNIT", "amount": "5" }
+      ],
+      "totalDebit": "1008.2",
+      "fromBalanceAfter": "3991.8",
+      "toBalanceAfter": "1.33195",
+      "status": "SUCCESSFUL",
+      "createdAt": "2026-11-24T10:15:12.000000Z"
+    }
+  }
+}
+```
+
+## Handling
+
+<Steps>
+
+### Verify and acknowledge
+
+Check `X-Signature` against the raw body, then return `2xx` straight away. See
+[Webhooks](/webhooks) for the verification snippet.
+
+### Deduplicate on `merchantReference`
+
+`merchantReference` is the value you sent when you created the swap. Check
+whether you have already recorded it before doing anything else: this event
+can arrive more than once, and you may have recorded the swap from the create
+response already.
+
+### Record
+
+Record the debit of `totalDebit` in `fromToken` and the credit of `toAmount`
+in `toToken`. `fromBalanceAfter` and `toBalanceAfter` let you check your
+ledger against Knit's.
+
+</Steps>
+
+## Not receiving it?
+
+- Confirm the webhook URL and secret in **Business → Developer → Webhooks**,
+  and that the endpoint is publicly reachable.
+- Check the delivery attempts in the dashboard. A `4xx` from your endpoint is
+  recorded there along with the response body.
+- Remember the retry window is about 24 hours. Past that, reconcile with
+  [List swaps](/swaps/get-all-swaps).
+
+## See also
+
+- [Create a swap](/swaps/create-a-swap)
+- [Webhooks overview](/webhooks): signature verification and retries
