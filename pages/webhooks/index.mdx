@@ -11,8 +11,10 @@ payouts — polling is a fallback for reconciliation, not a primary integration.
 
 ## Configure your endpoint
 
-Set your webhook URL and secret in the dashboard under **Business → Developer →
-Webhooks**. There is no public API for changing them.
+Set your webhook URL in the dashboard under **Business → Developer →
+Webhooks**. Knit creates your webhook secret for you; copy it from the same
+page. You can replace it there with your own. There is no public API for
+changing either.
 
 Your endpoint must be:
 
@@ -33,7 +35,8 @@ Your endpoint must be:
 ## Verifying the signature
 
 Every delivery carries an `X-Signature` header: the **HMAC-SHA256 of the raw
-request body**, keyed with your webhook secret, hex-encoded.
+request body**, keyed with your webhook secret, hex-encoded. Knit never sends
+a webhook without it.
 
 | Header | Value |
 | ------ | ----- |
