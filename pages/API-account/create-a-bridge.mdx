@@ -169,6 +169,9 @@ Returns `201`. The bridge is complete when you get the response: its status is
   does not change the balance and has no entry.
 </Callout>
 
+If you set a webhook URL, Knit also sends the
+[`BRIDGE_SUCCESSFUL`](/webhooks/bridge-successful) webhook for each new bridge.
+
 ## Errors
 
 | Status | Cause |
