@@ -171,14 +171,16 @@ changes from page to page.
   </Field>
   <Field name="category" type="string">
     What the entry is for, for example `PAYOUT`, `WALLETS COLLECTION` (a deposit
-    to an API wallet) or `COLLECTION`.
+    to an API wallet), `COLLECTION` or `SWAP`.
   </Field>
   <Field name="amount" type="string">
-    The change to the balance. For a payout it includes the fee.
+    The change to the balance. For a payout, and for the `DEBIT` of a swap, it
+    includes the fee.
   </Field>
   <Field name="amountNet" type="string">
     For a payout, the amount the recipient got. For a deposit or a collection,
-    the amount that arrived before the fee.
+    the amount that arrived before the fee. For the `DEBIT` of a swap, the
+    amount converted.
   </Field>
   <Field name="fee" type="string">
     The fee in this entry.
@@ -189,12 +191,14 @@ changes from page to page.
   <Field name="sourceType" type="string | null">
     What made the entry: `PAYOUT`, `WALLET_TRANSACTION` (a deposit),
     `COLLECTION`, `SUBSCRIPTION`, `TRANSACTION` (a transfer from or to your
-    business wallet) or `BRIDGE` (the fee of a
-    [bridge](/API-account/create-a-bridge)). `null` when Knit did not record a
-    source.
+    business wallet), `BRIDGE` (the fee of a
+    [bridge](/API-account/create-a-bridge)) or `SWAP`. A
+    [swap](/swaps/create-a-swap) makes two entries: a `DEBIT` in the token you
+    swapped from and a `CREDIT` in the token you got, each on that token's
+    statement. `null` when Knit did not record a source.
   </Field>
   <Field name="sourceId" type="string | null">
-    The ID of that payout, deposit, collection, transfer or bridge.
+    The ID of that payout, deposit, collection, transfer, bridge or swap.
   </Field>
   <Field name="reversalOfId" type="string | null">
     For a refund, the `id` of the entry it gives back. A refunded payout has a
