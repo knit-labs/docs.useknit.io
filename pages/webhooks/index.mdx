@@ -1,6 +1,6 @@
 ---
 title: Webhooks
-description: Receive signed notifications when collections, payouts, swaps, and watched addresses change state.
+description: Receive signed notifications when collections, payouts, swaps, bridges, and watched addresses change state.
 ---
 
 # Webhooks
@@ -135,6 +135,7 @@ table before you write your parser:
 | [`PAYOUT_FAILED`](/webhooks/payout-failed) | `body` wrapper | camelCase |
 | [`WALLET_FUNDING_SUCCESSFUL`](/webhooks/wallet-funding-successful) | top level | snake_case |
 | [`SWAP_SUCCESSFUL`](/webhooks/swap-successful) | `body` wrapper | camelCase |
+| [`BRIDGE_SUCCESSFUL`](/webhooks/bridge-successful) | `body` wrapper | camelCase |
 | [`BLOCKCHAIN_TRANSACTION_DETECTED`](/webhooks/blockchain-transaction-detected) | top level | camelCase |
 
 <Callout type="warning">
@@ -186,6 +187,9 @@ app.post("/webhooks/knit", (req, res) => {
   </Card>
   <Card title="Swap successful" href="/webhooks/swap-successful">
     `SWAP_SUCCESSFUL` — a swap between two of your API accounts is complete.
+  </Card>
+  <Card title="Bridge successful" href="/webhooks/bridge-successful">
+    `BRIDGE_SUCCESSFUL` — a bridge of your network liquidity is complete.
   </Card>
   <Card title="Transaction detected" href="/webhooks/blockchain-transaction-detected">
     `BLOCKCHAIN_TRANSACTION_DETECTED` — a watched address sent or received
