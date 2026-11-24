@@ -7,5 +7,6 @@
   "payout-successful": "Payout Successful",
   "payout-failed": "Payout Failed",
   "wallet-funding-successful": "Wallet Funding Successful",
+  "swap-successful": "Swap Successful",
   "blockchain-transaction-detected": "Transaction Detected"
 }

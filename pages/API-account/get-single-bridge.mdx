@@ -44,6 +44,11 @@ curl "https://api-prod.useknit.io/api/v1/bridges/9f3c2a71-5d0e-4b8a-9a43-6c2f1e7
     "toNetwork": "ETHEREUM_MAINNET",
     "amount": "200",
     "fee": "2",
+    "feesBreakdown": [
+      { "type": "PROVIDER", "amount": "1.2" },
+      { "type": "NETWORK", "amount": "0.6" },
+      { "type": "KNIT", "amount": "0.2" }
+    ],
     "totalDebit": "202",
     "accountBalanceBefore": "500",
     "accountBalanceAfter": "498",

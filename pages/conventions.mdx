@@ -255,6 +255,10 @@ both.
   Only generate a new reference for a genuinely new payout. Knit retries a
   `FAILED` payout automatically: do not send it again under a new reference
   (see [Create a payout](/payouts/create-a-single-payout#status-lifecycle)).
+- **Swaps** are protected by `merchantReference` too. Sending the same
+  `quoteId` and `merchantReference` again returns the swap Knit already made,
+  with `200`, instead of swapping twice. See
+  [Create a swap](/swaps/create-a-swap#sending-a-request-again).
 - **Managed signing requests** accept an `idempotencyKey` in the body; replaying
   the same key returns the original request rather than creating another.
 - **`5xx` and network timeouts** should be retried with exponential backoff. A

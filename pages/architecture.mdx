@@ -98,6 +98,12 @@ account balance for the requested token, holds the amount, and submits the
 transfer. If the balance is short, the payout is rejected with `400` and
 nothing is held.
 
+### Swaps move value between tokens
+
+A [swap](/swaps/create-a-swap) takes one token from its API account and adds
+another token to its API account, at a price you agree to first from a quote.
+Only the fees leave your API accounts.
+
 ### Return unused balance
 
 To move value back to the business wallet, use the transfer action in the

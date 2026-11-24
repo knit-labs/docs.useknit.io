@@ -33,6 +33,11 @@ Knit refuses the bridge, and changes nothing, if the API account balance or
 the liquidity on `fromNetwork` is less than `amount` plus `fee`. Call
 [Quote a bridge](/API-account/quote-a-bridge) first to see the fee.
 
+Knit works out the fee again when you create the bridge, and it can differ
+from the quote. To pay no more than the quoted fee, send it as `maxFee`. If the
+fee is higher than `maxFee`, Knit refuses the bridge with `FEE_ABOVE_MAX` and
+nothing moves. Quote again, check the new fee, and create the bridge again.
+
 If your business keeps deposits on Tron in its own Tron wallet, that part of
 your Tron liquidity pays your Tron payouts and cannot be moved. Only the rest
 of your Tron liquidity can be bridged.
@@ -61,6 +66,12 @@ of your Tron liquidity can be bridged.
     The amount that arrives on `toNetwork`, in token units. Minimum `0.01`. The
     fee is added on top.
   </Field>
+  <Field name="maxFee" type="number | string" required={false}>
+    The most you agree to pay in fees, in token units. Use the `fee` from
+    [Quote a bridge](/API-account/quote-a-bridge). If the fee is higher when
+    Knit creates the bridge, the bridge is refused with `FEE_ABOVE_MAX`. Without
+    `maxFee`, Knit charges the fee at that time.
+  </Field>
 </Fields>
 
 ## Reusing a reference
@@ -85,7 +96,8 @@ curl -X POST "https://api-prod.useknit.io/api/v1/bridges" \
     "token": "USDT",
     "fromNetwork": "TRON_MAINNET",
     "toNetwork": "ETHEREUM_MAINNET",
-    "amount": "200"
+    "amount": "200",
+    "maxFee": "2"
   }'
 ```
 
@@ -106,6 +118,11 @@ Returns `201`. The bridge is complete when you get the response: its status is
     "toNetwork": "ETHEREUM_MAINNET",
     "amount": "200",
     "fee": "2",
+    "feesBreakdown": [
+      { "type": "PROVIDER", "amount": "1.2" },
+      { "type": "NETWORK", "amount": "0.6" },
+      { "type": "KNIT", "amount": "0.2" }
+    ],
     "totalDebit": "202",
     "accountBalanceBefore": "500",
     "accountBalanceAfter": "498",
@@ -122,6 +139,13 @@ Returns `201`. The bridge is complete when you get the response: its status is
   </Field>
   <Field name="fee" type="string">
     The bridge fee. `0` when no fee applies.
+  </Field>
+  <Field name="feesBreakdown" type="array">
+    The parts of `fee`. Each item has a `type` and an `amount` in `token`, and
+    the amounts add up to `fee`. `PROVIDER` is what it costs to move the funds
+    between networks, `NETWORK` is the network cost of the transfers, and
+    `KNIT` is Knit's fee. Not every part is always present, and the list is
+    empty when there is no fee.
   </Field>
   <Field name="totalDebit" type="string">
     `amount` plus `fee`: the amount taken from your liquidity on `fromNetwork`.
@@ -152,6 +176,7 @@ Returns `201`. The bridge is complete when you get the response: its status is
 | `400` | A field failed validation, for example a `merchantReference` your business has already used, a coin as `token`, the same network twice, or a network the token cannot be moved from or to |
 | `400` | `Insufficient balance in wallet`: the API account balance is less than `amount` plus `fee` |
 | `400` | `Insufficient network liquidity`: the liquidity on `fromNetwork` is less than `amount` plus `fee` |
+| `400` | `code` `FEE_ABOVE_MAX`: the fee is higher than the `maxFee` you sent. [Quote again](/API-account/quote-a-bridge) and check the new fee |
 | `400` | `Only 200 USDT, including the bridge fee, can be moved from TRON_MAINNET. …`: part of the liquidity is held in your business's own wallet on that network, and the rest is less than `amount` plus `fee` |
 | `401` | Missing or invalid token, IP not allow-listed, or missing `payout-wallets:write` |
 | `403` | API Services are not enabled for your business |
@@ -181,7 +206,20 @@ A network that a token cannot be moved from:
 }
 ```
 
-A refused bridge carries the standard envelope and no `errors`:
+A fee above `maxFee` carries a `code`. Branch on the `code`, not the
+`message`:
+
+```json filename="400 — fee above maxFee"
+{
+  "statusCode": 400,
+  "code": "FEE_ABOVE_MAX",
+  "message": "The bridge fee is higher than maxFee.",
+  "data": null,
+  "success": false
+}
+```
+
+Other refused bridges carry the standard envelope and no `errors`:
 
 ```json filename="400 — insufficient network liquidity"
 {
