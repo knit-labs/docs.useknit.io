@@ -27,6 +27,7 @@ and accepts any number of deposits.
 | Ethereum | `ETHEREUM_MAINNET` | EVM |
 | Base | `BASE_MAINNET` | EVM |
 | Tron | `TRON_MAINNET` | Tron |
+| Tron Nile (testnet) | `TRON_TESTNET` | Tron |
 | Bitcoin | `BITCOIN_MAINNET` | Bitcoin |
 | Bitcoin Testnet (testnet) | `BITCOIN_TESTNET` | Bitcoin |
 
@@ -45,7 +46,8 @@ address, and that address receives deposits on every network in the list.
 - **Knit watches only the listed networks.** Tell your customers which
   networks they can use.
 - **Tron has its own wallet.** A wallet holds EVM networks or Tron, not both.
-  A Tron wallet uses `TRON_MAINNET` only.
+  A Tron wallet uses `TRON_MAINNET`. On `https://api-dev.useknit.io` it can
+  also use `TRON_TESTNET`. See [Tron test wallets](#tron-test-wallets).
 - **Bitcoin has its own wallet.** A Bitcoin wallet has one Bitcoin network and
   no other network.
 
@@ -54,6 +56,18 @@ address, and that address receives deposits on every network in the list.
   on a network that is not in `networks`, Knit does not detect the deposit and
   does not credit your API account. Add the network first.
 </Callout>
+
+## Tron test wallets
+
+On `https://api-dev.useknit.io` you can send `TRON_TESTNET` as `network` to get
+an address on Nile, Tron's test network. Production does not accept it.
+
+- **It receives test USDT.** Use the Nile USDT token
+  `TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf`. Test coins have no value.
+- **Deposits show `USDT` on `TRON_TESTNET`.** They go to your USDT API
+  account, so tell them apart from real USDT by the network.
+- **Pay it out on `TRON_TESTNET`.** See
+  [Create a payout](/payouts/create-a-single-payout).
 
 ## Bitcoin wallets
 
